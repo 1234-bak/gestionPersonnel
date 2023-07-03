@@ -17,7 +17,7 @@ class SignatureType extends AbstractType
         $builder
         // ->add('personne')
         ->add('photo', FileType::class, [
-            'label' => "Veuillez charger une nouvelle signature, cette signature seras prioritaire sur toutes votre signature précédente  !",
+            'label' => "Veuillez charger une nouvelle signature, cette signature seras prioritaire sur toutes vos anciennes signatures  !",
             'mapped' => false,
             'required' => false,
             'constraints' => [

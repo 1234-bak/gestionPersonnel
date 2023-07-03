@@ -26,12 +26,10 @@ class DeclarationController extends AbstractController
     public function __construct(private Security $security)
     {
     }
-    #[Route('/declaration', name: 'app_declaration')]
+    #[Route('/template', name: 'app_declaration')]
     public function index(): Response
     {
-        return $this->render('declaration/index.html.twig', [
-            'controller_name' => 'DeclarationController',
-        ]);
+        return $this->render('admin-template.html.twig');
     }
     
     #[Route('/declaration/liste', name: 'declaration.liste')]

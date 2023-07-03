@@ -21,7 +21,7 @@ class PersonneController extends AbstractController
     #[Route('/index', name: 'personne')]
     public function index(): Response
     {
-        return $this->render('admin-template.html.twig');
+        return $this->render('page.html.twig');
     }
     #[Route('/personne/liste', name: 'personne.liste')]
     public function indexAll(ManagerRegistry $doctrine): Response
