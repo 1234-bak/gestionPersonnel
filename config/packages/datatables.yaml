@@ -1,0 +1,4 @@
+# datatables:
+#     assets:
+#         - jquery
+#         - datatables

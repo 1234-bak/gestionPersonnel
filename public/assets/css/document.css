@@ -1,0 +1,25 @@
+.container {
+    width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    font-family: Arial, sans-serif;
+    
+  }
+  
+  h1 {
+    text-align: center;
+  }
+  
+  #current-date {
+    font-weight: bold;
+  }
+  
+  #permission-details {
+    margin-top: 20px;
+  }
+  
+  p {
+    margin: 10px 0;
+  }
+  

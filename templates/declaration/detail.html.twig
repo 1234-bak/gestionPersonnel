@@ -1,0 +1,74 @@
+{% extends 'form-template.html.twig' %}
+
+{% block main %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h1 class="card-title">Détails de la déclaration</h1>
+                        <hr>
+
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label text-md-right">Nom du concerné:</label>
+                            <div class="col-sm-8">
+                                {{ declaration.nomconcerne }}
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label text-md-right">Prénom du concerné:</label>
+                            <div class="col-sm-8">
+                                {{ declaration.prenomconcerne }}
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label text-md-right">Date de déclaration:</label>
+                            <div class="col-sm-8">
+                                {{ declaration.datedeclaration ? declaration.datedeclaration|date('d/m/Y') : '' }}
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label text-md-right">Type de déclaration:</label>
+                            <div class="col-sm-8">
+                                {{ declaration.type ? declaration.type.libelle : '' }}
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label text-md-right">Preuve:</label>
+                            <div class="col-sm-8">
+                                {% if declaration.preuve %}
+                                    <a href="{{ asset('uploads/fichiers/' ~ declaration.preuve) }}" target="_blank" rel="noopener noreferrer">{{ declaration.preuve }}</a>
+                                {% else %}
+                                    Pas de preuve disponible
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label text-md-right">Statut:</label>
+                            <div class="col-sm-8">
+                                {{ declaration.statut }}
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label text-md-right">Programme des obsèques:</label>
+                            <div class="col-sm-8">
+                                {{ declaration.programmeobsq }}
+                            </div>
+                        </div>
+
+                        <div class="text-center d-flex flex-direction-center">
+                            <a href="{{ path('declaration.edit', {id: declaration.id}) }}" class="btn btn-primary">Modifier</a>
+                            {# <a href="{{ path('declaration.liste')}}" class="btn btn-primary">Retour</a> #}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

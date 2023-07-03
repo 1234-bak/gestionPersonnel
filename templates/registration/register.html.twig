@@ -1,0 +1,145 @@
+{% extends 'form-template.html.twig' %}
+
+{% block title %}Register{% endblock %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/form-inscription.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/show-information.css') }}">
+
+{% endblock %}
+{% block main %}
+<div class="modal">
+    <div class="modal-content">
+        <div class="nav">
+            <h3>Veuillez vérifier vos informations avant de vous inscrire</h3>
+        </div>
+        <div class="row parent">
+            <div class="col left">
+                <div class="registration-form-box">
+                    <h3 class="font-weight-bold text-center">Inscrivez-vous</h3>
+                    {{ form_start(registrationForm) }}
+                    <div class="search">
+                        <i class="fa fa-envelope"></i>
+                        {{ form_row(registrationForm.email,{
+                        'attr':{
+                            'class': 'input'
+                        }
+                    }) }}
+                    </div>
+                    <div class="search">
+                        <i class="fa fa-lock"></i>
+                        {{ form_row(registrationForm.plainPassword.first,{
+                        'attr':{
+                            'class': 'input'
+                        }
+                    }) }}
+                    </div>
+                    <div class="search">
+                        <i class="fa fa-lock"></i>
+                        {{ form_row(registrationForm.plainPassword.second,{
+                        'attr':{
+                            'class': 'input'
+                        }
+                    }) }}
+                    </div>
+                    {{ form_row(registrationForm.submit, { 
+                        'attr':{
+                            'class': 'btn'
+                        }  }) }}
+                    {{ form_end(registrationForm) }}
+                </div>
+            </div>
+            <div class="col right">
+                <div class="col-sm-8 bg-white rounded-right">
+                    <h3 class="mt-3 text-center h3">Informations</h3>
+                    <div class="row">
+                        <div class="col-sm-3 my-3">
+                            <p class="font-weight-bold">Civilite</p>
+                            <h6 class="text-muted">{{personne.civilite}}</h6>
+                        </div>
+                        <div class="col-sm-3 my-3">
+                            <p class="font-weight-bold">Nom</p>
+                            <h6 class="text-muted">{{personne.nom}}</h6>
+                        </div>
+                        <div class="col-sm-3 my-3">
+                            <p class="font-weight-bold">Prenom</p>
+                            <h6 class="text-muted">{{personne.prenom}}</h6>
+                        </div>
+                        <div class="col-sm-3 my-3">
+                            <p class="font-weight-bold">matricule</p>
+                            <h6 class="text-muted">{{personne.matricule}}</h6>
+                        </div>
+                    </div>
+                    <hr class="ligne">
+                    <div class="row">
+                        <div class="col-sm-3 my-3">
+                            <p class="font-weight-bold">Sexe</p>
+                            <h6 class="text-muted">{{personne.sexe}}</h6>
+                        </div>
+                        <div class="col-sm-3 my-3">
+                            <p class="font-weight-bold">Grade</p>
+                            <h6 class="text-muted">{{personne.grade}}</h6>
+                        </div>
+                        <div class="col-sm-3 my-3">
+                            <p class="font-weight-bold">Structure</p>
+                            <h6 class="text-muted">{{personne.structure}}</h6>
+                        </div>
+                        <div class="col-sm-3 my-3">
+                            <p class="font-weight-bold">Tél</p>
+                            <h6 class="text-muted">{{personne.telephone}}</h6>
+                        </div>
+                    </div>
+                    <hr class="ligne">                   
+                    <div class="row">
+                        <div class="col-sm-3 my-3">
+                            <p class="font-weight-bold">Date de naissance</p>
+                            <h6 class="text-muted">{{personne.datenaiss|date('d-m-Y')}}</h6>
+                        </div>
+                        <div class="col-sm-3 my-3">
+                            <p class="font-weight-bold">Lieu de naissance</p>
+                            <h6 class="text-muted">{{personne.lieunaiss}}</h6>
+                        </div>
+                        <div class="col-sm-3 my-3">
+                            <p class="font-weight-bold">Fonction</p>
+                            <h6 class="text-muted">{{personne.emploi}}</h6>
+                        </div>
+                        <div class="col-sm-3 my-3">
+                            <p class="font-weight-bold">service</p>
+                            <h6 class="text-muted">{{personne.service.designation}}</h6>
+                        </div>
+                    </div>
+                    <hr class="ligne">
+                    <div class="row">                      
+                        <div class="col-sm-6 my-3">
+                            <p class="font-weight-bold">Direction</p>
+                            <h6 class="text-muted">{{personne.direction.designation}}</h6>
+                        </div>
+                        <div class="col-sm-6 my-3">
+                            <p class="font-weight-bold">Sous direction</p>
+                            <h6 class="text-muted">{{personne.sousdirection.designation}}</h6>
+                        </div>
+                    </div>
+                    <hr class="ligne">
+                    <div class="row">
+                        <div class="col-sm-4 my-3">
+                            <p class="font-weight-bold">Nom du père</p>
+                            <h6 class="text-muted">{{personne.nompere}}</h6>
+                        </div>
+                        <div class="col-sm-4 my-3">
+                            <p class="font-weight-bold">Nom de la mère</p>
+                            <h6 class="text-muted">{{personne.nommere}}</h6>
+                        </div>
+                        <div class="col-sm-4 my-3">
+                            <p class="font-weight-bold">Nombre d'enfant</p>
+                            <h6 class="text-muted">{{personne.nbreenfant}}</h6>
+                        </div>
+                        
+                    </div>
+                    <hr class="ligne">
+                    <div class="row">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

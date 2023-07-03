@@ -1,0 +1,102 @@
+{% extends 'liste-template.html.twig' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{asset('assets/css/datatables/tables-style.css')}}">
+    <link rel="stylesheet" href="{{asset('assets/css/edit-agent.css')}}">
+{% endblock %}
+
+{% block main %}
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="data_table">
+                    <table id="example" class="table table-striped table-bordered">
+                        <a href="{{path('role.edit')}}" id="btn" class="btn">Ajouter un nouveau role</a>
+                        <thead>
+                            <tr>
+                                <th class="head"></th>
+                                <th class="head">Libellé</th>
+                                <th class="head descripTitle">Description</th>
+                                <th class="head">Privilèges</th>
+                                <th class="head">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for role in roles %}
+                                {% set privilegeCount = role.privilege|length %}
+                                {% for loopIndex, privilege in role.privilege %}
+                                    <tr data-privilege-id="{{ privilege.id }}" data-role-id="{{ role.id }}">
+                                        {% if loopIndex == 0 %}
+                                            <td rowspan="{{ privilegeCount }}">
+                                                <input type="checkbox" name="roles[]" class="personne-checkbox" value="{{ role.id }}">
+                                            </td>
+                                            <td rowspan="{{ privilegeCount }}">{{ role.libelle }}</td>
+                                            <td rowspan="{{ privilegeCount }}">{{ role.description }}</td>
+                                            <td>{{ privilege.libelle }}</td>
+                                            <td rowspan="{{ privilegeCount }}" class="action">
+                                                <div class="dropdown">
+                                                    <button class="btn dropdown-toggle" type="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    </button>
+                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                                        <li><a class="dropdown-item lien" href="{{ path('role.detail', {id: role.id}) }}"><i class="fa-regular fa-circle-info"></i> Voir plus</a></li>
+                                                        <li><a id="lien" class="dropdown-item lien" onclick="showModal('lien')" href="{{ path('role.edit', {id: role.id}) }}"><i class="fa fa-user-pen"></i> Editer</a></li>
+                                                        <li><a class="dropdown-item lien" href="{{ path('role.delete', {id: role.id}) }}"><i class="fa fa-trash"></i> Supprimer</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        {% else %}
+                                            <td>{{ privilege.libelle }}</td>
+                                        {% endif %}
+                                    </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="dataTables_paginate">
+                        <!-- Éléments de pagination générés par DataTables -->
+                        <!-- ... -->
+                    </div>
+                    <button id="btnSupprimer" class="btn" data-delete-url="{{ path('role.delete_multiple') }}">Supprimer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+      $(document).ready(function() {
+        $('.dropdown-toggle').dropdown();
+      });
+    </script>
+    <script>
+        $(document).ready(function() {
+            $('#btnSupprimer').on('click', function() {
+                var rolesSelectionnees = [];
+                $('input.role-checkbox:checked').each(function() {
+                    rolesSelectionnees.push($(this).val());
+                });
+
+                var deleteUrl = $(this).data('delete-url');
+
+                $.ajax({
+                    url: deleteUrl,
+                    method: 'POST',
+                    data: { roles: JSON.stringify(rolesSelectionnees) },
+                    success: function(response) {
+                        alert(response.message);
+                        // Suppression réussie, mettez à jour l'affichage de la liste des roles ou effectuez une redirection
+                        window.location.reload(); // Recharge la page pour mettre à jour la liste
+                    },
+                    error: function(xhr, status, error) {
+                        console.log(xhr.responseText);
+                        alert('Une erreur est survenue lors de la suppression.');
+                    }
+                });
+            });
+        });        
+    </script>
+    <script src="{{ asset('assets/js/datatables/init.js') }}"></script>
+    <script src="{{asset('assets/js/modal.js')}}"></script>
+   
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'form-template.html.twig' %}
+
+{% block title %}Log in !{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/css/login.css') }}">
+
+{% endblock %}
+
+{% block main %}
+<div class="modal vh-100" style="background-repeat: no-repeat; background-position: right top; background-attachement: fixed; background-image: url('{{asset('assets/img/ministre.jpg')}}'); background-size: cover">
+    <div class="modal-content">
+        <form method="post">
+            {% if error %}
+                <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
+
+            {% if app.user %}
+                <div class="mb-3 notice">
+                    Vous êtes inscrit avec le compte <span class="email">{{ app.user.userIdentifier }},</span> <a class="deconnexion" href="{{ path('app_logout') }}">Deconnexion</a>
+                </div>
+            {% endif %}
+
+            <h1 class="titre mb-3 font-weight-bold text-center">Connectez-vous</h1>
+            <div class="search">
+                <label for="inputEmail">Email</label>
+                <i class="fas fa-envelope"></i>
+                <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
+            
+            </div>
+            <div class="search">
+                <label for="inputPassword">Mot de passe</label>
+                <i class="fas fa-lock"></i>
+                <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+            
+            </div>
+            {# <div class="search">
+                <i class="fas fa-lock"></i>
+                <input class="input" type="hidden" name="_csrf_token"
+                value="{{ csrf_token('authenticate')}}">
+            
+            </div> #}
+            <input type="hidden" name="_csrf_token"
+                value="{{ csrf_token('authenticate') }}"
+            >
+
+        {#     
+                Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
+                See https://symfony.com/doc/current/security/remember_me.html #}
+
+
+                {# <div class="checkbox mb-3">
+                    <label>
+                        <input type="checkbox" name="_remember_me"> Remember me
+                    </label>
+                </div>  #}
+
+            <button class="btn mt-2" type="submit">
+                Se connecter
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

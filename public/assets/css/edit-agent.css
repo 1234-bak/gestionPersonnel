@@ -1,0 +1,101 @@
+
+:root {
+	--poppins: 'Poppins', sans-serif;
+	--lato: 'Lato', sans-serif;
+
+	--light: #F9F9F9;
+	--blue: #3C91E6;
+	--light-blue: #CFE8FF;
+	--grey: #eee;
+	--dark-grey: #AAAAAA;
+	--dark: #342E37;
+	--red: #DB504A;
+	--yellow: #FFCE26;
+	--light-yellow: #FFF2C6;
+	--orange: #fd4600;
+	--light-orange: #FFE0D3;
+	--green: #036d00;
+	--green-forest:#228B22;
+}
+
+.modal {
+    display: none;
+    z-index: 9999;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+.modal-content {
+    position: absolute;
+    top: 10px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    left: 50%; 
+    transform: translateX(-50%);
+    max-width: 800px; /* Limite la largeur maximale du modal */
+    max-height: 2000px;
+}
+.modal-close {
+    float: right;
+    cursor: pointer;
+    font-size: 30px;
+    font-weight: bolder;
+    color: #ccc;
+}
+
+.titre{
+    color: var(--green);
+}
+.email{
+    color: orange;
+}
+.deconnexion{
+    color: var(--green);
+}
+
+.search{
+    position: relative;
+}
+.search .form-control{
+    /* margin-left: 50px; */
+    width: 80%;
+    border-top: none;
+    border-left: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+.search .form-control:focus{
+    box-shadow: none;
+    border: 2px solid orange;
+
+}
+
+.search .fa-envelope{
+position: absolute;
+top: 35px;
+left: 16px;
+color: orange;
+
+}
+
+.search .fa-lock{
+    position: absolute;
+    top: 35px;
+    left: 16px;
+    color: orange;
+    
+}
+
+.btn{
+    background-color: var(--green);
+    color: white;
+}
+
+.btn:hover{
+    background-color: green;
+    color: white;
+}
+

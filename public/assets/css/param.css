@@ -1,0 +1,15 @@
+    #param-div {
+        border: px solid black;
+        position: fixed;
+        top: 0;
+        right: -300px; /* Définissez la valeur initiale à la largeur souhaitée de la div des paramètres */
+        width: 300px; /* Définissez la largeur de la div des paramètres */
+        height: 100vh; /* Définissez la hauteur de la div des paramètres pour couvrir toute la hauteur de la page */
+        background-color: #f1f1f1;
+        transition: right 0.3s ease-out; /* Définissez la durée et la fonction de transition souhaitées */
+        z-index: 9999; /* Assurez-vous que la div des paramètres est en avant-plan */
+    }
+
+    #param-div.open {
+        right: 0; /* Définissez la position finale de la div des paramètres après le clic */
+    }

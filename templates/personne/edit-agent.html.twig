@@ -1,0 +1,270 @@
+{% extends 'liste-template.html.twig' %}
+
+{% block stylesheets %}
+    
+    <link rel="stylesheet" href="{{asset('assets/css/datatables/tables-style.css')}}">
+    <link rel="stylesheet" href="{{asset('assets/css/edit-agent.css')}}">
+    <style>
+    .action .btn:hover{
+    background-color: orange;
+    color: white;
+    }
+
+    .lien:hover{
+        background: var(--green);
+    }
+
+    #btnAction{
+        background-color: var(--orange);
+        color: white;
+    }
+
+    #btnAction:hover{
+        background-color: orange;
+        color: white;
+    }
+
+    .fa-trash , .fa-user-pen, .fa-circle-info{
+        color: orange;
+    }
+    .modal {
+        display: flex;
+        align-items: center;
+        justify-content:center;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+    .modal-content {
+        position: absolute;
+        top: 10px;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 5px;
+        left: 50%; 
+        transform: translateX(-50%);
+        max-width: 800px; /* Limite la largeur maximale du modal */
+        max-height: 2000px;
+    }
+
+    </style>
+{% endblock %}
+
+{% block main %}
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <a href="{{path('personne.liste')}}"><span id="modal-close" class="modal-close">&times;</span></a>
+            <h3 class="font-weight-bold text-center">Enregistrement d'un agent</h3>
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+            <div class="row">
+                <div class="search">
+                        {# <i class="fa fa-envelope"></i> #}
+                        {{ form_row(form.nom,{
+                        'attr':{
+                            'class': 'input'
+                        }
+                    }) }}
+                    </div>
+                <div class="search">
+                        {# <i class="fa fa-envelope"></i> #}
+                        {{ form_row(form.prenom,{
+                        'attr':{
+                            'class': 'input'
+                        }
+                    }) }}
+                    </div>
+            </div>
+            <div class="search">
+                        {# <i class="fa fa-envelope"></i> #}
+                        {{ form_row(form.matricule,{
+                        'attr':{
+                            'class': 'input'
+                        }
+                    }) }}
+            </div>
+            <div class="search">
+                        {# <i class="fa fa-envelope"></i> #}
+                        {{ form_row(form.civilite,{
+                        'attr':{
+                            'class': 'input'
+                        }
+                    }) }}
+            </div>
+            <div class="search">
+                        {# <i class="fa fa-envelope"></i> #}
+                        {{ form_row(form.structure,{
+                        'attr':{
+                            'class': 'input'
+                        }
+                    }) }}
+            </div>
+            <div class="search">
+                        {# <i class="fa fa-envelope"></i> #}
+                        {{ form_row(form.emploi,{
+                        'attr':{
+                            'class': 'input'
+                        }
+                    }) }}
+            </div>
+            <div class="search">
+                        {# <i class="fa fa-envelope"></i> #}
+                        {{ form_row(form.service) }}
+            </div>
+            <div class="search">
+                        {# <i class="fa fa-envelope"></i> #}
+                        {{ form_row(form.direction) }}
+            </div>
+            <div class="search">
+                        {# <i class="fa fa-envelope"></i> #}
+                        {{ form_row(form.sousdirection) }}
+            </div>
+            <div class="search">
+                        <i class=""></i>
+                        {{ form_row(form.datenaiss,{
+                        'attr':{
+                            'class': 'input'
+                        }
+                    }) }}
+            </div>
+            <div class="search">
+                        {# <i class="fa fa-envelope"></i> #}
+                        {{ form_row(form.lieunaiss,{
+                        'attr':{
+                            'class': 'input'
+                        }
+                    }) }}
+            </div>
+            <div class="search">
+                        {# <i class="fa fa-envelope"></i> #}
+                        {{ form_row(form.nompere,{
+                        'attr':{
+                            'class': 'input'
+                        }
+                    }) }}
+            </div>
+            <div class="search">
+                        {# <i class="fa fa-envelope"></i> #}
+                        {{ form_row(form.nommere,{
+                        'attr':{
+                            'class': 'input'
+                        }
+                    }) }}
+            </div>
+            <div class="search">
+                        {# <i class="fa fa-envelope"></i> #}
+                        {{ form_row(form.nbreenfant,{
+                        'attr':{
+                            'class': 'input'
+                        }
+                    }) }}
+            </div>
+            <div class="search">
+                        {# <i class="fa fa-envelope"></i> #}
+                        {{ form_row(form.grade,{
+                        'attr':{
+                            'class': 'input'
+                        }
+                    }) }}
+            </div>
+            <div class="search">
+                        {# <i class="fa fa-envelope"></i> #}
+                        {{ form_row(form.sexe,{
+                        'attr':{
+                            'class': 'input'
+                        }
+                    }) }}
+            </div>
+            <div class="search">
+                        {# <i class="fa fa-envelope"></i> #}
+                        {{ form_row(form.telephone,{
+                        'attr':{
+                            'class': 'input'
+                        }
+                    }) }}
+            </div>
+            <div class="search">
+                        {# <i class=""></i> #}
+                        {{ form_row(form.photo,{
+                        'attr':{
+                            'class': 'input'
+                        }
+                    }) }}
+            </div>
+            {{ form_row(form.editer, {'attr': {'class': 'orange-button'}}) }}
+            {{ form_end(form) }}
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="data_table">
+                    <table id="example" class="table table-striped table-bordered">
+                        <a href="{{path('personne.edit')}}" id="btn" class="btn">Ajouter une nouvelle personne</a>
+                        <thead>
+                            <tr>
+                                <th class="head"></th>
+                                <th class="head">Matricule</th>
+                                <th class="head">Nom</th>
+                                <th class="head">Prenom</th>
+                                <th class="head">Emploi</th>
+                                <th class="head">Direction</th>
+                                <th class="head">Date de naissance</th>
+                                <th class="head">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for personne in personnes %}
+                                <tr class="table-{% if loop.index is odd %}success{% else %}warning{% endif %}">
+                                    <td class="custom-checkbox"><input type="checkbox" class="personne-checkbox" value="{{personne.id}}"></td>
+                                    <td>{{personne.matricule}}</td>
+                                    <td>{{personne.nom}}</td>
+                                    <td>{{personne.prenom}}</td>
+                                    <td>{{personne.emploi}}</td>
+                                    <td>{{personne.direction.designation}}</td>
+                                    <td>{{ personne.datenaiss|date('Y-m-d') }}</td>
+                                    <td class="action">
+                                        <div class="dropdown">
+                                            <button class="btn dropdown-toggle" type="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                                <li><a class="dropdown-item lien" href="{{ path('personne.detail', {id: personne.id}) }}"><i class="fa-regular fa-circle-info"></i> Voir plus</a></li>
+                                                <li><a id="lien" class="dropdown-item lien" href="{{ path('personne.edit', {id: personne.id}) }}"><i class="fa fa-user-pen"></i> Editer</a></li>
+                                                <li><a class="dropdown-item lien" href="{{ path('personne.delete', {matricule: personne.matricule}) }}"><i class="fa fa-trash"></i> Supprimer</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="dataTables_paginate">
+                        <!-- Éléments de pagination générés par DataTables -->
+                        <!-- ... -->
+                    </div>
+                    <button id="btnAction" class="btn">Lancer l'action</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+      $(document).ready(function() {
+        $('.dropdown-toggle').dropdown();
+        
+      });
+    </script>
+    <script>
+        $(document).ready(function() {
+          $('.select2').select2();
+        });
+    </script>
+    <script src="{{ asset('assets/js/datatables/init.js') }}"></script>
+    <script src="{{asset('assets/js/modal.js')}}"></script>
+    
+   
+{% endblock %}

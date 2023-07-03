@@ -1,0 +1,105 @@
+{% extends 'form-template.html.twig' %}
+
+{% block title %}Informations de la personne{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{asset('assets/css/detail.css')}}">
+{% endblock %}
+
+{% block main %}
+    <div class="img-profile">
+        <img src="{{ asset('uploads/image_personne/' ~ personne.image)}}" alt="Photo de profil">
+    </div>
+    <p class="text-center notice mb-5">
+        Veuillez vérifier vos informations et cliquer sur le bouton
+        <a href="{{ path('app_register', { matricule: personne.matricule, datenaiss: personne.datenaiss|date('Y-m-d') }) }}">Suivant</a>
+    </p>
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <th>Matricule:</th>
+                                    <td>{{ personne.matricule }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Civilité:</th>
+                                    <td>{{ personne.civilite }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Nom:</th>
+                                    <td>{{ personne.nom }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Prénom:</th>
+                                    <td>{{ personne.prenom }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Structure:</th>
+                                    <td>{{ personne.structure }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Emploi:</th>
+                                    <td>{{ personne.emploi }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Service:</th>
+                                    <td>{{ personne.service }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Direction:</th>
+                                    <td>{{ personne.direction }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Sous-direction:</th>
+                                    <td>{{ personne.sousdirection }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-sm-6">
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <th>Date de naissance:</th>
+                                    <td>{{ personne.datenaiss|date('d/m/Y') }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Lieu de naissance:</th>
+                                    <td>{{ personne.lieunaiss }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Nom du père:</th>
+                                    <td>{{ personne.nompere }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Nom de la mère:</th>
+                                    <td>{{ personne.nommere }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Nombre d'enfants:</th>
+                                    <td>{{ personne.nbreenfant }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Grade:</th>
+                                    <td>{{ personne.grade }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Sexe:</th>
+                                    <td>{{ personne.sexe }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Téléphone:</th>
+                                    <td>{{ personne.telephone }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

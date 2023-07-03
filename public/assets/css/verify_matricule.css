@@ -1,0 +1,119 @@
+    :root {
+        --poppins: 'Poppins', sans-serif;
+        --lato: 'Lato', sans-serif;
+
+        --light: #F9F9F9;
+        --blue: #3C91E6;
+        --light-blue: #CFE8FF;
+        --grey: #eee;
+        --dark-grey: #AAAAAA;
+        --dark: #342E37;
+        --red: #DB504A;
+        --yellow: #FFCE26;
+        --light-yellow: #FFF2C6;
+        --orange: #fd4600;
+        --light-orange: #FFE0D3;
+        --green: #036d00;
+        --green-forest:#228B22;
+    }
+    /* Styles pour la boîte modale */
+    .modal {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /* position: fixed; */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        
+    }
+    
+    .modal-content {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 5px;
+        margin: 0 20px; /* Ajoute une marge de 20px à gauche et à droite */
+        max-width: 800px; /* Limite la largeur maximale du modal */
+        height: 400px;
+        background-color: rgba(0, 0, 0, 0.2);
+    }
+    .modal-content .card{
+        background: linear-gradient(45deg,var(--orange),var(--green));
+        color: var(--light);
+        font-weight: bold;
+    }
+    .modal-content .notice{
+        color: #fff;
+    }
+    .modal-content .notice span{
+        color: orange;
+        font-weight: bold;
+    }
+  
+    /* Styles pour l'input et l'icone */
+    .search{
+        position: relative;
+        color: #fff;
+        font-weight: bold;
+    }
+    .search .input{
+        margin-left: 50px;
+        width: 80%;
+        border-top: none;
+        border-left: none;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .search .input:focus{
+        box-shadow: none;
+        border: 2px solid orange;
+    
+    }
+    
+    .search .fa-lock{
+    position: absolute;
+    top: 43px;
+    left: 16px;
+    color: orange;
+    
+    }
+
+    .date-input{
+        margin-left: 50px;
+        width: 80%;
+        border-top: none;
+        border-left: none;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .date-input:focus{
+        box-shadow: none;
+        border: 2px solid orange;
+    
+    }
+    /* Styles pour le bouton de couleur orange */
+    .orange-button {
+        background-color: var(--orange);
+        color: #fff;
+        
+    }
+    .orange-button:hover{
+        background-color: orange;
+        color: white;
+    }
+    .alert {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 80%;
+        z-index: 9999; /* Valeur élevée pour afficher par-dessus le modal système */
+    }
+
+    .modal{
+        animation : backgroundAnimation 10s infinite alternate;
+    }
+
+    @keyframes backgroundAnimation{
+        0% {background-position: right top;}
+        100% {background-position: left bottom;}
+    }

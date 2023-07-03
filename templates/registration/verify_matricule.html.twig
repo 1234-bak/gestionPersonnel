@@ -1,0 +1,53 @@
+
+    {% extends 'form-template.html.twig' %}
+    
+    {% block stylesheets %}
+        <link rel="stylesheet" href="{{asset('assets/css/verify_matricule.css')}}">
+    {% endblock %}
+
+    {% block title %}
+        Vérification
+    {% endblock %}
+
+    {% block main %}
+        <div class="modal vh-100" style="background-repeat: no-repeat; background-position: right top; background-attachement: fixed; background-image: url('{{asset('assets/img/ministre.jpg')}}'); background-size: cover">
+        <div class="modal-content">
+            <div class="card mb-3 card-top">
+                <div class="card-body text-center">
+                    Ministère de la Fonction Publique: 
+                    Module Gestion du personnel
+                </div>
+            </div>
+            <p class="text-center notice mb-3">Veuillez renseignez votre <span>matricule</span> et votre <span>date de naissance</span> pour une vérfication</p>
+            
+            <!-- Votre code Twig ici -->
+            {{ form_start(form) }}
+            {# {{ form_row(form.matricule, {'attr': {'class': 'white-input'}}) }} #}
+            <div class="search">
+                {{ form_row(form.matricule,{
+                'attr':{
+                    'placeholder': '000000A',
+                    'class': 'input'
+                }
+                }) }}
+            </div>
+            <div class="search">
+                {{ form_row(form.datenaiss,{
+                'attr':{
+                    'class': 'input'
+                }
+                }) }}
+            </div>
+
+            {{ form_row(form.submit, {'attr': {'class': 'orange-button'}}) }}
+                
+            {{ form_end(form) }}
+        </div>
+    </div>
+    {% endblock %}
+    {% block javascripts %}
+        
+    {% endblock %}
+    
+{# </body>
+</html> #}

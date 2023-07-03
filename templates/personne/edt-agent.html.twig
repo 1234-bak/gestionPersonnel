@@ -1,0 +1,222 @@
+{% extends 'form-template.html.twig' %}
+
+{% block title %}
+    formulaire d'enregistrement des personnes
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{asset('assets/css/edit-agent.css')}}">
+
+{% endblock %}
+
+
+{% block main %}
+<style>
+    .action .btn:hover{
+    background-color: orange;
+    color: white;
+}
+
+.lien:hover{
+    background: var(--green);
+}
+
+#btnAction{
+    background-color: var(--orange);
+    color: white;
+}
+
+#btnAction:hover{
+    background-color: orange;
+    color: white;
+}
+
+.fa-trash , .fa-user-pen, .fa-circle-info{
+    color: orange;
+}
+.modal {
+    display: flex;
+    align-items: center;
+    justify-content:center;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+.modal-content {
+    position: absolute;
+    top: 10px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    left: 50%; 
+    transform: translateX(-50%);
+    max-width: 800px; /* Limite la largeur maximale du modal */
+    max-height: 2000px;
+}
+
+</style>
+<div class="modal">
+    <div class="modal-content">
+    <h3 class="font-weight-bold text-center">Enregistrement d'un agent</h3>
+    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+    <div class="row">
+        <div class="search">
+                <i class="fa fa-envelope"></i>
+                {{ form_row(form.nom,{
+                'attr':{
+                    'class': 'input'
+                }
+            }) }}
+            </div>
+        <div class="search">
+                <i class="fa fa-envelope"></i>
+                {{ form_row(form.prenom,{
+                'attr':{
+                    'class': 'input'
+                }
+            }) }}
+            </div>
+    </div>
+    <div class="search">
+                <i class="fa fa-envelope"></i>
+                {{ form_row(form.matricule,{
+                'attr':{
+                    'class': 'input'
+                }
+            }) }}
+    </div>
+    <div class="search">
+                <i class="fa fa-envelope"></i>
+                {{ form_row(form.civilite,{
+                'attr':{
+                    'class': 'input'
+                }
+            }) }}
+    </div>
+    <div class="search">
+                <i class="fa fa-envelope"></i>
+                {{ form_row(form.structure,{
+                'attr':{
+                    'class': 'input'
+                }
+            }) }}
+    </div>
+    <div class="search">
+                <i class="fa fa-envelope"></i>
+                {{ form_row(form.emploi,{
+                'attr':{
+                    'class': 'input'
+                }
+            }) }}
+    </div>
+    <div class="search">
+                {# <i class="fa fa-envelope"></i> #}
+                {{ form_row(form.service,{
+                'attr':{
+                    'class': 'input'
+                }
+            }) }}
+    </div>
+    <div class="search">
+                {# <i class="fa fa-envelope"></i> #}
+                {{ form_row(form.direction,{
+                'attr':{
+                    'class': 'input'
+                }
+            }) }}
+    </div>
+    <div class="search">
+                {# <i class="fa fa-envelope"></i> #}
+                {{ form_row(form.sousdirection,{
+                'attr':{
+                    'class': 'input'
+                }
+            }) }}
+    </div>
+    <div class="search">
+                <i class=""></i>
+                {{ form_row(form.datenaiss,{
+                'attr':{
+                    'class': 'input'
+                }
+            }) }}
+    </div>
+    <div class="search">
+                <i class="fa fa-envelope"></i>
+                {{ form_row(form.lieunaiss,{
+                'attr':{
+                    'class': 'input'
+                }
+            }) }}
+    </div>
+    <div class="search">
+                <i class="fa fa-envelope"></i>
+                {{ form_row(form.nompere,{
+                'attr':{
+                    'class': 'input'
+                }
+            }) }}
+    </div>
+    <div class="search">
+                <i class="fa fa-envelope"></i>
+                {{ form_row(form.nommere,{
+                'attr':{
+                    'class': 'input'
+                }
+            }) }}
+    </div>
+    <div class="search">
+                <i class="fa fa-envelope"></i>
+                {{ form_row(form.nbreenfant,{
+                'attr':{
+                    'class': 'input'
+                }
+            }) }}
+    </div>
+    <div class="search">
+                <i class="fa fa-envelope"></i>
+                {{ form_row(form.grade,{
+                'attr':{
+                    'class': 'input'
+                }
+            }) }}
+    </div>
+    <div class="search">
+                <i class="fa fa-envelope"></i>
+                {{ form_row(form.sexe,{
+                'attr':{
+                    'class': 'input'
+                }
+            }) }}
+    </div>
+    <div class="search">
+                <i class="fa fa-envelope"></i>
+                {{ form_row(form.telephone,{
+                'attr':{
+                    'class': 'input'
+                }
+            }) }}
+    </div>
+    <div class="search">
+                <i class=""></i>
+                {{ form_row(form.photo,{
+                'attr':{
+                    'class': 'input'
+                }
+            }) }}
+    </div>
+    {{ form_row(form.editer, {'attr': {'class': 'orange-button'}}) }}
+    {{ form_end(form) }}
+    </div>
+</div>    
+{% endblock %}
+{% block javascripts %}
+    <script>
+        $(document).ready(function() {
+        $('.select2').select2();
+    });
+    </script>
+{% endblock %}
