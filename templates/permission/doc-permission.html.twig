@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permission validée</title>
+    <link rel="shortcut icon" type="image/x-icon" href="{{asset('assets/asset/img/favicon.png')}}')}}">
+
+    <link href="../../../../css?family=Roboto:300,400,500,700,900" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{asset('assets/asset/css/bootstrap.min.css')}}">
+
+    <link rel="stylesheet" href="{{asset('assets/asset/plugins/fontawesome/css/all.min.css')}}">
+    <link rel="stylesheet" href="{{asset('assets/asset/plugins/fontawesome/css/fontawesome.min.css')}}">
+
+    <link rel="stylesheet" href="{{asset('assets/asset/css/fullcalendar.min.css')}}">
+
+    <link rel="stylesheet" href="{{asset('assets/asset/css/dataTables.bootstrap4.min.css')}}">
+
+    <link rel="stylesheet" href="{{asset('assets/asset/plugins/morris/morris.css')}}">
+
+    <link rel="stylesheet" href="{{asset('assets/asset/css/style.css')}}">
+    <link rel="stylesheet" href="{{asset('node_modules/@fortawesome/fontawesome-free/css/all.min.css')}}" rel="stylsheet" />
+    <link rel="stylesheet" href="{{asset('node_modules/sweetalert2/dist/sweetalert2.min.css')}}" />
+
+</head>
+<body>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100&family=Roboto:wght@100&display=swap');
+        .logo-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        #container{
+            font-family: Robotto, Poppins sans-serif;
+        }
+
+        .title_contenair{
+            width: 60%;
+            margin: 0 auto;
+            padding: 10px;
+            text-decoration: underline;
+        }
+        h2 {
+            margin: 0 auto;
+            text-align: center;
+
+        }
+
+        .newright p {
+            margin-bottom: 0;
+        }
+      
+        .direction_info {
+            margin-bottom: 10px;
+        }
+
+        .cabinet {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .dsi {
+            text-align: center;
+            font-size: 16px;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        .date {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        } 
+        .content {
+            margin-top: 40px;
+        }
+
+        .signature-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+
+        .signature {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .signature .contenu img{
+            width: 100px;
+            height: 75px;
+        }
+
+    </style>
+    <section id="container">
+        <!--main content start-->
+        <section id="main-content mb-3" style="background-color: white;max-width: 800px;margin: 0 auto;padding: 20px;" >
+            <section class="wrapper">
+                <div class="form-w3layouts" style="background-color: white; opacity:0.8; box-shadow: rgb(38, 57, 77) 0px 1px 1px 1px;">
+                    <!-- page start -->
+
+                    <div class="row pt-3 pb-3">
+                        <div class="col-md-12">
+                            <div data-collapsed="0" class="panel">
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="logo-container ml-3 mr-3">
+                                            <div class="newleft">
+                                                <p>MINISTERE DE LA FONCTION PUBLIQUE</p>
+                                                <img class="logodoc pl-5" src="{{asset('assets/img/logomfp.jpeg')}}" alt="Coat of Arms" style="width: 150px">
+                                                <p class="text-center w-75">CABINET</p>
+                                            </div>
+                                            <div class="newright">
+                                                <p>REPUBLIQUE DE COTE D'IVOIRE</p>
+                                                <img class="logodoc pl-5" src="{{asset('assets/img/armoirie-vert.svg')}}" alt="Coat of Arms" style="width: 150px">
+                                                <p>UNION-DISCIPLINE-TRAVAIL</p>
+                                            </div>
+                                        </div>
+                                        <p class="w-75 pl-5 ml-4">
+                                                --------------
+                                        </p>
+                                        <div class="row w-100 ml-2 mr-2">
+                                            <div class=" col-md-5">
+                                                <p class="temp text-uppercase text-center">{{permission.personne.direction.designation}}</p>
+                                            </div>
+                                            <div class="date col-md-12 ">
+                                                <p>Abidjan, le {{ permission.getFormattedDatedebut() }} </p>
+                                            </div>
+                                        </div>
+                                        <div class="title_contenair mt-5 mb-2">
+                                            <h2>DEMANDE DE PERMISSION</h2>
+                                        </div>                            
+                                        <div class="content ml-3">
+                                            <p>Nom et Prénoms : <strong>{{permission.personne.nom}} {{permission.personne.prenom}}</strong></p>
+                                            <p>Emploi : <strong>{{permission.personne.fonction.designation}}</strong></p>
+                                            <p>Matricule : <strong>{{permission.personne.matricule}}</strong></p>
+                                            <p>Motif : <strong>{{permission.typepermission}}</strong></p>
+                                            <p>Durée de l'absence : <strong class="mr-5">{{permission.duree}}</strong>  Du : <strong class="mr-5"> {{ permission.getFormattedDatedebut() }}</strong>  Au :<strong> {{ permission.getFormattedDatereprise() }}</strong></p>
+                                            </div>
+
+                                            <div class="signature-row ml-3">
+                                            <div class="signature mr-5">
+                                                <div class="titre text-center">Signature de l'agent:</div>
+                                                {# <div class="contenu"><img src="{{ asset('uploads/image_signature/' ~ permission.personne.signature.path)}}" alt=""></div> #}
+                                            </div>
+                                            <div class="signature mr-5">
+                                                <div class="titre text-center">Visa du Chef de service:</div>
+                                                {# <div class="contenu"><img src="{{ asset('uploads/image_signature/' ~ permission.personne.signature.path)}}" alt=""></div> #}
+                                            </div>
+                                            <div class="signature mr-5">
+                                                <div class="titre text-center">Visa du Sous-Directeur:</div>
+                                                {# <div class="contenu"><img src="{{ asset('uploads/image_signature/' ~ permission.personne.signature.path)}}" alt=""></div> #}
+                                            </div>
+                                            <div class="signature">
+                                                <div class="titre text-center">Signature du Directeur:</div>
+                                                {# <div class="contenu"><img src="{{ asset('uploads/image_signature/' ~ permission.personne.signature.path)}}" alt=""></div> #}
+                                            </div>
+                                        </div>                                    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- page end-->
+                </div>
+            </section>
+        </section>
+        <!--main content end-->
+    </section>
+    <ul class="row d-flex justify-content-between list-unstyled text-center w-50 mt-2 mb-2" style="position:relative;left:50%;transform:translateX(-50%)">
+        {% if is_granted('ROLE_GRH') or is_granted('ROLE_MIN') or is_granted('ROLE_DIRCAB') or is_granted('ROLE_DIR') or is_granted('ROLE_SD') or is_granted('ROLE_CS') %}
+            <li class="col">
+                <a href="{{ path('permission.valider', { permissionId: permission.id }) }}" class="btn btn-success btn-sm mb-1">
+                    <i class="fas fa-check-square"></i> Valider
+                </a>
+            </li>
+            <li class="col">
+                <a href="{{ path('permission.rejeter', { permissionId: permission.id }) }}" class="btn btn-danger btn-sm mb-1">
+                    <i class="fas fa-times"></i> Rejeter
+                </a>
+            </li>
+        {% endif %}
+
+        <li class="col">
+            {% if is_granted('ROLE_GRH') %}
+                <a href="{{path('grh-permission.liste',{permissionId: permission.id})}}" class="btn btn-success btn-sm mb-1">
+                    <i class="fa-solid fa-arrow fa-arrow-left"></i>Retour
+                </a>
+            {% elseif is_granted('ROLE_DIRCAB') %}
+                <a href="{{path('dircab-permission.liste',{permissionId: permission.id})}}" class="btn btn-success btn-sm mb-1">
+                    <i class="fa-solid fa-arrow fa-arrow-left"></i>Retour
+                </a>
+            {% elseif is_granted('ROLE_DIR') %}
+                <a href="{{path('dir-permission.liste',{permissionId: permission.id})}}" class="btn btn-success btn-sm mb-1">
+                    <i class="fa-solid fa-arrow fa-arrow-left"></i>Retour
+                </a>
+            {% elseif is_granted('ROLE_SD') %}
+                <a href="{{path('sd-permission.liste',{permissionId: permission.id})}}" class="btn btn-success btn-sm mb-1">
+                    <i class="fa-solid fa-arrow fa-arrow-left"></i>Retour
+                </a>
+            {% elseif is_granted('ROLE_CS') %}
+                <a href="{{path('cs-permission.liste',{permissionId: permission.id})}}" class="btn btn-success btn-sm mb-1">
+                    <i class="fa-solid fa-arrow fa-arrow-left"></i>Retour
+                </a>
+            {% elseif is_granted('ROLE_MIN') %}
+                <a href="{{path('ministre-permission.liste',{permissionId: permission.id})}}" class="btn btn-success btn-sm mb-1">
+                    <i class="fa-solid fa-arrow fa-arrow-left"></i>Retour
+                </a>
+            {% endif %}
+        </li>
+    </ul><br><br>
+    <script src="{{asset('node_modules/sweetalert2/dist/sweetalert2.all.min.js')}}"></script>
+    <script>
+		{% for flashMessage in app.session.flashbag.get('error') %}
+			Swal.fire({
+				title: 'Erreur',
+				text: '{{ flashMessage|e }}',
+				icon: 'error'
+			});
+		{% endfor %}
+
+		{% for flashMessage in app.session.flashbag.get('success') %}
+			Swal.fire({
+				title: 'Succès',
+				text: '{{ flashMessage|e }}',
+				icon: 'success'
+			});
+		{% endfor %}
+	</script>
+</body>
+</html>

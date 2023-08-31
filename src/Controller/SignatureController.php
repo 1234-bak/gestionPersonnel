@@ -25,13 +25,23 @@ class SignatureController extends AbstractController
     }
 
     #[Route('/signature/liste', name: 'signature.liste')]
-    public function indexAll(ManagerRegistry $doctrine): Response
+    public function indexAll(ManagerRegistry $doctrine,
+    UserInterface $user,
+    Signature $signature,
+    EntityManagerInterface $entityManager
+    ): Response
     {
+        if ($user && $user->getPersonne()) {
+            $personneId = $user->getPersonne()->getId();
+        }
+        $signatureId = $signature->getPersonne()->getId();
+        $personne = $entityManager->getRepository(Personne::class)->find($personneId);
         $repository = $doctrine->getRepository(Signature::class);
-        $signatures = $repository->findAll();
-        $form = $this->createForm(SignatureType::class);
-        return $this->render('signature/liste-agent.html.twig', [
-            'signatures' => $signatures
+        $signature = $entityManager->getRepository(Signature::class)->find($signatureId);
+        return $this->render('permission/show-permission.html.twig', [
+            'signature' => $signature,
+            'personne' => $personne,
+            'user'=>$user
         ]);
     }
 
@@ -60,13 +70,13 @@ class SignatureController extends AbstractController
 
     $form->handleRequest($request);
     if ($form->isSubmitted() && $form->isValid()) {
-        $photo = $form->get('photo')->getData();
+        // $photo = $form->get('photo')->getData();
 
-        // Vérifie si une photo a été téléchargée
-        if ($photo) {
-            $directory = $this->getParameter('image_signature_directory');
-            $signature->setPath($uploaderService->uploadFile($photo, $directory));
-        }
+        // // Vérifie si une photo a été téléchargée
+        // if ($photo) {
+        //     $directory = $this->getParameter('image_signature_directory');
+        //     $signature->setPath($uploaderService->uploadFile($photo, $directory));
+        // }
 
         if ($new) {
             $personne->addSignature($signature);
@@ -86,8 +96,10 @@ class SignatureController extends AbstractController
     return $this->render('signature/edit-signature.html.twig', [
         'form' => $form->createView(),
         'signature' => $signature,
-        'personne' => $personne
+        'personne' => $personne,
+        'user' => $user
     ]);
 }
+
 
 }

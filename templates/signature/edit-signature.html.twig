@@ -52,11 +52,22 @@
 
     </style>
 {% endblock %}
-
+{% block editprofile %}
+    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Edit Profile</a>
+{% endblock %}
+{% block showprofile %}
+    <a class="dropdown-item" href="{{path('user_show',{id: user.id})}}">Edit Profile</a>
+{% endblock %}
+{% block notifpro %}
+    <img alt="John Doe" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" class="img-fluid rounded-circle">
+{% endblock %}
+{% block photoprofile %}
+    <img class="rounded-circle" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" width="30" alt="Admin">
+{% endblock %}
 {% block main %}
     <div id="modal" class="modal">
         <div class="modal-content">
-            <a href="#"><span id="modal-close" class="modal-close">&times;</span></a>
+            <a href="{{path('personne.liste')}}"><span id="modal-close" class="modal-close">&times;</span></a>
             <h3 class="font-weight-bold text-center">Ajout d'une nouvelle signature</h3>
             {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
             <div class="search">

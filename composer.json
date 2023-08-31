@@ -12,7 +12,10 @@
         "doctrine/doctrine-bundle": "^2.9",
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^2.15",
+        "dompdf/dompdf": "^2.0",
         "fakerphp/faker": "^1.22",
+        "knplabs/knp-snappy-bundle": "^1.9",
+        "nesbot/carbon": "^2.68",
         "phpdocumentor/reflection-docblock": "^5.3",
         "phpstan/phpdoc-parser": "^1.20",
         "symfony/asset": "6.2.*",
@@ -42,7 +45,10 @@
         "symfony/validator": "6.2.*",
         "symfony/web-link": "6.2.*",
         "symfony/yaml": "6.2.*",
+        "twig/cssinliner-extra": "^3.7",
         "twig/extra-bundle": "^2.12|^3.0",
+        "twig/inky-extra": "^3.7",
+        "twig/intl-extra": "^3.6",
         "twig/twig": "^2.12|^3.0"
     },
     "config": {

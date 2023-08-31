@@ -1,0 +1,143 @@
+{% extends 'user-template.html.twig' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{asset('assets/css/datatables/datatables.min.css')}}">
+    <link rel="stylesheet" href="{{ asset('assets/css/datatables/tables-style.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/edit-agent.css') }}">
+    <style>
+        .custom-radio input[type="radio"] {
+        /* Cacher l'input radio natif */
+        position: absolute;
+        opacity: 0;
+        }
+
+        .custom-radio input[type="radio"] + label {
+        /* Styles pour la représentation graphique du radio */
+        position: relative;
+        padding-left: 25px; /* Espace réservé pour le radio */
+        cursor: pointer;
+        }
+
+        .custom-radio input[type="radio"] + label:before {
+        /* Styles pour la coche du radio */
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 0;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background-color: #fff; /* Couleur de fond du radio */
+        border: 2px solid #aaa; /* Couleur de la bordure du radio */
+        }
+
+        .custom-radio input[type="radio"]:checked + label:before {
+        /* Styles pour la coche du radio lorsqu'il est sélectionné */
+        background-color: #2fdf84; /* Couleur de fond du radio lorsqu'il est sélectionné */
+        border-color: orange; /* Couleur de la bordure du radio lorsqu'il est sélectionné */
+        }
+
+    </style>
+    
+{% endblock %}
+{% block editprofile %}
+    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Editer Profile</a>
+{% endblock %}
+{% block showprofile %}
+    <a class="dropdown-item" href="{{path('user_show',{id: user.id})}}">Mon Profile</a>
+{% endblock %}
+{% block notifpro %}
+    <img alt="John Doe" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" class="img-fluid rounded-circle">
+{% endblock %}
+{% block photoprofile %}
+    <img class="rounded-circle" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" width="30" alt="Admin">
+{% endblock %}
+{% block main %}
+    <div class="page-header">
+    <div class="row">
+    <div class="col-md-6">
+    <h3 class="page-title text-lowercase mb-0">Mes permissions validées</h3>
+    </div>
+    <div class="col-md-6">
+    <button class="float-right text-muted p-1" style="border: none;" data-toggle="modal" data-target="#newpermission"><i class="fa fa-solid fa-plus"></i> nouvelle permission </button>
+    </div>
+    </div>
+    </div>
+    <div class="d-flex justify-content-center">
+        <div class="card-deck">
+            {% for permission in permissions %}
+                <a href="{{path('mespermissionvalidees.show',{id: permission.id})}}"  class="btn btn-outline-danger mr-2">
+                    <img src="{{asset('assets/asset/img/pdf.png')}}" alt="" height="18">
+                    <span class="ml-2">PDF</span>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        $(document).ready(function() {
+            $('input[name="permission[typepermission]"]').on('change', function() {
+                var selectedValue = $(this).val();
+                if (selectedValue === "autres") {
+                    $('#motif').show();
+                } else {
+                    $('#motif').hide();
+                }
+
+                var dureeInput = $('#permission_duree');
+
+                if (selectedValue === "Décès d'un ascendant ou d'un descendant en ligne directe" ) {
+                    dureeInput.val('05 jours');
+                    dureeInput.prop('readonly', true);
+                } else if (selectedValue === "Mariage de l'agent ou d'un enfant de l'agent") {
+                    dureeInput.val('02 jours');
+                    dureeInput.prop('readonly', true);
+                } else if (selectedValue === "Naissance survenue au foyer du fonctionnaire") {
+                    dureeInput.val('03 jours');
+                    dureeInput.prop('readonly', true);
+                } else {
+                    dureeInput.val('');
+                    dureeInput.prop('readonly', false);
+                }
+            });
+        });
+        
+
+        function handleDelete() {
+        event.preventDefault();
+        if (confirm('Êtes-vous sûr de vouloir supprimer ?')) {
+            console.log('Submitting delete form...');
+            var selectedPersonnes = Array.from(permissionCheckboxes)
+                .filter(function(checkbox) {
+                    return checkbox.checked;
+                })
+                .map(function(checkbox) {
+                    return checkbox.value;
+                });
+
+            var deleteForm = document.getElementById('delete-form');
+            deleteForm.querySelector('input[name="permissions"]').value = JSON.stringify(selectedPersonnes);
+
+            deleteForm.submit();
+        }
+    }
+    function showModal(elementId) {
+      const newmodal = document.getElementById('newmodal');
+      newmodal.style.display = 'block';
+  
+      }
+      function closeModal(elementId) {
+      const newmodal = document.getElementById('newmodal');
+      newmodal.style.display = 'none';
+    
+    }
+    
+    </script>
+    <script src="{{ asset('assets/js/datatables/datatables.min.js') }}"></script>
+    <script src="{{ asset('assets/js/datatables/datatables.bootstrap5.min.js') }}"></script>
+    <script src="{{ asset('assets/js/datatables/init.js') }}"></script>
+    <script src="{{asset('assets/js/newmodal.js')}}"></script>
+{% endblock %}

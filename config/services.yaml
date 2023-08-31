@@ -7,7 +7,7 @@ parameters:
     image_personne_directory: '%kernel.project_dir%/public/uploads/image_personne'
     preuve_declaration_directory: '%kernel.project_dir%/public/uploads/preuve_declaration'
     preuve_permission_directory: '%kernel.project_dir%/public/uploads/preuve_permission'
-    image_signature_directory: '%kernel.project_dir%/public/uploads/image_permission'
+    image_signature_directory: '%kernel.project_dir%/public/uploads/image_signature'
 services:
     # default configuration for services in *this* file
     _defaults:

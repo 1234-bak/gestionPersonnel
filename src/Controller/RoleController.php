@@ -9,11 +9,12 @@ use App\Service\UploaderService;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class RoleController extends AbstractController
 {
@@ -25,16 +26,45 @@ class RoleController extends AbstractController
         ]);
     }
 
-    #[Route('/role/liste', name: 'role.liste')]
-    public function indexAll(ManagerRegistry $doctrine): Response
-    {
-        $repository = $doctrine->getRepository(Role::class);
-        $roles = $repository->findAll();
-        $form = $this->createForm(RoleType::class);
-        return $this->render('role/liste-role.html.twig', [
-            'roles' => $roles
-        ]);
+    #[Route('role/liste/{id?0}', name: 'role.liste')]
+    public function indexAll(
+    Role $role = null,
+    UserInterface $user,
+    EntityManagerInterface $entityManager,
+    Request $request,
+): Response {
+    $new = false;
+    if (!$role) {
+        $role = new Role();
+        $new = true;
     }
+
+    $form = $this->createForm(RoleType::class, $role);
+    $form->remove('createdAt');
+    $form->remove('updatedAt');
+
+    $form->handleRequest($request);
+    if ($form->isSubmitted() && $form->isValid()) {
+        if ($new) {
+            $entityManager->persist($role);
+        }
+
+        $entityManager->flush();
+
+        $message = $new ? "a été ajouté avec succès" : "a été mis à jour avec succès";
+        $this->addFlash("success", $role->getLibelle() . ' ' . $message);
+        return $this->redirectToRoute('role.liste');
+    }
+
+    $repository = $entityManager->getRepository(Role::class);
+    $roles = $repository->findAll();
+
+    return $this->render('role/liste-role.html.twig', [
+        'form' => $form->createView(),
+        'roles' => $roles,
+        'user' => $user
+    ]);
+}
 
     #[Route("/role/delete-multiple", name:"role.delete_multiple", methods:["POST"])]
     public function deleteMultiple(Request $request, EntityManagerInterface $entityManager): Response
@@ -61,6 +91,7 @@ class RoleController extends AbstractController
     #[Route('role/edit/{id?0}', name: 'role.edit')]
     public function edit(
     Role $role = null,
+    UserInterface $user,
     EntityManagerInterface $entityManager,
     Request $request,
 ): Response {
@@ -93,16 +124,17 @@ class RoleController extends AbstractController
     return $this->render('role/edit-role.html.twig', [
         'form' => $form->createView(),
         'roles' => $roles,
+        'user' => $user
     ]);
 }
     #[Route('/role/{id<\d+>}', name: 'role.detail')]
-    public function detail(Role $role = null){    
+    public function detail(Role $role = null,UserInterface $user){    
         if (!$role) {
             $this->addFlash('error',"Le role n'existe pas");
             return $this->redirectToRoute('role.liste');
 
         }
-        return $this->render('role/show-information.html.twig',['role'=>$role]);
+        return $this->render('role/show-information.html.twig',['role'=>$role,'user' => $user]);
 
     }
 

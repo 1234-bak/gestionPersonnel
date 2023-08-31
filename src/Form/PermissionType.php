@@ -14,6 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
@@ -22,19 +23,19 @@ class PermissionType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('type', EntityType::class, [
-                'class' => TypePermission::class,
-                'label' => "Veuillez choisir le motif de la demande",
-                'required' => false,
-                'attr' => [
-                    'class' => 'select2'
-                ],
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('t')
-                        ->orderBy('t.libelle', 'ASC');
-                },
-                'choice_label' => 'libelle',
-                
+        ->add('typepermission',ChoiceType::class,[
+            'choices' => [
+                "Décès d'un ascendant ou d'un descendant en ligne directe" => "Décès d'un ascendant ou d'un descendant en ligne directe",
+                "Mariage de l'agent ou d'un enfant de l'agent" => "Mariage de l'agent ou d'un enfant de l'agent",
+                "Naissance survenue au foyer du fonctionnaire" => "Naissance survenue au foyer du fonctionnaire",
+                "autres" => "autres"
+            ],
+            "expanded" => true,
+            "multiple" => false,
+            'mapped' => true, 
+            'label_attr' => ['class' => 'radio-label'],
+            'attr' => ['class' => 'radio-input'],
+
             ])
             ->add('datedebut', DateType::class, [
                 'label' => 'Date de début',
@@ -57,8 +58,15 @@ class PermissionType extends AbstractType
                     'autocomplete' => 'off',
                 ],
             ])
-            ->add('duree', TextType::class, ['label' => 'Durée de la permission'])
-            ->add('motif', TextareaType::class, ['label' => "Saisir le motif de la permission si le type n'est pas susmentionné"])
+            ->add('duree', TextType::class, [
+                'label' => 'Durée maximale de la permission',
+                'required' => false,
+                'attr' => [
+                    'readonly' => 'readonly',
+                    
+                ],
+            ])
+            ->add('motif', TextareaType::class, ['label' => "Saisir le motif de la permission"])
             ->add('statut', TextType::class, [
                 'attr' => [
                     'style' => 'none',
@@ -81,7 +89,7 @@ class PermissionType extends AbstractType
                     ]),
                 ],
             ])
-            ->add('editer', SubmitType::class)
+            ->add('envoyer', SubmitType::class)
         ;
     }
 

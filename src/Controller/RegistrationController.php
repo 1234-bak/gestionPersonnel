@@ -14,6 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\BirthdayType;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -26,19 +27,19 @@ class RegistrationController extends AbstractController
             'action' => $this->generateUrl('app_verify_matricule'),
             'method' => 'POST'
         ])
-            ->add('matricule', TextType::class, [
-                'label' => 'Matricule',
-            ])
-            ->add('datenaiss', BirthdayType::class, ['label' => 'Date de naissance',
-            'widget' => 'single_text',
-            'attr' => [
-            'autocomplete' => 'off',
-            ],
-            ])
-            ->add('submit', SubmitType::class, [
-                'label' => 'Lancer la vérification',
-            ])
-            ->getForm();
+        ->add('matricule', TextType::class, [
+            'label' => 'Matricule',
+        ])
+        ->add('datenaiss', BirthdayType::class, ['label' => 'Date de naissance',
+        'widget' => 'single_text',
+        'attr' => [
+        'autocomplete' => 'off',
+        ],
+        ])
+        ->add('submit', SubmitType::class, [
+            'label' => 'Lancer la vérification',
+        ])
+        ->getForm();
 
         $form->handleRequest($request);
 
@@ -65,9 +66,13 @@ class RegistrationController extends AbstractController
         ]);
     }
 
-    #[Route('/register/{matricule}/{datenaiss}', name: 'app_register')]
+    #[Route('/register/{matricule?0}/{datenaiss?0}', name: 'app_register')]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager, string $matricule, DateTime $datenaiss): Response
     {
+        if ($matricule === 0 || $datenaiss->getTimestamp() === 0) {
+            return $this->redirectToRoute('app_verify_matricule');
+        }
+        
         $existingPersonne = $entityManager->getRepository(Personne::class)->findOneBy(['matricule' => $matricule, 'datenaiss' => $datenaiss]);
 
         if (!$existingPersonne) {
@@ -76,30 +81,39 @@ class RegistrationController extends AbstractController
             return $this->redirectToRoute('app_verify_matricule');
         }
 
-        $user = new User();
-        $user->setPersonne($existingPersonne);
-        $matriculeUser = $user->getPersonne();
-        $form = $this->createForm(RegistrationFormType::class, $user);
-        $form->handleRequest($request);
+        try {
+            $user = new User();
+            $user->setPersonne($existingPersonne);
+            $user->setMatricule($matricule);
+            $matriculeUser = $user->getPersonne();
+            $form = $this->createForm(RegistrationFormType::class, $user);
+            $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            // encode the plain password
-            $user->setPassword(
-                $userPasswordHasher->hashPassword($user, $form->get('plainPassword')->getData())
-            );
+            if ($form->isSubmitted() && $form->isValid()) {
+                // encode the plain password
+                $user->setPassword(
+                    $userPasswordHasher->hashPassword($user, $form->get('plainPassword')->getData())
+                );
 
-            $entityManager->persist($user);
-            $entityManager->flush();
+                $entityManager->persist($user);
+                $entityManager->flush();
 
-            // do anything else you need here, like send an email
-            $this->addFlash('success',"Compte crée avec succès  ");
-            return $this->redirectToRoute('app_login');
+                // do anything else you need here, like send an email
+                $this->addFlash('success',"Compte crée avec succès ! appuyez sur la touche ok pour vous connecté ");
+                // return $this->redirectToRoute('app_login');
+            }
+        }catch (UniqueConstraintViolationException $e) {
+            // Redirigez vers la page d'erreur personnalisée avec le message d'erreur
+            $errorMessage = "Une erreur s'est produite lors de la création du compte : " . $e->getMessage();
+            $this->addFlash('error',"vous ne pouvez plus créer de compte car vous en avez dejà un");
         }
 
         return $this->render('registration/register.html.twig', [
             'registrationForm' => $form->createView(),
             'personne' => $existingPersonne,
             'matriculeUser' =>$matriculeUser,
+            'matricule' => $matricule,
+            'user' => $user
             // 'user' => $user
         ]);
     }
@@ -112,13 +126,14 @@ class RegistrationController extends AbstractController
 
         if (!$personne) {
             // Le matricule n'existe pas, afficher un message flash
-            $this->addFlash('error', 'Informations invalides.');
+            $this->addFlash('error', 'matricule ou date de naissance invalides.');
             return $this->redirectToRoute('app_verify_matricule');
         }
 
         // Afficher les informations dans une vue dédiée
         return $this->render('personne/show-information.html.twig', [
             'personne' => $personne,
+            'matricule' => $matricule
 
         ]);
     }

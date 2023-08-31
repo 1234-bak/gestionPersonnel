@@ -10,18 +10,17 @@
     {% endblock %}
 
     {% block main %}
-        <div class="modal vh-100" style="background-repeat: no-repeat; background-position: right top; background-attachement: fixed; background-image: url('{{asset('assets/img/ministre.jpg')}}'); background-size: cover">
+        <div class="modal vh-100" style="background-repeat: no-repeat; background-position: right top; background-attachement: fixed; background-image: url('{{asset('assets/asset/img/batimentmfp.jpg')}}'); background-size: cover">
         <div class="modal-content">
             <div class="card mb-3 card-top">
                 <div class="card-body text-center">
-                    Ministère de la Fonction Publique: 
-                    Module Gestion du personnel
+                    Ministère de la Fonction Publique
                 </div>
             </div>
             <p class="text-center notice mb-3">Veuillez renseignez votre <span>matricule</span> et votre <span>date de naissance</span> pour une vérfication</p>
             
             <!-- Votre code Twig ici -->
-            {{ form_start(form) }}
+            {{ form_start(form, {'attr': {'id': 'verif_form'}}) }}
             {# {{ form_row(form.matricule, {'attr': {'class': 'white-input'}}) }} #}
             <div class="search">
                 {{ form_row(form.matricule,{
@@ -42,6 +41,7 @@
             {{ form_row(form.submit, {'attr': {'class': 'orange-button'}}) }}
                 
             {{ form_end(form) }}
+            <p class="mt-2 text-light">Deja un compte ? <a href="{{path('app_login')}}" style="margin-top:5px; color:orange; font-weight:bold;"><span>Se connecter</span></a></p>
         </div>
     </div>
     {% endblock %}

@@ -1,93 +1,178 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Document Justificatif de Permission</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-    }
-    
-    .container {
-      width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-      border: 1px solid #000;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assets/asset/img/favicon.png') }}">
 
-    h1 {
-      text-align: center;
-      margin-bottom: 40px;
-    }
+    <link href="../../../../css?family=Roboto:300,400,500,700,900" rel="stylesheet">
 
-    .field {
-      margin-bottom: 20px;
-    }
+    <link rel="stylesheet" href="{{ asset('assets/asset/css/bootstrap.min.css') }}">
 
-    .field label {
-      font-weight: bold;
-    }
+    <link rel="stylesheet" href="{{ asset('assets/asset/plugins/fontawesome/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/asset/plugins/fontawesome/css/fontawesome.min.css') }}">
 
-    .field-value {
-      display: inline-block;
-      margin-left: 10px;
-    }
+    <link rel="stylesheet" href="{{ asset('assets/asset/css/fullcalendar.min.css') }}">
 
-    .photo {
-      margin-top: 20px;
-    }
+    <link rel="stylesheet" href="{{ asset('assets/asset/css/dataTables.bootstrap4.min.css') }}">
 
-    .photo label {
-      font-weight: bold;
-    }
+    <link rel="stylesheet" href="{{ asset('assets/asset/plugins/morris/morris.css') }}">
 
-    .photo img {
-      max-width: 100%;
-      max-height: 400px;
-      margin-top: 10px;
-    }
-  </style>
+    <link rel="stylesheet" href="{{ asset('assets/asset/css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('node_modules/@fortawesome/fontawesome-free/css/all.min.css') }}" rel="stylsheet" />
 </head>
 <body>
-  <div class="container">
-    <h1>Document Justificatif de Permission</h1>
-    
-    <div class="field">
-      <label>Type :</label>
-      <span class="field-value"><!-- Insérer ici la valeur du type de permission --></span>
-    </div>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100&family=Roboto:wght@100&display=swap');
+        .logo-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        #container{
+            font-family: Roboto, Poppins, sans-serif;
+        }
 
-    <div class="field">
-      <label>Date de début :</label>
-      <span class="field-value"><!-- Insérer ici la valeur de la date de début --></span>
-    </div>
+        .title_contenair{
+            width: 60%;
+            margin: 0 auto;
+            padding: 10px;
+            text-decoration: underline;
+        }
+        h2 {
+            margin: 0 auto;
+            text-align: center;
 
-    <div class="field">
-      <label>Date de fin :</label>
-      <span class="field-value"><!-- Insérer ici la valeur de la date de fin --></span>
-    </div>
+        }
 
-    <div class="field">
-      <label>Date de reprise :</label>
-      <span class="field-value"><!-- Insérer ici la valeur de la date de reprise --></span>
-    </div>
+        .newright p {
+            margin-bottom: 0;
+        }
+      
+        .direction_info {
+            margin-bottom: 10px;
+        }
 
-    <div class="field">
-      <label>Durée :</label>
-      <span class="field-value"><!-- Insérer ici la valeur de la durée --></span>
-    </div>
+        .cabinet {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
 
-    <div class="field">
-      <label>Motif :</label>
-      <span class="field-value"><!-- Insérer ici la valeur du motif --></span>
-    </div>
+        .dsi {
+            text-align: center;
+            font-size: 16px;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
 
-    <div class="photo">
-      <label>Preuve :</label>
-      <img src="" alt="Preuve de permission"><!-- Insérer ici l'URL de la photo -->
-    </div>
-  </div>
+        .date {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        } 
+        .content {
+            margin-top: 40px;
+        }
+
+        .signature-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+
+        .signature {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .signature .contenu img{
+            width: 100px;
+            height: 75px;
+        }
+
+    </style>
+    <section id="container">
+        <!--main content start-->
+        <section id="main-content mb-3" style="background-color: white;max-width: 800px;margin: 0 auto;padding: 20px;" >
+            <section class="wrapper">
+                <div class="form-w3layouts" style="background-color: white; opacity:0.8; box-shadow: rgb(38, 57, 77) 0px 1px 1px 1px;">
+                    <!-- page start -->
+                    <div class="row pt-3 pb-3">
+                        <div class="col-md-12">
+                            <div data-collapsed="0" class="panel">
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="content ml-3">
+                                            <p>Nom et Prénoms du concerné : <strong>{{ declaration.personne.nom }} {{ declaration.personne.prenom }}</strong></p>
+                                            <p>Matricule : <strong>{{ declaration.personne.matricule }}</strong></p>
+                                            <p>Type : <strong>{{ declaration.typedeclaration }}</strong></p>
+                                            <p>Motif : <strong>{{ declaration.personne.motif }}</strong></p>
+                                            <p>Date : <strong class="mr-5">{{ declaration.getFormattedDatedebut() }}</strong> </p>
+                                        </div>
+                                        <div class="signature-row ml-3">
+                                            <div class="signature mr-5">
+                                                <div class="titre text-center">Signature de l'agent qui a fait la déclaration:</div>
+                                                {# <div class="contenu"><img src="{{ asset('uploads/image_signature/' ~ declaration.personne.signature.path)}}" alt=""></div> #}
+                                            </div>
+                                            <div class="signature mr-5">
+                                                <div class="titre text-center">Signature du DRH:</div>
+                                                {# <div class="contenu"><img src="{{ asset('uploads/image_signature/' ~ declaration.personne.signature.path)}}" alt=""></div> #}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- page end-->
+                </div>
+            </section>
+        </section>
+        <!--main content end-->
+    </section>
+    <ul class="row d-flex justify-content-between list-unstyled text-center w-50 mt-2 mb-2" style="position:relative;left:50%;transform:translateX(-50%)">
+        <li class="col">
+            <a href="{{ path('declaration.valider', { declarationId: declaration.id }) }}" class="btn btn-success btn-sm mb-1">
+                <i class="fa-solid fa-square-check"></i>Valider
+            </a>
+        </li>
+        <li class="col">
+            <a href="{{ path('declaration.rejeter', { declarationId: declaration.id }) }}" class="btn btn-danger btn-sm mb-1">
+                <i class="fa-sharp fa-solid fa-xmark"></i>Rejeter
+            </a>
+        </li>
+        <li class="col">
+            {% if is_granted('ROLE_GRH') %}
+                <a href="{{ path('grh-declaration.liste', { declarationId: declaration.id }) }}" class="btn btn-success btn-sm mb-1">
+                    <i class="fa-solid fa-arrow fa-arrow-left"></i>Retour
+                </a>
+            {% elseif is_granted('ROLE_DIRCAB') %}
+                <a href="{{ path('dircab-declaration.liste', { declarationId: declaration.id }) }}" class="btn btn-success btn-sm mb-1">
+                    <i class="fa-solid fa-arrow fa-arrow-left"></i>Retour
+                </a>
+            {% elseif is_granted('ROLE_DIR') %}
+                <a href="{{ path('dir-declaration.liste', { declarationId: declaration.id }) }}" class="btn btn-success btn-sm mb-1">
+                    <i class="fa-solid fa-arrow fa-arrow-left"></i>Retour
+                </a>
+            {% elseif is_granted('ROLE_SD') %}
+                <a href="{{ path('sd-declaration.liste', { declarationId: declaration.id }) }}" class="btn btn-success btn-sm mb-1">
+                    <i class="fa-solid fa-arrow fa-arrow-left"></i>Retour
+                </a>
+            {% elseif is_granted('ROLE_CS') %}
+                <a href="{{ path('cs-declaration.liste', { declarationId: declaration.id }) }}" class="btn btn-success btn-sm mb-1">
+                    <i class="fa-solid fa-arrow fa-arrow-left"></i>Retour
+                </a>
+            {% elseif is_granted('ROLE_MIN') %}
+                <a href="{{ path('ministre-declaration.liste', { declarationId: declaration.id }) }}" class="btn btn-success btn-sm mb-1">
+                    <i class="fa-solid fa-arrow fa-arrow-left"></i>Retour
+                </a>
+            {% endif %}
+        </li>
+    </ul><br><br>
 </body>
 </html>

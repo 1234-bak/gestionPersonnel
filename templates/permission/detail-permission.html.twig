@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Document Justificatif de Permission</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100&family=Roboto:wght@100&display=swap');
+    body {
+      font-family: Robotto, Poppins sans-serif;
+      margin: 0;
+      padding: 20px;
+
+    }
+    .action{
+      margin: 0 auto
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding-left: 100px;
+      padding-right: 100px;
+      padding-top: 20px;
+      padding-bottom: 20px;
+      border: 2px solid #000;
+    }
+
+    .logo-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      width: 100px;
+    }
+    .right .logo{
+        position: relative;
+        left: 75px
+    }
+    .direction_info{
+        width: 250px;
+        position: relative;
+        left: -65px;
+    }
+    .cabinet {
+      text-align: center;
+      font-size: 18px;
+      
+    }
+
+    .divider {
+      text-align: center;
+      font-size: 20px;
+      
+    }
+
+    .dsi {
+      text-align: center;
+      font-size: 16px;
+      text-transform: UPPERCASE;
+    }
+
+    .date {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+
+    .title {
+      text-align: center;
+      font-size: 24px;
+      text-decoration: underline;
+      margin-top: 30px;
+    }
+
+    .content {
+      margin-top: 40px;
+    }
+
+    .signature-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 40px;
+    }
+
+    .signature {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .signature .contenu img{
+        width: 100px;
+        height: 75px;
+    }
+
+    .strong1, .strong2 {
+        margin-right: 100px;
+    }
+  </style>
+  <link rel="stylesheet" href="{{asset('assets/asset/css/bootstrap.min.css')}}">
+</head>
+<body>
+  <div class="container pr-3 pl-3">
+    <div class="logo-container">
+      <div class="left">
+        <img class="logo" src="{{asset('assets/img/logomfp.jpeg')}}" alt="Logo">
+      </div>
+      <div class="right">
+        <p>REPUBLIQUE DE COTE D'IVOIRE</p>
+        <img class="logo" src="{{asset('assets/img/armoirie-vert.svg')}}" alt="Coat of Arms">
+        <p>UNION-DISCIPLINE-TRAVAIL</p>
+      </div>
+    </div>
+    <div class="direction_info">
+      <p class="divider">
+        --------------
+      </p>
+      <p class="cabinet">
+        CABINET
+      </p>
+
+      <p class="divider">
+        --------------
+      </p>
+
+      <p class="dsi">
+        {{personne.direction.designation}}
+      </p>
+    </div>
+
+    <div class="date">
+      <div style="flex-grow: 1; text-align: right;">Abidjan le {{permission.datereprise|date('d-m-Y')}}</div>
+    </div>
+
+    <div class="title">
+      DEMANDE DE PERMISSION
+    </div>
+
+    <div class="content">
+      <p>Nom et Prénoms : <strong>{{personne.nom}} {{personne.prenom}}</strong></p>
+      <p>Emploi : <strong>{{personne.fonction.designation}}</strong></p>
+      <p>Matricule : <strong>{{personne.matricule}}</strong></p>
+      <p>Motif : <strong>{{permission.typepermission}}</strong></p>
+      <p>Durée de l'absence : <strong class="strong1">{{permission.duree}}</strong>  Du : <strong class="strong1"> {{permission.datedebut|date('d-m-Y')}}</strong>  Au :<strong> {{permission.datefin|date('d-m-Y')}}</strong></p>
+    </div>
+
+    <div class="signature-row">
+      <div class="signature">
+        <div class="titre">Signature de l'agent:</div>
+        {# <div class="contenu"><img src="{{ asset('uploads/image_signature/' ~ personne.signature.path)}}" alt=""></div> #}
+      </div>
+      <div class="signature">
+        <div class="titre">Visa du Chef de service:</div>
+        {# <div class="contenu"><img src="{{ asset('uploads/image_signature/' ~ personne.signature.path)}}" alt=""></div> #}
+      </div>
+      <div class="signature">
+        <div class="titre">Visa du Sous-Directeur:</div>
+        {# <div class="contenu"><img src="{{ asset('uploads/image_signature/' ~ personne.signature.path)}}" alt=""></div> #}
+      </div>
+      <div class="signature">
+        <div class="titre">Signature du Directeur:</div>
+        {# <div class="contenu"><img src="{{ asset('uploads/image_signature/' ~ personne.signature.path)}}" alt=""></div> #}
+      </div>
+    </div>
+  </div>
+  <ul class="row d-flex justify-content-between list-unstyled text-center w-50 mt-2 ml-3">
+    <li class="col">
+      <a href="{{path('permission.valider',{permissionId: permission.id})}}" class="btn btn-success btn-sm mb-1">
+        <i class="fa-solid fa-square-check"></i>Valider
+      </a>
+    </li>
+    <li class="col">
+      <a href="{{path('permission.rejeter',{permissionId: permission.id})}}" class="btn btn-danger btn-sm mb-1">
+          <i class="fa-sharp fa-solid fa-xmark"></i>Rejeter
+      </a>
+    </li>
+  </ul>
+</body>
+</html>

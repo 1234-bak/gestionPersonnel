@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="shortcut icon" type="image/x-icon" href="{{asset('assets/asset/img/favicon.png')}}')}}">
+
+    <link href="../../../../css?family=Roboto:300,400,500,700,900" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{asset('assets/asset/css/bootstrap.min.css')}}">
+
+    <link rel="stylesheet" href="{{asset('assets/asset/plugins/fontawesome/css/all.min.css')}}">
+    <link rel="stylesheet" href="{{asset('assets/asset/plugins/fontawesome/css/fontawesome.min.css')}}">
+
+    <link rel="stylesheet" href="{{asset('assets/asset/css/fullcalendar.min.css')}}">
+
+    <link rel="stylesheet" href="{{asset('assets/asset/css/dataTables.bootstrap4.min.css')}}">
+
+    <link rel="stylesheet" href="{{asset('assets/asset/plugins/morris/morris.css')}}">
+
+    <link rel="stylesheet" href="{{asset('assets/asset/css/style.css')}}">
+    <link rel="stylesheet" href="{{asset('node_modules/@fortawesome/fontawesome-free/css/all.min.css')}}" rel="stylsheet" />
+</head>
+<body>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100&family=Roboto:wght@100&display=swap');
+        .logo-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        #container{
+            font-family: Robotto, Poppins sans-serif;
+        }
+
+        .title_contenair{
+            width: 50%;
+            margin: 0 auto;
+            padding: 10px;
+            border: 2px solid #000;
+        }
+        h2 {
+            margin: 0 auto;
+            text-align: center;
+
+        }
+
+        .newright p {
+            margin-bottom: 0;
+        }
+      
+        .direction_info {
+            margin-bottom: 10px;
+        }
+
+        .cabinet {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .dsi {
+            text-align: center;
+            font-size: 16px;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        .date {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        } 
+    </style>
+    <section id="container">
+        <!--main content start-->
+        <section id="main-content mb-3" style="background-color: white;max-width: 800px;margin: 0 auto;padding: 20px;" >
+            <section class="wrapper">
+                <div class="form-w3layouts" style="background-color: white; opacity:0.8; box-shadow: rgb(38, 57, 77) 0px 1px 1px 1px;">
+                    <!-- page start -->
+
+                    <div class="row pt-3 pb-3">
+                        <div class="col-md-12">
+                            <div data-collapsed="0" class="panel">
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="logo-container ml-3 mr-3">
+                                            <div class="newleft">
+                                                <p>MINISTERE DE LA FONCTION PUBLIQUE</p>
+                                                <img class="logodoc pl-5" src="{{asset('assets/img/logomfp.jpeg')}}" alt="Coat of Arms" style="width: 150px">
+                                                <p>DIRECTEUR DE CABINET</p>
+                                            </div>
+                                            
+                                            <div class="newright">
+                                                <p>REPUBLIQUE DE COTE D'IVOIRE</p>
+                                                <img class="logodoc pl-5" src="{{asset('assets/img/armoirie-vert.svg')}}" alt="Coat of Arms" style="width: 150px">
+                                                <p>UNION-DISCIPLINE-TRAVAIL</p>
+                                            </div>
+                                        </div>
+                                        <p class="pl-5">
+                                                --------------
+                                        </p>
+                                        <div class="row w-100 ml-3 mr-3">
+                                            <div class="date col-md-12 ">
+                                                <p>Abidjan le {{ note.getFormattedDate() }} </p>
+                                            </div>                               
+                                            <div class="col-md-12 form-group"></div>
+                                            <div class=" col-md-5" data-toggle="modal" data-target="#numref">
+                                                <p class="temp">N° {{note.numref}}/MFP/CAB/DRH</p>
+                                            </div>
+                                            
+                                        </div>
+                                        <div class="title_contenair mt-5 mb-2">
+                                            <h2>Note de service</h2>
+                                        </div>
+                                        
+                                        <div class="col-md-12 form-group">
+                                            <p><strong class="underline">Destinataires: </strong> Mesdames et Messieurs</p>
+                                        </div>
+                                        <ul style="margin-left: 120px;">
+                                            <li>le Chef de Cabinet</li>
+                                            <li>l'Inspecteur Général</li>
+                                            <li>le Président du conseil de Discipline</li>
+                                            <li>les Directeurs Généraux</li>
+                                            <li>les Directeurs Centraux</li>
+                                        </ul>                                       
+                                        <div class="col-md-12 form-group">
+                                            <br><br>
+                                            <div class=" col-md-12">
+                                                <div class="panel-title" data-toggle="modal" data-target="#objet">
+                                                    Objet: {{note.objet}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {# <div class=" col-md-12" data-toggle="modal" data-target="#part1">
+                                            <p class="temp">{{note.part1}} </p>
+                                        </div>
+                                        
+                                        <div class=" col-md-12" data-toggle="modal" data-target="#part2">
+                                            <p class="temp">{{note.part2}} </p>
+                                        </div>
+                                        
+                                        
+                                        <div class=" col-md-12" data-toggle="modal" data-target="#part3">
+                                            <p class="temp">{{note.part3}} </p>
+                                        </div>
+                                        
+                                        <div class=" col-md-12" data-toggle="modal" data-target="#part4">
+                                            <p class="temp">{{note.part4}}</p>
+                                        </div>
+                                        
+                                        <div class=" col-md-12" data-toggle="modal" data-target="#part5">
+                                            <p class="temp"> {{note.part5}} </p>
+                                        </div> #}
+
+                                        <div class="col-md-12" data-toggle="modal" data-target="#contenu">
+                                            <p class="temp">
+                                                {{note.contenu}}
+                                            </p>
+                                        </div>
+                                                                            
+                                        <div class=" col-md-12" data-toggle="modal" data-target="#pj">
+                                            <p class="temp"><strong style="text-decoration: underline;"> PJ: </strong> {{note.pj}}</p>
+                                        </div>
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        <div class="col-md-8 form-group"></div>
+                                        <div class="row float-right" style="display:flex; flex-direction: column">
+                                            <div class="col form-group">
+                                                <p>Fait à Abidjan, le {{ note.getFormattedDate() }} </p>
+                                            </div>
+                                            <div class="col form-group">
+                                                <center> Nom de l'emmeteur </center>
+                                                <center> {{note.personne.nom}} {{note.personne.prenom}} </center>
+                                            </div>
+                                        </div>                                       
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- page end-->
+                </div>
+            </section>
+        </section>
+        <!--main content end-->
+    </section>
+
+    
+
+</body>
+</html>

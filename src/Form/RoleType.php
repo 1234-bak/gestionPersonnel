@@ -23,13 +23,13 @@ class RoleType extends AbstractType
             ->add('createdAt')
             ->add('updatedAt')
             ->add('privilege',EntityType::class,[
-                'expanded' => false,
+                'expanded' => true,
                 'class' => Privilege::class,
                 'required' => false,
                 'multiple' => true,
-                'attr' => [
-                    'class' => 'select2'
-                ],
+                // 'attr' => [
+                //     'class' => 'select2'
+                // ],
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('p')
                         ->orderBy('p.libelle', 'ASC');

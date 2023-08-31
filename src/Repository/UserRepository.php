@@ -56,6 +56,19 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->save($user, true);
     }
 
+    public function countAdminAndUser(): int
+    {
+        $queryBuilder = $this->createQueryBuilder('u');
+        $queryBuilder->select('COUNT(u)')
+            ->where('EXISTS(SELECT 1 FROM u.roles roleAdmin WHERE roleAdmin = :roleAdmin)')
+            ->andWhere('EXISTS(SELECT 1 FROM u.roles roleUser WHERE roleUser = :roleUser)')
+            ->setParameter('roleAdmin', 'ROLE_ADMIN')
+            ->setParameter('roleUser', 'ROLE_USER');
+
+        return (int) $queryBuilder->getQuery()->getSingleScalarResult();
+    }
+
+
 //    /**
 //     * @return User[] Returns an array of User objects
 //     */

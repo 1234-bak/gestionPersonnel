@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Carbon\Carbon;
 use App\Traits\TimeStampTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -46,17 +47,20 @@ class Permission
     #[ORM\Column(type: Types::TEXT,nullable: true)]
     private ?string $motif = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $statut = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255)]
     private ?string $preuve = null;
 
-    #[ORM\ManyToOne(inversedBy: 'permissions')]
-    private ?TypePermission $type = null;
+    // #[ORM\ManyToOne(inversedBy: 'permissions')]
+    // private ?TypePermission $type = null;
 
     #[ORM\ManyToOne(inversedBy: 'permission')]
     private ?Personne $personne = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $typepermission = null;
 
     public function getId(): ?int
     {
@@ -75,6 +79,13 @@ class Permission
         return $this;
     }
 
+    public function getFormattedDatedebut(): string
+    {
+        $carbonDatedebut = Carbon::instance($this->datedebut);
+        $formattedDatedebut = $carbonDatedebut->locale('fr')->isoFormat('D MMMM YYYY');
+        return ucfirst($formattedDatedebut);
+    }
+
     public function getDatefin(): ?\DateTimeInterface
     {
         return $this->datefin;
@@ -87,6 +98,13 @@ class Permission
         return $this;
     }
 
+    public function getFormattedDatefin(): string
+    {
+        $carbonDatefin = Carbon::instance($this->datefin);
+        $formattedDatefin = $carbonDatefin->locale('fr')->isoFormat('D MMMM YYYY');
+        return ucfirst($formattedDatefin);
+    }
+
     public function getDatereprise(): ?\DateTimeInterface
     {
         return $this->datereprise;
@@ -97,6 +115,13 @@ class Permission
         $this->datereprise = $datereprise;
 
         return $this;
+    }
+
+    public function getFormattedDatereprise(): string
+    {
+        $carbonDatereprise = Carbon::instance($this->datereprise);
+        $formattedDatereprise = $carbonDatereprise->locale('fr')->isoFormat('D MMMM YYYY');
+        return ucfirst($formattedDatereprise);
     }
 
     public function getDuree(): ?string
@@ -159,14 +184,26 @@ class Permission
         return $this;
     }
 
-    public function getType(): ?TypePermission
+    // public function getType(): ?TypePermission
+    // {
+    //     return $this->type;
+    // }
+
+    // public function setType(?TypePermission $type): self
+    // {
+    //     $this->type = $type;
+
+    //     return $this;
+    // }
+
+    public function getTypepermission(): ?string
     {
-        return $this->type;
+        return $this->typepermission;
     }
 
-    public function setType(?TypePermission $type): self
+    public function setTypepermission(string $typepermission): self
     {
-        $this->type = $type;
+        $this->typepermission = $typepermission;
 
         return $this;
     }

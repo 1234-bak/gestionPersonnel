@@ -1,293 +1,241 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Note de service</title>
+{% extends 'grh-template.html.twig' %}
+
+{% block stylesheets %}
+  <link rel="stylesheet" href="{{asset('assets/css/datatables/datatables.min.css')}}">
+  <link rel="stylesheet" href="{{ asset('assets/css/datatables/tables-style.css') }}">
+  <link rel="stylesheet" href="{{ asset('assets/css/edit-agent.css') }}">
   <style>
-    /* Styles pour la note de service */
-    .note {
-      border: 3px solid #ccc;
-      padding: 20px;
-      margin: 20px;
-      max-width: 794px;
-      font-family: Arial, sans-serif;
-      position: relative;
-      left: 50%;
-      transform: translateX(-50%);
-      height: auto;
-    }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100&family=Roboto:wght@100&display=swap');
+        .logo-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        #container{
+            font-family: Robotto, Poppins sans-serif;
+        }
 
-    /* titre de la note */
-    .note .title_contenair{
-        width: 75%;
-        background-color: #ccc;
-        margin: 0 auto;
-        padding: 10px;
-    }
+        .title_contenair{
+            width: 50%;
+            margin: 0 auto;
+            padding: 10px;
+            border: 2px solid #000;
+        }
+        h2 {
+            margin: 0 auto;
+            text-align: center;
 
-    .note .title_contenair h2 {
-      cursor: pointer;
-      margin: 0 auto;
-      text-align: center;
+        }
 
-    }
-
-    /* fin titre */
-    
-    .note .content {
-      margin-top: 20px;
-    }
-
-    .note .content p span.objet_title {
-      text-decoration: underline;
-    }
-     
-    .note .entete .logo img {
-      margin-top: 0;
-      max-width: 150px;
-      height: 75px;
-      position: relative;
-      left: 50%;
-      transform: translateX(-50%)
+        .newright p {
+            margin-bottom: 0;
+        }
       
-    }
+        .direction_info {
+            margin-bottom: 10px;
+        }
 
-    .note .entete{
-        display: flex;
-        justify-content: space-between;
-    }
+        .cabinet {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
 
-     .note .entete .right p.embleme{
-      margin-top: -25px;
-      text-align: center;
-     }
+        .dsi {
+            text-align: center;
+            font-size: 16px;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
 
-    .note .entete .right img{
-      margin-top: -10px;
-      max-width: 150px;
-      height: 75px;
-      position: relative;
-      left: 50%;
-      transform: translateX(-50%)
-    }
-
-    .desti p span{
-      text-decoration: underline;
-    }
-   
-    .note .signature {
-      text-align: right;
-      margin-top: 30px;
-      
-    }
-    .note .signature #expediteur,#signature{
-        margin-right: 20px;
-        margin-left: 60%;
-        width: 200px;
-    }
-    
-    /* Styles pour la modification du titre */
-    .edit-mode input[type="text"] {
-      border: none;
-      font-size: 24px;
-      font-weight: bold;
-      margin-bottom: 10px;
-      width: 100%;
-      height: 100px;
-    }
-    
-    .edit-mode input[type="submit"] {
-      background-color: #4CAF50;
-      border: none;
-      color: white;
-      padding: 5px 10px;
-      text-align: center;
-      text-decoration: none;
-      display: inline-block;
-      font-size: 14px;
-      margin-top: 10px;
-      cursor: pointer;
-    }
-
-    /* Styles pour la signature */
-    #signature{
-        cursor: progress;
-    }
-    #signature img {
-      max-width: 150px;
-      max-height: 100px;
-    }
-    /* Styles pour la fenêtre de modification */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0, 0, 0, 0.5);
-    }
-    
-    .modal-content {
-      background-color: #fff;
-      margin: 20% auto;
-      padding: 20px;
-      border: 1px solid #ccc;
-      max-width: 400px;
-      text-align: center;
-    }
- 
-    .modal textarea {
-      border: none;
-      font-size: 16px;
-      margin-bottom: 10px;
-      width: 100%;
-      padding: 5px;
-      resize: vertical;
-    }
-    
-    .modal input[type="submit"] {
-      background-color: #4CAF50;
-      border: none;
-      color: white;
-      padding: 5px 10px;
-      text-align: center;
-      text-decoration: none;
-      display: inline-block;
-      font-size: 14px;
-      margin-top: 10px;
-      cursor: pointer;
-    }
-    .modal-close {
-      float: right;
-      cursor: pointer;
-      font-size: 30px;
-      font-weight: bolder;
-      color: #ccc;
-    }
+        .date {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        } 
   </style>
-  <script>
-  function showModal(fieldId) {
-    const modal = document.getElementById('modal');
-    const field = document.getElementById(fieldId);
-    const fieldValue = field.value;
-    const textarea = document.getElementById('modal-textarea');
-    const submitBtn = document.getElementById('modal-submit');
-    const closeBtn = document.getElementById('modal-close');
+{% endblock %}
+{% block editprofile %}
+    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Editer Profil</a>
+{% endblock %}
+{% block editprofile2 %}
+  <li><a href="{{path('user_edit',{id: user.id})}}"><span>Créer compte agent</span></a></li>
+{% endblock %}
+{% block showprofile %}
+    <a class="dropdown-item" href="{{path('user_show',{id: user.id})}}">Mon Profile</a>
+{% endblock %}
+{% block notifpro %}
+    <img alt="John Doe" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" class="img-fluid rounded-circle">
+{% endblock %}
+{% block photoprofile %}
+    <img class="rounded-circle" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" width="30" alt="Admin">
+{% endblock %}
 
-    modal.style.display = 'block';
-    textarea.value = fieldValue;
-    textarea.focus();
+{% block main %}
+{{ form_start(form) }}
+    <section id="container">
+        <!--main content start-->
+        <section id="main-content mb-3" style="background-color: white;max-width: 800px;margin: 0 auto;padding: 20px;" >
+            <section class="wrapper">
+                <div class="form-w3layouts" style="background-color: white; opacity:0.8; box-shadow: rgb(38, 57, 77) 0px 5px 5px 5px;">
+                    <!-- page start -->
 
-    submitBtn.onclick = function() {
-      const newText = textarea.value.trim();
-      field.value = newText !== '' ? newText : '[Cliquez ici pour ajouter du texte]';
-      modal.style.display = 'none';
+                    <div class="row pt-3 pb-3">
+                        <div class="col-md-12">
+                            <div data-collapsed="0" class="panel">
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="logo-container ml-3 mr-3">
+                                            <div class="newleft">
+                                                <p>MINISTERE DE LA FONCTION PUBLIQUE</p>
+                                                <img class="logodoc pl-5" src="{{asset('assets/img/logomfp.jpeg')}}" alt="Coat of Arms" style="width: 150px">
+                                                <p>DIRECTEUR DE CABINET</p>
+                                            </div>
+                                            
+                                            <div class="newright">
+                                                <p>REPUBLIQUE DE COTE D'IVOIRE</p>
+                                                <img class="logodoc pl-5" src="{{asset('assets/img/armoirie-vert.svg')}}" alt="Coat of Arms" style="width: 150px">
+                                                <p>UNION-DISCIPLINE-TRAVAIL</p>
+                                            </div>
+                                        </div>
+                                        <p class="pl-5">
+                                                --------------
+                                        </p>
+                                        <div class="row w-100 ml-3 mr-3">
+                                            <div class="date btn-success col-md-12" data-toggle="modal" data-target="#date">
+                                                <p class="temp">Abidjan le {{note.getFormattedDate}} </p>
+                                            </div>                               
+                                            
+                                            <div class="btn-success col-md-5" data-toggle="modal" data-target="#numref">
+                                                <p class="temp">N° {{note.numref}}  /MFP/DIRCAB/DRH</p>
+                                            </div>
+                                            
+                                        </div>
+                                        <div class="title_contenair mt-5 mb-2">
+                                            <h2>Note de service</h2>
+                                        </div>
+                                        
+                                        <div class="col-md-12 form-group">
+                                            <p><strong class="underline">Destinataires: </strong> Mesdames et Messieurs</p>
+                                        </div>
+                                        <ul style="margin-left: 120px;">
+                                            <li>le Chef de Cabinet</li>
+                                            <li>l'Inspecteur Général</li>
+                                            <li>le Président du conseil de Discipline</li>
+                                            <li>les Directeurs Généraux</li>
+                                            <li>les Directeurs Centraux</li>
+                                        </ul>
+                                        <div class="col-md-12 form-group">
+                                            <br><br>
+                                            <div class="col-md-12">
+                                                <div class="btn-success panel-title" data-toggle="modal" data-target="#objet">
+                                                    <p class="temp">Objet: {{note.objet}} </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        {# <div class="btn-success col-md-12" data-toggle="modal" data-target="#part1">
+                                            <p class="temp">{{note.part1}} </p>
+                                        </div>
+                                        
+                                        <div class="btn-success col-md-12" data-toggle="modal" data-target="#part2">
+                                            <p class="temp">{{note.part2}}  </p>
+                                        </div>
+                                        
+                                        
+                                        <div class="btn-success col-md-12" data-toggle="modal" data-target="#part3">
+                                            <p class="temp">{{note.part3}}  </p>
+                                        </div>
+                                        
+                                        <div class="btn-success col-md-12" data-toggle="modal" data-target="#part4">
+                                            <p class="temp"> {{note.part4}}  </p>
+                                        </div>
+                                        
+                                        <div class="btn-success col-md-12" data-toggle="modal" data-target="#part5">
+                                            <p class="temp"> {{note.part5}}  </p>
+                                        </div> #}
 
-      // Envoie des données au serveur
-      const formData = new FormData();
-      formData.append('fieldId', fieldId);
-      formData.append('newText', newText);
+                                        <div class="btn-success col-md-12" data-toggle="modal" data-target="#contenu">
+                                            <p class="temp"> 
+                                                {{note.contenu}}
+                                            </p>
+                                        </div><br><br>
 
-      fetch('/note/edit/', {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => response.json())
-      .then(data => {
-        // Traitement des données de réponse du serveur
-      })
-      .catch(error => {
-        console.error('Une erreur s\'est produite lors de l\'envoi des données:', error);
-      });
-    };
+                                        {# <div class="col-md-12 form-group"> #}                         
+                                        <div class="btn-success col-md-12 mt-2" data-toggle="modal" data-target="#pj">
+                                            <p class="temp">Pièce jointe: {{note.pj}} </p>
+                                        </div>
 
-    closeBtn.onclick = function() {
-      modal.style.display = 'none';
-    };
-  }
-</script>
+                                        <div class="col-md-8 form-group"></div>
+                                        <div class="row float-right" style="display:flex; flex-direction: column">
+                                            <div class="col form-group">
+                                                <p>Fait à Abidjan, le {{note.getFormattedDate()}} </p>
+                                            </div>
+                                            <div class="col form-group">
+                                                <center>Nom de l'emmeteur</center>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- page end-->
+                </div>
+            </section>
+        </section>
+        <!--main content end-->
+    </section>
 
-</head>
-<body>
-  <div class="note">
-    <div class="entete">
-        <div class="logo">
-            <p>MINISTERE DE LA FONCTION PUBLIQUE</p><br>
-            <img src="{{asset('assets/img/logomfp.jpeg')}}" alt="Logo du ministère">
-            <div class="info_emmeteur">
-              <p id="emmeteur" onclick="showModal('emmeteur')">
-              {% if form.personne.vars.value is defined %}
-                {{ form.personne.vars.value }}
-              {% else %}
-                [Emmeteur]
-              {% endif %}
-              </p>
-          </div>
-        </div>
-        <div class="right">
-            <p>REPUBLIQUE DE COTE D'IVOIRE</p><br>
-            <p class="embleme">Union-Discipline-Travail</p>
-            <img src="{{asset('assets/img/armoirie.jpg')}}" alt="Logo du ministère">
-        </div>
+    {% include 'includes/templateedit/numref.html.twig' %}
+    {% include 'includes/templateedit/objet.html.twig' %}
+    {# {% include 'includes/templateedit/part1.html.twig' %}
+    {% include 'includes/templateedit/part2.html.twig' %}
+    {% include 'includes/templateedit/part3.html.twig' %}
+    {% include 'includes/templateedit/part4.html.twig' %}
+    {% include 'includes/templateedit/part5.html.twig' %} #}
+    {% include 'includes/templateedit/pj.html.twig' %}
+    {% include 'includes/templateedit/date.html.twig' %}
+    {% include 'includes/templateedit/contenu.html.twig' %}
+    <div class="mb-2 text-center">
+        {{ form_row(form.submit) }}
     </div>
-    <div class="entete">
-        <div class="numero">
-        <p id="numref" onclick="showModal('numref')">
-            {% if form.numeref.vars.value is defined %}
-              {{ form.numeref.vars.value }}
-            {% else %}
-              [numéro de référence]
-            {% endif %}
-        </p>
-      </div>
-      <div class="right">
-            Abidjan, le<span id="date" onclick="showModal('date')"> [Date d'édition]</span>
-      </div>
-    </div>
-    <div class="desti">
-        <p><span>Destinataires</span>: Mesdames et Messieurs</p>
-        <ul>
-          <li>le Chef de cabinet</li>
-          <li>l'inspecteur Général</li>
-          <li>le Président du conseil de discipline</li>
-        </ul>
-    </div>
-    <div class="title_contenair">
-        <h2>Note de service</h2>
-    </div>
-    <div class="content">
-      <p><span class="objet_title">Objet</span>:<span id="objet" onclick="showModal('objet')">
-          {% if form.numeref.vars.value is defined %}
-              {{ form.objet.vars.value }}
-          {% else %}
-            [Objet de la note]
-          {% endif %}</span>
-      </p>
-      <hr>
-      <p id="contenu" onclick="showModal('contenu')">
-          {% if form.numeref.vars.value is defined %}
-            {{ form.numeref.vars.value }}
-          {% else %}
-            [Contenu de la note de service]
-          {% endif %}
-      </p>
-    </div>
-    <div class="signature">
-        <p id="expediteur" onclick="showModal('expediteur')">[Poste de l'emmeteur]</p>
-        <p id="signature" onclick="loadSignature()">[Cliquez ici pour charger votre signature]</p>
-    </div>
-  </div>
-  <!-- Fenêtre de modification -->
-  <div id="modal" class="modal">
-    <div class="modal-content">
-      <span id="modal-close" class="modal-close">&times;</span>
-      <textarea id="modal-textarea" cols="30" rows="10"></textarea>
-      <input id="modal-submit" type="submit" value="Enregistrer">
-    </div>
-  </div>
-</body>
+{{ form_end(form) }}
+{% endblock %}
+{% block javascripts %}
+    
+    <script>
+        $(document).ready(function() {
+             $('.part-field').on('input', function() {
+                var fieldId = $(this).attr('id');
 
-</html>
-         
+                var fieldValue = $(this).val();
+
+                $('.btn-success[data-target="#' + fieldId + '"]').find('.temp').text(fieldValue);
+            });
+
+            // $('.part-field').on('input', function() {
+            //     updateContenuField();
+            // });
+
+            // function updateContenuField() {
+            //     var part1Value = $('#form_part1').val();
+            //     var part2Value = $('#form_part2').val();
+            //     var part3Value = $('#form_part3').val();
+            //     var part4Value = $('#form_part4').val();
+            //     var part5Value = $('#form_part5').val();
+
+            //     var contenuValue = part1Value + '\n' +
+            //                     part2Value + '\n' +
+            //                     part3Value + '\n' +
+            //                     part4Value + '\n' +
+            //                     part5Value;
+
+            //     $('#form_contenu').val(contenuValue);
+            // }
+            // updateContenuField();
+        });
+    </script>
+{% endblock %}

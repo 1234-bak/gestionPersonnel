@@ -14,7 +14,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-#[UniqueEntity(fields: ['email'], message: "Ce mail existe déjà, veuillez vous inscrire avec un autre mail ")]
+#[UniqueEntity(fields: ['matricule'], message: "Ce matricule existe déjà, veuillez vous inscrire avec un autre matricule ")]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use TimeStampTrait;
@@ -24,7 +24,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    private ?string $email = null;
+    private ?string $matricule = null;
 
     #[ORM\Column]
     private array $roles = [];
@@ -40,14 +40,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->id;
     }
 
-    public function getEmail(): ?string
+    public function getMatricule(): ?string
     {
-        return $this->email;
+        return $this->matricule;
     }
 
-    public function setEmail(string $email): self
+    public function setMatricule(string $matricule): self
     {
-        $this->email = $email;
+        $this->matricule = $matricule;
 
         return $this;
     }
@@ -59,7 +59,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->email;
+        return (string) $this->matricule;
     }
 
     /**
@@ -127,18 +127,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
-    // public function getMatricule(): ?string
-    // {
-    //     return $this->matricule;
-    // }
-
-    // public function setMatricule(string $matricule): self
-    // {
-    //     $this->matricule = $matricule;
-
-    //     return $this;
-    // }
-
     public function getPersonne(): ?Personne
     {
         return $this->personne;
@@ -150,6 +138,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+    
+
 
     
 

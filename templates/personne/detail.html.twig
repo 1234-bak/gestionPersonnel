@@ -5,7 +5,21 @@
 {% block stylesheets %}
     <link rel="stylesheet" href="{{asset('assets/css/detail.css')}}">
 {% endblock %}
-
+{% block editprofile %}
+    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Edit Profile</a>
+{% endblock %}
+{% block editprofile2 %}
+  <li><a href="{{path('user_edit',{id: user.id})}}"><span>Créer compte agent</span></a></li>
+{% endblock %}
+{% block showprofile %}
+    <a class="dropdown-item" href="{{path('user_show',{id: user.id})}}">Edit Profile</a>
+{% endblock %}
+{% block notifpro %}
+    <img alt="John Doe" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" class="img-fluid rounded-circle">
+{% endblock %}
+{% block photoprofile %}
+    <img class="rounded-circle" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" width="30" alt="Admin">
+{% endblock %}
 {% block main %}
     <div class="img-profile">
         <img src="{{ asset('uploads/image_personne/' ~ personne.image)}}" alt="Photo de profil">

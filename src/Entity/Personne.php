@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Carbon\Carbon;
 use App\Entity\Permission;
 use App\Entity\Declaration;
 use App\Traits\TimeStampTrait;
@@ -41,13 +42,10 @@ class Personne
     #[Assert\NotBlank(message: "Veuillez renseigner ce champ")]
     private ?string $structure = null;
 
-    #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "Veuillez renseigner ce champ")]
-    private ?string $emploi = null;
-
     #[ORM\Column(length: 20, type: "datetime")]
+    #[Assert\NotNull(message: "Veuillez renseigner la date")]
     private ?\DateTimeInterface $datenaiss = null;
-
+    
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank(message: "Veuillez renseigner ce champ")]
     private ?string $lieunaiss = null;
@@ -103,8 +101,22 @@ class Personne
     #[ORM\OneToMany(mappedBy: 'personne', targetEntity: Note::class)]
     private Collection $note;
 
-    #[ORM\OneToMany(mappedBy: 'personne', targetEntity: Signature::class)]
-    private Collection $signature;
+    // #[ORM\OneToMany(mappedBy: 'personne', targetEntity: Signature::class)]
+    // private Collection $signature;
+
+    #[ORM\ManyToOne(targetEntity: Fonction::class, inversedBy: 'personnes')]
+    #[ORM\JoinColumn(name: 'fonction_id', referencedColumnName: 'id', nullable: true)]
+    private ?Fonction $fonction = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $signature = null;
+
+    #[ORM\ManyToMany(targetEntity: Note::class, mappedBy: 'destinataire')]
+    private Collection $notes;
+
+    #[ORM\ManyToMany(targetEntity: Notification::class, mappedBy: 'destinataire')]
+    private Collection $notifications;
+
 
 
     public function __construct()
@@ -114,7 +126,9 @@ class Personne
         $this->declaration = new ArrayCollection();
         $this->permission = new ArrayCollection(); 
         $this->note = new ArrayCollection();
-        $this->signature = new ArrayCollection();
+        // $this->signature = new ArrayCollection();
+        $this->notes = new ArrayCollection();
+        $this->notifications = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -182,18 +196,6 @@ class Personne
         return $this;
     }
 
-    public function getEmploi(): ?string
-    {
-        return $this->emploi;
-    }
-
-    public function setEmploi(string $emploi): self
-    {
-        $this->emploi = $emploi;
-
-        return $this;
-    }
-
     public function getDateNaiss(): ?\DateTimeInterface
     {
         return $this->datenaiss;
@@ -204,6 +206,13 @@ class Personne
         $this->datenaiss = $datenaiss;
 
         return $this;
+    }
+
+    public function getFormattedDateNaiss(): string
+    {
+        $carbonDatenaiss = Carbon::instance($this->datenaiss);
+        $formattedDatenaiss = $carbonDatenaiss->locale('fr')->isoFormat('D MMMM YYYY');
+        return ucfirst($formattedDatenaiss);
     }
 
     public function getLieuNaiss(): ?string
@@ -452,31 +461,90 @@ class Personne
         return $this;
     }
 
-    /**
-     * @return Collection<int, Signature>
-     */
-    public function getSignature(): Collection
+    // /**
+    //  * @return Collection<int, Signature>
+    //  */
+    // public function getSignature(): Collection
+    // {
+    //     return $this->signature;
+    // }
+
+    // public function addSignature(Signature $signature): self
+    // {
+    //     if (!$this->signature->contains($signature)) {
+    //         $this->signature->add($signature);
+    //         $signature->setPersonne($this);
+    //     }
+
+    //     return $this;
+    // }
+
+    // public function removeSignature(Signature $signature): self
+    // {
+    //     if ($this->signature->removeElement($signature)) {
+    //         // set the owning side to null (unless already changed)
+    //         if ($signature->getPersonne() === $this) {
+    //             $signature->setPersonne(null);
+    //         }
+    //     }
+
+    //     return $this;
+    // }
+
+    public function getFonction(): ?Fonction
+    {
+        return $this->fonction;
+    }
+
+    public function setFonction(?Fonction $fonction): self
+    {
+        $this->fonction = $fonction;
+
+        return $this;
+    }
+
+    public function getSignature(): ?string
     {
         return $this->signature;
     }
 
-    public function addSignature(Signature $signature): self
+    public function setSignature(?string $signature): self
     {
-        if (!$this->signature->contains($signature)) {
-            $this->signature->add($signature);
-            $signature->setPersonne($this);
+        $this->signature = $signature;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Note>
+     */
+    public function getNotes(): Collection
+    {
+        return $this->notes;
+    }
+
+    /**
+     * @return Collection<int, Notification>
+     */
+    public function getNotifications(): Collection
+    {
+        return $this->notifications;
+    }
+
+    public function addNotification(Notification $notification): self
+    {
+        if (!$this->notifications->contains($notification)) {
+            $this->notifications->add($notification);
+            $notification->addDestinataire($this);
         }
 
         return $this;
     }
 
-    public function removeSignature(Signature $signature): self
+    public function removeNotification(Notification $notification): self
     {
-        if ($this->signature->removeElement($signature)) {
-            // set the owning side to null (unless already changed)
-            if ($signature->getPersonne() === $this) {
-                $signature->setPersonne(null);
-            }
+        if ($this->notifications->removeElement($notification)) {
+            $notification->removeDestinataire($this);
         }
 
         return $this;

@@ -18,8 +18,8 @@ class Signature
     #[ORM\Column(length: 255)]
     private ?string $path = null;
 
-    #[ORM\ManyToOne(inversedBy: 'signature')]
-    private ?Personne $personne = null;
+    // #[ORM\ManyToOne(inversedBy: 'signature')]
+    // private ?Personne $personne = null;
 
     public function getId(): ?int
     {
@@ -38,15 +38,15 @@ class Signature
         return $this;
     }
 
-    public function getPersonne(): ?Personne
-    {
-        return $this->personne;
-    }
+    // public function getPersonne(): ?Personne
+    // {
+    //     return $this->personne;
+    // }
 
-    public function setPersonne(?Personne $personne): self
-    {
-        $this->personne = $personne;
+    // public function setPersonne(?Personne $personne): self
+    // {
+    //     $this->personne = $personne;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 }

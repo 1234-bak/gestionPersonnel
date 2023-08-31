@@ -1,0 +1,123 @@
+{% extends 'sd-template.html.twig' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{asset('assets/css/datatables/datatables.min.css')}}">
+    <link rel="stylesheet" href="{{ asset('assets/css/datatables/tables-style.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/edit-agent.css') }}">
+    
+{% endblock %}
+{% block editprofile %}
+    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Edit Profile</a>
+{% endblock %}
+{% block showprofile %}
+    <a class="dropdown-item" href="{{path('user_show',{id: user.id})}}">Edit Profile</a>
+{% endblock %}
+{% block notifpro %}
+    <img alt="John Doe" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" class="img-fluid rounded-circle">
+{% endblock %}
+{% block photoprofile %}
+    <img class="rounded-circle" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" width="30" alt="Admin">
+{% endblock %}
+{% block main %}
+    <div class="page-header">
+    <div class="row">
+    <div class="col-md-6">
+    <h3 class="page-titl mb-0">Listes des notes de services</h3>
+    </div>
+    <div class="col-md-6">
+    <button class="float-right text-muted p-1" style="border: none;" id="edit" onclick="showModal('edit')"><i class="fa fa-solid fa-plus"></i> nouvelle note </button>
+    </div>
+    </div>
+    </div>
+    <div class="card-body mb-2" style="box-shadow: 1px 3px 5px #aaa;">
+        <div class="table-responsive ">
+            <table id="example" class="table custom-table ">
+                <thead class="thead-light">
+                <tr>
+                    <th></th>
+                    <th>Numéro de reférence </th>
+                    <th>Date d'édition</th>
+                    <th>objet</th>
+                    <th class="text-right">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for note in notes %}
+                    <tr>
+                        <td class="custom-checkbox">
+                            <input type="checkbox" name="notes[]" class="note-checkbox" value="{{ note.id }}">
+                        </td>
+                        <td>{{note.numref}}</td>
+                        <td>{{note.date|date('d-m-Y')}}</td>
+                        <td> {{note.objet}} </td>
+                        <td class="text-right">
+                            <a href="{{path('note.doc',{id: note.id})}}" class="btn btn-warning btn-sm mb-1">
+                                <i class="far fa-thin fa-eye text-light"></i>
+                            </a>
+                            <a href="{{path('note.edit',{id: note.id})}}" class="btn btn-primary btn-sm mb-1">
+                                <i class="far fa-edit"></i>
+                            </a>
+                            <a href="{{ path('note.supprimer', {noteId: note.id, personneId: personne.id}) }}" class="btn btn-danger btn-sm mb-1">
+                                <i class="far fa-trash-alt"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <td colspan="5">Vous n'avez établie aucune note de service</td>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+        
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2();
+
+            $('input[name="note[hasProgrammeObsq]"]').on('change', function() {
+                var selectedValue = $(this).val();
+                if (selectedValue === '1') {
+                    $('#programmeobsq').show();
+                } else {
+                    $('#programmeobsq').hide();
+                }
+            });
+        });
+        function handleDelete() {
+        event.preventDefault();
+        if (confirm('Êtes-vous sûr de vouloir supprimer ?')) {
+            console.log('Submitting delete form...');
+            var selectedPersonnes = Array.from(noteCheckboxes)
+                .filter(function(checkbox) {
+                    return checkbox.checked;
+                })
+                .map(function(checkbox) {
+                    return checkbox.value;
+                });
+
+            var deleteForm = document.getElementById('delete-form');
+            deleteForm.querySelector('input[name="notes"]').value = JSON.stringify(selectedPersonnes);
+
+            deleteForm.submit();
+        }
+    }
+    function showModal(elementId) {
+      const newmodal = document.getElementById('newmodal');
+      newmodal.style.display = 'block';
+  
+      }
+      function closeModal(elementId) {
+      const newmodal = document.getElementById('newmodal');
+      newmodal.style.display = 'none';
+    
+    }
+    
+    </script>
+    <script src="{{ asset('assets/js/datatables/datatables.min.js') }}"></script>
+    <script src="{{ asset('assets/js/datatables/datatables.bootstrap5.min.js') }}"></script>
+    <script src="{{ asset('assets/js/datatables/init.js') }}"></script>
+    <script src="{{asset('assets/js/newmodal.js')}}"></script>
+{% endblock %}

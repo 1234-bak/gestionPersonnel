@@ -28,12 +28,12 @@ class LoginAuthenticator extends AbstractLoginFormAuthenticator
 
     public function authenticate(Request $request): Passport
     {
-        $email = $request->request->get('email', '');
+        $matricule = $request->request->get('matricule', '');
 
-        $request->getSession()->set(Security::LAST_USERNAME, $email);
+        $request->getSession()->set(Security::LAST_USERNAME, $matricule);
 
         return new Passport(
-            new UserBadge($email),
+            new UserBadge($matricule),
             new PasswordCredentials($request->request->get('password', '')),
             [
                 (new RememberMeBadge())->enable(),
@@ -48,7 +48,32 @@ class LoginAuthenticator extends AbstractLoginFormAuthenticator
             return new RedirectResponse($targetPath);
         }
 
-        return new RedirectResponse($this->urlGenerator->generate('personne'));
+        $user = $token->getUser();
+        $roles = $user->getRoles();
+
+        if (in_array('ROLE_ADMIN', $roles)) {
+            return new RedirectResponse($this->urlGenerator->generate('admin'));
+        }
+        elseif (in_array('ROLE_GRH', $roles)) {
+            return new RedirectResponse($this->urlGenerator->generate('grh'));
+        }
+        elseif (in_array('ROLE_CS', $roles)) {
+            return new RedirectResponse($this->urlGenerator->generate('cs'));
+        } 
+        elseif (in_array('ROLE_DIR', $roles)) {
+            return new RedirectResponse($this->urlGenerator->generate('dir'));
+        } 
+        elseif (in_array('ROLE_SD', $roles)) {
+            return new RedirectResponse($this->urlGenerator->generate('sd'));
+        }
+        elseif (in_array('ROLE_DIRCAB', $roles)) {
+            return new RedirectResponse($this->urlGenerator->generate('dircab'));
+        } 
+
+        elseif (in_array('ROLE_USER', $roles)) {
+            return new RedirectResponse($this->urlGenerator->generate('user'));
+        } 
+        
     }
 
     protected function getLoginUrl(Request $request): string

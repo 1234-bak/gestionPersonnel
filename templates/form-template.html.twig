@@ -7,13 +7,13 @@
 	<!-- Inclure Bootstrap CSS -->
 	<link rel="stylesheet" href="{{asset('node_modules/bootstrap/dist/css/bootstrap.min.css')}}">
 	<link rel="stylesheet" href="{{asset('node_modules/select2/dist/css/select2.min.css')}}">
-		<link rel="stylesheet" href="{{asset('assets/css/style.css')}}">
+	<link rel="stylesheet" href="{{asset('assets/css/style.css')}}">
+	<link rel="stylesheet" href="{{asset('node_modules/sweetalert2/dist/sweetalert2.min.css')}}" />
+
 	{% block stylesheets %}
 		
 	{% endblock %}
-	<link rel="stylesheet" href="{{asset('node_modules/@fortawesome/fontawesome-free/css/all.min.css')}}" rel="stylsheet" />
-	<!-- Boxicons -->
-	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+	
 	<!-- Lien CSS -->
 
 
@@ -24,23 +24,7 @@
 
 	<!-- CONTENT -->
 	<section id="content">
-		<div class="card-body">
-			{% for message in app.session.flashBag.get('info') %}
-				<div class="alert alert-primary" role="alert">
-					{{message}}
-				</div>
-			{% endfor %}
-			{% for message in app.session.flashBag.get('success') %}
-				<div class="alert alert-success" role="alert">
-					{{message}}
-				</div>
-			{% endfor %}
-			{% for message in app.session.flashBag.get('error') %}
-				<div class="alert alert-danger" role="alert">
-					{{message}}
-				</div>
-			{% endfor %}
-		</div>
+
         {% block main %}
 		<!-- MAIN -->
 		<main>
@@ -189,8 +173,26 @@
 	<!-- Inclure Bootstrap JavaScript et les dépendances Popper.js et jQuery --> 
 	<script src="{{asset('node_modules/jquery/dist/jquery.min.js')}}"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-	<script src="{{asset('node_modules/select2/dist/js/select2.min.js')}}"></script>
 	<script src="{{asset('assets/js/script.js')}}"></script>
+
+	<script src="{{ asset('node_modules/sweetalert2/dist/sweetalert2.all.min.js') }}"></script>
+	<script>
+		{% for flashMessage in app.session.flashbag.get('error') %}
+			Swal.fire({
+				title: 'Erreur',
+				text: '{{ flashMessage|e }}',
+				icon: 'error'
+			});
+		{% endfor %}
+
+		{% for flashMessage in app.session.flashbag.get('success') %}
+			Swal.fire({
+				title: 'Succès',
+				text: '{{ flashMessage|e }}',
+				icon: 'success'
+			});
+		{% endfor %}
+	</script>
 	{% block javascripts %}
 		
 	{% endblock %}

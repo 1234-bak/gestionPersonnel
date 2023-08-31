@@ -1,0 +1,267 @@
+{% extends 'user-template.html.twig' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{asset('assets/css/datatables/datatables.min.css')}}">
+    <link rel="stylesheet" href="{{ asset('assets/css/datatables/tables-style.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/edit-agent.css') }}">
+    <style>
+        .custom-radio input[type="radio"] {
+        /* Cacher l'input radio natif */
+        position: absolute;
+        opacity: 0;
+        }
+
+        .custom-radio input[type="radio"] + label {
+        /* Styles pour la représentation graphique du radio */
+        position: relative;
+        padding-left: 25px; /* Espace réservé pour le radio */
+        cursor: pointer;
+        }
+
+        .custom-radio input[type="radio"] + label:before {
+        /* Styles pour la coche du radio */
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 0;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background-color: #fff; /* Couleur de fond du radio */
+        border: 2px solid #aaa; /* Couleur de la bordure du radio */
+        }
+
+        .custom-radio input[type="radio"]:checked + label:before {
+        /* Styles pour la coche du radio lorsqu'il est sélectionné */
+        background-color: #2fdf84; /* Couleur de fond du radio lorsqu'il est sélectionné */
+        border-color: orange; /* Couleur de la bordure du radio lorsqu'il est sélectionné */
+        }
+
+    </style>
+    
+{% endblock %}
+{% block editprofile %}
+    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Edit Profile</a>
+{% endblock %}
+{% block showprofile %}
+    <a class="dropdown-item" href="{{path('user_show',{id: user.id})}}">Edit Profile</a>
+{% endblock %}
+{% block notifpro %}
+    <img alt="John Doe" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" class="img-fluid rounded-circle">
+{% endblock %}
+{% block photoprofile %}
+    <img class="rounded-circle" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" width="30" alt="Admin">
+{% endblock %}
+{% block main %}
+    <div id="newdeclaration" class="modal fade" role="dialog" style="display: none;position: fixed;z-index: 9999;left: 0;top: 0;width: 100%;height: 100%;overflow: auto;background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content" style="position: absolute;top: 10px;background-color: #fff;padding: 20px;border-radius: 5px;left: 50%; transform: translateX(-50%);max-width: 800px;max-height: 2000px;">
+                <span data-dismiss="modal" id="close" class="newmodal-close float-right" style="cursor: pointer;font-size: 20px;font-weight: bolder;color: #ccc;">&times;</span>
+                <h3 class="font-weight-bold text-center">Faire une déclaration</h3>
+                {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+                <div class="search" style="position: relative !important">
+                    <label for="inputNom">Nom et Prénoms</label>
+                    {# <i class="fas fa-envelope"></i> #}
+                    <input type="nom" value="{{ personne.nom }} {{ personne.prenom }}" name="nom" id="inputNom" class="form-control" autocomplete="email" required autofocus readonly>
+                </div>
+
+                <div class="search mt-4" style="position: relative !important">
+                    <label for="inputEmploi">Fonction</label>
+                    {# <i class="fas fa-envelope"></i> #}
+                    <input type="email" value="{{ personne.fonction.designation }}" name="email" id="inputEmploi" class="form-control" autocomplete="email" required autofocus readonly>
+                </div>
+
+                <div class="search mt-4" style="position: relative !important">
+                    <label for="inputMatricule">Matricule</label>
+                    {# <i class="fas fa-envelope"></i> #}
+                    <input type="text" value="{{ personne.matricule }}" name="matricule" id="inputMatricule" class="form-control" autocomplete="off" required autofocus readonly>
+                </div><br>
+                {{ form_label(form.typedeclaration, 'Type de déclaration', {
+                'label_attr': {
+                    'class': 'label',
+                }
+                }) }}</br>
+                {{ form_widget(form.typedeclaration, {'attr':{'class': 'custom-radio','style': 'width: 80% !important;'}}) }}</br></br>
+                <div id="parent"  class="search" style="display: none;">
+                    {{ form_row(form.parent, {'attr': {'class': 'input'}}) }}
+                </div>
+                <div id="matriculedeces"  class="search" style="display: none;">
+                    {{ form_row(form.matriculedeces, {'attr': {'class': 'input'}}) }}
+                </div>
+                <div id="enfant"  class="search" style="display: none;">
+                    {{ form_row(form.enfant, {'attr': {'class': 'input'}}) }}
+                </div>
+                <div id="datenaiss"  class="search" style="display: none;">
+                    {{ form_row(form.datenaiss, {'attr': {'class': 'input'}}) }}
+                </div>
+                <div id="datedeces" class="search" style="display: none;">
+                    {{ form_row(form.datedeces, {'attr': {'class': 'input'}}) }}
+                </div>
+                <div class="search" style="display: none;">
+                    {{ form_row(form.statut) }}
+                </div>
+                <div id="fichiernaiss" style="display: none;">
+                    {{ form_row(form.fichiernaiss, {'attr': {'class': 'input'}}) }}
+                </div>
+                <div id="fichierdeces" style="display: none;">
+                    {{ form_row(form.fichierdeces, {'attr': {'class': 'input'}}) }}
+                </div>
+                <div class="search">
+                    <div id="hasProgrammeObsq" style="display: none;">
+                        {{ form_row(form.hasProgrammeObsq, {'attr':{'class': 'custom-radio','style': 'width: 80% !important;'}}) }}
+                    </div>
+                </div>
+                <div class="search">
+                    <div id="programmeobsq" style="display: none;">
+                        {{ form_row(form.programmeobsq) }}
+                    </div>
+                </div>
+                {{ form_row(form.editer, {'attr': {'class': 'orange-button mb-2'}}) }}
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+    
+    <div class="page-header">
+    <div class="row">
+    <div class="col-md-6">
+    <h3 class="page-title text-lowercase mb-0">Mes déclarations</h3>
+    </div>
+    <div class="col-md-6">
+    <button class="float-right text-muted p-1" style="border: none;" data-toggle="modal" data-target="#newdeclaration"><i class="fa fa-solid fa-plus"></i> nouvelle déclaration </button>
+    </div>
+    </div>
+    </div>
+    <div class="card-body mb-2" style="box-shadow: 1px 3px 5px #aaa;">
+        <div class="table-responsive ">
+            <table id="example" class="table custom-table ">
+                <thead class="thead-light">
+                <tr>
+                    <th></th>
+                    <th>Type </th>
+                    <th>Date</th>
+                    <th>Statut</th>
+                    <th class="text-right">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for declaration in declarations %}
+                    <tr>
+                        <td class="custom-checkbox">
+                            <input type="checkbox" name="declarations[]" class="declaration-checkbox" value="{{ declaration.id }}">
+                        </td>
+                        <td>{{declaration.typedeclaration}}</td>
+                        <td>{{declaration.datenaiss|date('d-m-Y')}}</td>
+                        <td>{{declaration.statut}}</td>
+                        <td class="text-right">
+                            <a href="{{path('declaration.show',{id: declaration.id})}}" class="btn btn-warning btn-sm mb-1">
+                                <i class="far fa-thin fa-eye text-light"></i>
+                            </a>
+                            <a href="{{path('declaration.edit',{id: declaration.id})}}" class="btn btn-primary btn-sm mb-1">
+                                <i class="far fa-edit"></i>
+                            </a>
+                            <a href="{{path('declaration.annuler',{declarationId:declaration.id})}}" class="btn btn-danger btn-sm mb-1">
+                                <i class="fa-sharp fa-solid fa-xmark"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <td colspan="5">Vous n'avez effectué aucune déclaration</td>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+        
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        $(document).ready(function() {
+        $('input[name="declaration[typedeclaration]"]').on('change', function() {
+            var selectedValue = $(this).val();
+
+            if (selectedValue === 'Naissance') {
+                // Afficher les champs pour le type "Naissance"
+                $('#enfant, #datenaiss, #fichiernaiss').show();
+            } else {
+                $('#enfant, #datenaiss, #fichiernaiss').hide();
+            }
+
+            if (selectedValue === 'Décès agent') {
+                // Afficher le champ spécifique pour "Décès agent"
+                $('#matriculedeces').show();
+            } else {
+                $('#matriculedeces').hide();
+            }
+
+            if (selectedValue === 'Décès parent') {
+                // Afficher le champ spécifique pour "Décès parent"
+                $('#parent').show();
+            } else {
+                $('#parent').hide();
+            }
+
+            // Gestion de l'affichage du champ "hasProgrammeObsq" et "datedeces" pour "Décès agent" ou "Décès parent"
+            if (selectedValue === 'Décès agent' || selectedValue === 'Décès parent') {
+                $('#hasProgrammeObsq').show();
+                if ($('input[name="declaration[hasProgrammeObsq]"]:checked').val() === '1') {
+                    $('#programmeobsq').show();
+                } else {
+                    $('#programmeobsq').hide();
+                }
+                $('#datedeces').show();
+            } else {
+                $('#hasProgrammeObsq').hide();
+                $('#programmeobsq').hide();
+                $('#datedeces').hide();
+            }
+        });
+
+        // Géstion de l'affichage du champ "programmeobsq" lorsque l'utilisateur change la valeur de "hasProgrammeObsq"
+        $('input[name="declaration[hasProgrammeObsq]"]').on('change', function() {
+            if ($('input[name="declaration[typedeclaration]"]:checked').val() === 'Décès agent' || $('input[name="declaration[typedeclaration]"]:checked').val() === 'Décès parent') {
+                if ($(this).val() === '1') {
+                    $('#programmeobsq').show();
+                } else {
+                    $('#programmeobsq').hide();
+                }
+            }
+        });
+        });
+
+        function handleDelete() {
+        event.preventDefault();
+        if (confirm('Êtes-vous sûr de vouloir supprimer ?')) {
+            console.log('Submitting delete form...');
+            var selectedPersonnes = Array.from(declarationCheckboxes)
+                .filter(function(checkbox) {
+                    return checkbox.checked;
+                })
+                .map(function(checkbox) {
+                    return checkbox.value;
+                });
+
+            var deleteForm = document.getElementById('delete-form');
+            deleteForm.querySelector('input[name="declarations"]').value = JSON.stringify(selectedPersonnes);
+
+            deleteForm.submit();
+        }
+    }
+    function showModal(elementId) {
+      const newmodal = document.getElementById('newmodal');
+      newmodal.style.display = 'block';
+  
+      }
+      function closeModal(elementId) {
+      const newmodal = document.getElementById('newmodal');
+      newmodal.style.display = 'none';
+    
+    }
+    
+    </script>
+    <script src="{{ asset('assets/js/datatables/datatables.min.js') }}"></script>
+    <script src="{{ asset('assets/js/datatables/datatables.bootstrap5.min.js') }}"></script>
+    <script src="{{ asset('assets/js/datatables/init.js') }}"></script>
+    <script src="{{asset('assets/js/newmodal.js')}}"></script>
+{% endblock %}

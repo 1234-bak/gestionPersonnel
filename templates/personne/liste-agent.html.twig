@@ -1,69 +1,245 @@
-{% extends 'liste-template.html.twig' %}
+{% extends 'admin-template.html.twig' %}
 
 {% block stylesheets %}
+    <link rel="stylesheet" href="{{asset('assets/css/datatables/datatables.min.css')}}">
     <link rel="stylesheet" href="{{ asset('assets/css/datatables/tables-style.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/edit-agent.css') }}">
+    
 {% endblock %}
-
+{% block editprofile %}
+    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Editer Profile</a>
+{% endblock %}
+{% block editprofile2 %}
+  <li><a href="{{path('user_edit',{id: user.id})}}"><span>Créer compte agent</span></a></li>
+{% endblock %}
+{% block showprofile %}
+    <a class="dropdown-item" href="{{path('user_show',{id: user.id})}}">Edit Profile</a>
+{% endblock %}
+{% block notifpro %}
+    <img alt="John Doe" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" class="img-fluid rounded-circle">
+{% endblock %}
+{% block photoprofile %}
+    <img class="rounded-circle" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" width="30" alt="Admin">
+{% endblock %}
 {% block main %}
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="data_table">
-                    <table id="example" class="table table-striped table-bordered">
-                        <a href="{{ path('personne.edit') }}" id="btn" class="btn">Ajouter un nouveau agent</a>
-                        <thead>
-                            <tr>
-                                <th class="head"></th>
-                                <th class="head">Matricule</th>
-                                <th class="head">Nom</th>
-                                <th class="head">Prenom</th>
-                                <th class="head">Emploi</th>
-                                <th class="head">Direction</th>
-                                <th class="head">Date de naissance</th>
-                                <th class="head">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for personne in personnes %}
-                                <tr class="table">
-                                    <td class="custom-checkbox">
-                                        <input type="checkbox" name="personnes[]" class="personne-checkbox" value="{{ personne.id }}">
-                                    </td>
-                                    <td>{{ personne.matricule }}</td>
-                                    <td>{{ personne.nom }}</td>
-                                    <td>{{ personne.prenom }}</td>
-                                    <td>{{ personne.emploi }}</td>
-                                    <td>{{ personne.direction.designation }}</td>
-                                    <td>{{ personne.datenaiss|date('Y-m-d') }}</td>
-                                    <td class="action">
-                                        <div class="dropdown">
-                                            <button class="btn dropdown-toggle" type="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false"></button>
-                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                                <li><a class="dropdown-item lien" href="{{ path('personne.detail', {id: personne.id}) }}"><i class="fa-regular fa-circle-info"></i> Voir plus</a></li>
-                                                <li><a id="lien" class="dropdown-item lien" onclick="showModal('lien')" href="{{ path('personne.edit', {id: personne.id}) }}"><i class="fa fa-user-pen"></i> Editer</a></li>
-                                                <li><a class="dropdown-item lien delete-link" href="{{ path('personne.delete', {matricule: personne.matricule}) }}"><i class="fa fa-trash"></i> Supprimer</a></li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+<div id="newpersonne" class="modal fade" role="dialog" style="display: none;position: fixed;z-index: 9999;left: 0;top: 0;width: 100%;height: 100%;overflow: auto;background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content" style="position: absolute;top: 10px;background-color: #fff;padding: 20px;border-radius: 5px;left: 50%; transform: translateX(-50%);max-width: 800px;max-height: 2000px;">
+            <span data-dismiss="modal" id="close" class="newmodal-close float-right" style="cursor: pointer;font-size: 20px;font-weight: bolder;color: #ccc;">&times;</span>
+            <h3 class="font-weight-bold text-center">Enregistrement d'un agent</h3>
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+            <div class="search" style="position: relative !important;" style="position: relative !important;">
+                {{ form_row(form.nom,{
+                    'attr':{
+                        'class': 'input',
+                        'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
+                    }
+                }) }}
             </div>
+            <div class="search" style="position: relative !important;">
+                    {{ form_row(form.prenom,{
+                    'attr':{
+                        'class': 'input',
+                        'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
+                    }
+                }) }}
+            </div>
+            <div class="search" style="position: relative !important;">
+                        {{ form_row(form.matricule,{
+                        'attr':{
+                            'class': 'input',
+                            'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
+                        }
+                    }) }}
+            </div>
+            <div class="search" style="position: relative !important;">
+                        {{ form_row(form.civilite,{
+                        'attr':{
+                            'class': 'input',
+                            'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
+                        }
+                    }) }}
+            </div>
+            <div class="search" style="position: relative !important;">
+                        {{ form_row(form.structure,{
+                        'attr':{
+                            'class': 'input',
+                            'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
+                        }
+                    }) }}
+            </div>
+            {{ form_label(form.fonction, 'Fonction', {
+            'label_attr': {
+                'class': 'label',
+            }
+            }) }}</br>
+            {{ form_widget(form.fonction,{'attr':{'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'}}) }}</br></br>
+
+            {{ form_label(form.direction, 'Direction', {
+            'label_attr': {
+                'class': 'label',
+            }
+            }) }}</br>
+            {{ form_widget(form.direction,{'attr':{'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'}}) }}</br></br>
+
+            {{ form_label(form.sousdirection, 'Sous-direction', {
+            'label_attr': {
+                'class': 'label',
+            }
+            }) }}</br>
+            {{ form_widget(form.sousdirection,{'attr':{'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'}}) }}</br></br>
+
+            {{ form_label(form.service, 'Service', {
+            'label_attr': {
+                'class': 'label',
+            }
+            }) }}</br>
+            {{ form_widget(form.service,{'attr':{'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'}}) }}</br></br>
+
+            {% set currentDate = "now"|date("d/m/Y") %}
+            <div class="search" style="position: relative !important;">
+                <div class="search" style="position: relative !important;">
+            {{ form_row(form.datenaiss, {
+                'attr': {
+                    'class': 'input',
+                    'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;',
+                    'value': "now"|date("Y-m-d")
+                }
+            }) }}
+</div>
+
+            </div>
+            <div class="search" style="position: relative !important;">
+                        {{ form_row(form.lieunaiss,{
+                        'attr':{
+                            'class': 'input',
+                            'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
+                        }
+                    }) }}
+            </div>
+            <div class="search" style="position: relative !important;">
+                        {{ form_row(form.nompere,{
+                        'attr':{
+                            'class': 'input',
+                            'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
+                        }
+                    }) }}
+            </div>
+            <div class="search" style="position: relative !important;">
+                        {{ form_row(form.nommere,{
+                        'attr':{
+                            'class': 'input',
+                            'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
+                        }
+                    }) }}
+            </div>
+            <div class="search" style="position: relative !important;">
+                        {{ form_row(form.nbreenfant,{
+                        'attr':{
+                            'class': 'input',
+                            'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
+                        }
+                    }) }}
+            </div>
+            <div class="search" style="position: relative !important;">
+                        {{ form_row(form.grade,{
+                        'attr':{
+                            'class': 'input',
+                            'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
+                        }
+                    }) }}
+            </div>
+            <div class="search" style="position: relative !important;">
+                        {{ form_row(form.sexe,{
+                        'attr':{
+                            'class': 'input',
+                            'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
+                        }
+                    }) }}
+            </div>
+            <div class="search" style="position: relative !important;">
+                        {{ form_row(form.telephone,{
+                        'attr':{
+                            'class': 'input',
+                            'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
+                        }
+                    }) }}
+            </div>
+            <div class="search" style="position: relative !important;">
+                        {{ form_row(form.photo,{
+                        'attr':{
+                            'class': 'input',
+                            'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
+                        }
+                    }) }}
+            </div>
+            <div class="row">
+                <div class="col-md-5">{{ form_row(form.editer, {'label': 'Soumettre','attr': {'class': 'orange-button mb-2'}}) }}</div>
+                <div class="col-md-5"><button type="button" class="btn btn-danger" data-dismiss="modal">Annuler</button></div>
+            </div>
+            {{ form_end(form) }}
         </div>
-        <div class="row">
-            <div class="col-12">
-                <button id="btnSupprimer" class="btn" onclick="handleDelete()">Supprimer</button>
-                <form id="delete-form" action="{{ path('personne.delete_multiple') }}" method="POST" style="display: none;">
-                    {{ csrf_token('delete') }}
-                    <input type="hidden" name="_method" value="DELETE">
-                    <input type="hidden" name="personnes" value="">
-                </form>
-            </div>
         </div>
     </div>
+    
+    <div class="page-header">
+    <div class="row">
+    <div class="col-md-6">
+    <h3 class="page-title text-lowercase mb-0">Listes des agents du ministère</h3>
+    </div>
+    <div class="col-md-6">
+    <button class="float-right text-muted p-1" style="border: none;" data-toggle="modal" data-target="#newpersonne"><i class="fa fa-solid fa-plus"></i> Ajouter un nouveau agent</button>
+    </div>
+    </div>
+    </div>
+    <div class="card-body" style="box-shadow: 1px 3px 5px #aaa;">
+        <div class="table-responsive ">
+            <table id="example" class="table custom-table">
+                <thead class="thead-light">
+                <tr>
+                    <th></th>
+                    <th>Matricule </th>
+                    <th>Nom</th>
+                    <th>Prenom</th>
+                    <th>Fonction</th>
+                    <th>Direction</th>
+                    <th>Date de naissance</th>
+                    <th class="text-right">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for personne in personnes %}
+                    <tr>
+                        <td class="custom-checkbox">
+                            <input type="checkbox" name="personnes[]" class="personne-checkbox" value="{{ personne.id }}">
+                        </td>
+                        <td>
+                            {# <h2><a href="#" class="avatar text-white"><img src="{{asset('assets/asset/img/profile/img-1.jpg')}}" alt=""></a><a href="#">{{personne.matricule}} <span></span></a></h2> #}
+                            <h2><a href="{{path('personne.detail',{id: personne.id})}}" class="avatar text-white"><img src="{{asset('uploads/image_personne/' ~ personne.image)}}" alt=""></a><a href="#">{{personne.matricule}} <span></span></a></h2>
+                        </td>
+                        <td>{{personne.nom}}</td>
+                        <td>{{personne.prenom}}</td>
+                        <td>{{personne.fonction.designation}}</td>
+                        <td>{{personne.direction.designation}}</td>
+                        <td> {{ personne.getFormattedDatenaiss() }} </td>
+                        <td class="text-right">
+                            <a href="{{path('personne.detail',{id: personne.id})}}" class="btn btn-warning btn-sm mb-1">
+                                <i class="far fa-thin fa-eye text-light"></i>
+                            </a>
+                            <a href="{{path('admin_personne.edit',{id: personne.id})}}" class="btn btn-primary btn-sm mb-1">
+                                <i class="far fa-edit"></i>
+                            </a>
+                            <a href="{{path('personne.delete',{matricule: personne.matricule})}}" class="btn btn-danger btn-sm mb-1">
+                                <i class="far fa-trash-alt"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div><br><br>
+        
 {% endblock %}
 
 {% block javascripts %}
@@ -82,12 +258,22 @@
 
             var deleteForm = document.getElementById('delete-form');
             deleteForm.querySelector('input[name="personnes"]').value = JSON.stringify(selectedPersonnes);
-
             deleteForm.submit();
         }
     }
-
+    function showModal(elementId) {
+      const modal = document.getElementById('newmodal');
+      modal.style.display = 'block';
+  
+      }
+      function closeModal(elementId) {
+      const modal = document.getElementById('newmodal');
+      modal.style.display = 'none';
+    
+    }
     </script>
+    <script src="{{ asset('assets/js/datatables/datatables.min.js') }}"></script>
+    <script src="{{ asset('assets/js/datatables/datatables.bootstrap5.min.js') }}"></script>
     <script src="{{ asset('assets/js/datatables/init.js') }}"></script>
-    <script src="{{asset('assets/js/modal.js')}}"></script>
+    <script src="{{asset('assets/js/newmodal.js')}}"></script>
 {% endblock %}

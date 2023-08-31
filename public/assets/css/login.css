@@ -12,10 +12,10 @@
 	--red: #DB504A;
 	--yellow: #FFCE26;
 	--light-yellow: #FFF2C6;
-	--orange: #fd4600;
+	--orange: orange;
 	--light-orange: #FFE0D3;
-	--green: #036d00;
-	--green-forest:#228B22;
+	--green: #2fdf84;
+	--green-forest:#2fdf84;
 }
 
 .modal {

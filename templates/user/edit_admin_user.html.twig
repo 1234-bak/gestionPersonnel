@@ -1,0 +1,227 @@
+{% extends 'admin-template.html.twig' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{asset('assets/css/datatables/datatables.min.css')}}">
+    <link rel="stylesheet" href="{{ asset('assets/css/datatables/tables-style.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/edit-agent.css') }}">
+    <style>
+        :root {
+            --poppins: 'Poppins', sans-serif;
+            --lato: 'Lato', sans-serif;
+
+            --light: #F9F9F9;
+            --blue: #3C91E6;
+            --light-blue: #CFE8FF;
+            --grey: #eee;
+            --dark-grey: #AAAAAA;
+            --dark: #342E37;
+            --red: #DB504A;
+            --yellow: #FFCE26;
+            --light-yellow: #FFF2C6;
+            --orange: #fd4600;
+            --light-orange: #FFE0D3;
+            --green: #2fdf84;
+            --green-forest:#2fdf84;
+        }
+
+        .titre{
+            color: var(--green);
+        }
+        .email{
+            color: orange;
+        }
+        .deconnexion{
+            color: var(--green);
+        }
+
+        .search{
+            position: relative !important;
+        }
+        .search .input{
+            width: 80% !important;
+            border-top: none !important;
+            border-left: none !important;
+            margin-left: 40px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+        }
+        .search .input:focus{
+            box-shadow: none !important;
+            border: 2px solid orange !important;
+
+        }
+
+        .search .fa-envelope{
+        position: absolute !important;
+        top: 40px !important;
+        margin-right: 10px;
+        color: orange !important;
+
+        }
+
+        .search .fa-lock{
+            position: absolute !important;
+            top: 40px !important;
+            color: orange !important;
+            
+        }
+
+        .orange-button{
+            background-color: var(--green);
+            color: white;
+        }
+
+        .orange-button:hover{
+            background-color: var(--green);
+            color: white;
+        }
+        .custom-checkbox input[type="checkbox"] {
+            /* Cacher l'input checkbox natif */
+            position: absolute;
+            opacity: 0;
+            }
+
+        .custom-checkbox input[type="checkbox"] + label {
+        /* Styles pour la représentation graphique du checkbox */
+        position: relative;
+        padding-left: 25px; /* Espace réservé pour le checkbox */
+        cursor: pointer;
+        }
+
+        .custom-checkbox input[type="checkbox"] + label:before {
+        /* Styles pour la coche du checkbox */
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 0;
+        width: 16px;
+        height: 16px;
+        /* border-radius: 50%; */
+        background-color: #fff; /* Couleur de fond du checkbox */
+        border: 2px solid #aaa; /* Couleur de la bordure du checkbox */
+        }
+
+        .custom-checkbox input[type="checkbox"]:checked + label:before {
+        /* Styles pour la coche du checkbox lorsqu'il est sélectionné */
+        background-color: #2fdf84; /* Couleur de fond du checkbox lorsqu'il est sélectionné */
+        border-color: orange; /* Couleur de la bordure du checkbox lorsqu'il est sélectionné */
+        }
+
+        .custom-checkbox input[type="checkbox"] + label {
+        /* Styles pour la représentation graphique du checkbox */
+        position: relative;
+        padding-left: 25px; /* Espace réservé pour le checkbox */
+        cursor: pointer;
+        }
+
+        .custom-checkbox input[type="checkbox"] + label:before {
+        /* Styles pour la coche du checkbox */
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 0;
+        width: 16px;
+        height: 16px;
+        /* border-radius: 50%; */
+        background-color: #fff; /* Couleur de fond du checkbox */
+        border: 2px solid #aaa; /* Couleur de la bordure du checkbox */
+        }
+
+        .custom-checkbox input[type="checkbox"]:checked + label:before {
+        /* Styles pour la coche du checkbox lorsqu'il est sélectionné */
+        background-color: #2fdf84; /* Couleur de fond du checkbox lorsqu'il est sélectionné */
+        border-color: orange; /* Couleur de la bordure du checkbox lorsqu'il est sélectionné */
+        }
+
+    </style>
+{% endblock %}
+{% block showprofile %}
+    <a class="dropdown-item" href="{{path('user_show',{id: user.id})}}">Mon Profile</a>
+{% endblock %}
+{% block editprofile %}
+    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Editer Profile</a>
+{% endblock %}
+{% block editprofile2 %}
+    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Edit Profile</a>
+{% endblock %}
+{% block notifpro %}
+    <img alt="John Doe" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" class="img-fluid rounded-circle">
+{% endblock %}
+{% block photoprofile %}
+    <img class="rounded-circle" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" width="30" alt="Admin">
+{% endblock %}
+{% block main %}
+    <h3 class="font-weight-bold text-center">Modifier le rôle</h3>
+    {{ form_start(registrationForm) }}
+        <div class="search">
+            <i class="fa fa-envelope"></i>
+            {{ form_row(registrationForm.matricule,{
+            'attr':{
+                'class': 'input',
+            }
+        }) }}
+        </div>
+        {# <div class="search">
+            <i class="fa fa-lock"></i>
+            {{ form_row(registrationForm.plainPassword.first,{
+            'attr':{
+                'class': 'input'
+            }
+        }) }}
+        </div>
+        <div class="search">
+            <i class="fa fa-lock"></i>
+            {{ form_row(registrationForm.plainPassword.second,{
+            'attr':{
+                'class': 'input'
+            }
+        }) }}
+        </div> #}
+        <div class="search">
+            {{ form_row(registrationForm.roles,{
+            'attr':{
+                'class': 'input custom-checkbox'
+            }
+        }) }}
+        </div>
+        {{ form_row(registrationForm.submit, { 
+            'attr':{
+                'class': 'orange-button'
+            }  }) }}
+    {{ form_end(registrationForm) }}
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        function handleDelete() {
+        event.preventDefault();
+        if (confirm('Êtes-vous sûr de vouloir supprimer ?')) {
+            console.log('Submitting delete form...');
+            var selectedPersonnes = Array.from(personneCheckboxes)
+                .filter(function(checkbox) {
+                    return checkbox.checked;
+                })
+                .map(function(checkbox) {
+                    return checkbox.value;
+                });
+
+            var deleteForm = document.getElementById('delete-form');
+            deleteForm.querySelector('input[name="personnes"]').value = JSON.stringify(selectedPersonnes);
+            deleteForm.submit();
+        }
+    }
+    function showModal(elementId) {
+      const modal = document.getElementById('newmodal');
+      modal.style.display = 'block';
+  
+      }
+      function closeModal(elementId) {
+      const modal = document.getElementById('newmodal');
+      modal.style.display = 'none';
+    
+    }
+    </script>
+    <script src="{{ asset('assets/js/datatables/datatables.min.js') }}"></script>
+    <script src="{{ asset('assets/js/datatables/datatables.bootstrap5.min.js') }}"></script>
+    <script src="{{ asset('assets/js/datatables/init.js') }}"></script>
+    <script src="{{asset('assets/js/newmodal.js')}}"></script>
+{% endblock %}

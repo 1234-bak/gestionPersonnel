@@ -8,24 +8,24 @@
 {% endblock %}
 
 {% block main %}
-<div class="modal vh-100" style="background-repeat: no-repeat; background-position: right top; background-attachement: fixed; background-image: url('{{asset('assets/img/ministre.jpg')}}'); background-size: cover">
+<div class="modal vh-100" style="background-repeat: no-repeat; background-position: right top; background-attachement: fixed; background-image: url('{{asset('assets/asset/img/entreemfp.jpg')}}'); background-size: cover">
     <div class="modal-content">
         <form method="post">
-            {% if error %}
+            {# {% if error %}
                 <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-            {% endif %}
+            {% endif %} #}
 
             {% if app.user %}
                 <div class="mb-3 notice">
-                    Vous êtes inscrit avec le compte <span class="email">{{ app.user.userIdentifier }},</span> <a class="deconnexion" href="{{ path('app_logout') }}">Deconnexion</a>
+                    Vous êtes inscrit avec le compte <span class="matricule">{{ app.user.userIdentifier }},</span> <a class="deconnexion" href="{{ path('app_logout') }}">Deconnexion</a>
                 </div>
             {% endif %}
 
             <h1 class="titre mb-3 font-weight-bold text-center">Connectez-vous</h1>
             <div class="search">
-                <label for="inputEmail">Email</label>
+                <label for="inputMatricule">Matricule</label>
                 <i class="fas fa-envelope"></i>
-                <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
+                <input type="text" value="{{ last_username }}" name="matricule" id="inputMatricule" class="form-control" autocomplete="matricule" required autofocus placeholder="000000A">
             
             </div>
             <div class="search">
@@ -59,6 +59,7 @@
                 Se connecter
             </button>
         </form>
+        <p class="mt-2 text-light">Pas de compte ? <a href="{{path('app_register')}}" style="margin-top:5px; color:orange; font-weight:bold;"><span>S'inscrire</span></a></p>
     </div>
 </div>
 {% endblock %}
