@@ -7,10 +7,10 @@
     
 {% endblock %}
 {% block editprofile %}
-    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Edit Profile</a>
+    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Modifier son compte</a>
 {% endblock %}
 {% block showprofile %}
-    <a class="dropdown-item" href="{{path('user_show',{id: user.id})}}">Edit Profile</a>
+    <a class="dropdown-item" href="{{path('user_show',{id: user.id})}}">Editer Profil</a>
 {% endblock %}
 {% block notifpro %}
     <img alt="John Doe" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" class="img-fluid rounded-circle">

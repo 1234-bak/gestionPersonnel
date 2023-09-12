@@ -22,6 +22,11 @@ class NoteType extends AbstractType
             ->add('objet', TextareaType::class, [
                 'label' => 'Objet',
             ])
+            ->add('statut', TextType::class, [
+                'attr' => [
+                    'style' => 'none',
+                ],
+            ])
             // ->add('part1', TextareaType::class, [
             //     'label' => 'Partie 1 du corps',
             // ])

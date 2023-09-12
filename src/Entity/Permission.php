@@ -24,7 +24,6 @@ class Permission
     public function someMethod()
     {
         $statut = self::STATUT_EN_ATTENTE;
-        // Utilisez $statut comme vous le souhaitez
     }
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -50,7 +49,7 @@ class Permission
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $statut = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $preuve = null;
 
     // #[ORM\ManyToOne(inversedBy: 'permissions')]
@@ -62,9 +61,32 @@ class Permission
     #[ORM\Column(length: 255)]
     private ?string $typepermission = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $etatcs = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $etatsd = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $etatdir = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $etatdircab = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $delai = null;
+
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function calculerEtDefinirDelai(): void
+    {
+        if ($this->datedebut !== null && $this->datefin !== null) {
+            $diff = $this->datedebut->diff($this->datefin);
+            $this->delai = $diff->days;
+        }
     }
 
     public function getDatedebut(): ?\DateTimeInterface
@@ -204,6 +226,66 @@ class Permission
     public function setTypepermission(string $typepermission): self
     {
         $this->typepermission = $typepermission;
+
+        return $this;
+    }
+
+    public function getEtatcs(): ?string
+    {
+        return $this->etatcs;
+    }
+
+    public function setEtatcs(?string $etatcs): static
+    {
+        $this->etatcs = $etatcs;
+
+        return $this;
+    }
+
+    public function getEtatsd(): ?string
+    {
+        return $this->etatsd;
+    }
+
+    public function setEtatsd(?string $etatsd): static
+    {
+        $this->etatsd = $etatsd;
+
+        return $this;
+    }
+
+    public function getEtatdir(): ?string
+    {
+        return $this->etatdir;
+    }
+
+    public function setEtatdir(?string $etatdir): static
+    {
+        $this->etatdir = $etatdir;
+
+        return $this;
+    }
+
+    public function getEtatdircab(): ?string
+    {
+        return $this->etatdircab;
+    }
+
+    public function setEtatdircab(?string $etatdircab): static
+    {
+        $this->etatdircab = $etatdircab;
+
+        return $this;
+    }
+
+    public function getDelai(): ?int
+    {
+        return $this->delai;
+    }
+
+    public function setDelai(?int $delai): static
+    {
+        $this->delai = $delai;
 
         return $this;
     }

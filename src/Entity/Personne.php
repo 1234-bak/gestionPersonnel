@@ -117,6 +117,15 @@ class Personne
     #[ORM\ManyToMany(targetEntity: Notification::class, mappedBy: 'destinataire')]
     private Collection $notifications;
 
+    #[ORM\ManyToMany(targetEntity: Note::class, mappedBy: 'service')]
+    private Collection $noteduservice;
+
+    #[ORM\ManyToMany(targetEntity: Note::class, mappedBy: 'sousdirection')]
+    private Collection $notesd;
+
+    #[ORM\ManyToMany(targetEntity: Note::class, mappedBy: 'direction')]
+    private Collection $notedir;
+
 
 
     public function __construct()
@@ -129,6 +138,9 @@ class Personne
         // $this->signature = new ArrayCollection();
         $this->notes = new ArrayCollection();
         $this->notifications = new ArrayCollection();
+        $this->noteduservice = new ArrayCollection();
+        $this->notesd = new ArrayCollection();
+        $this->notedir = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -545,6 +557,87 @@ class Personne
     {
         if ($this->notifications->removeElement($notification)) {
             $notification->removeDestinataire($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Note>
+     */
+    public function getNoteduservice(): Collection
+    {
+        return $this->noteduservice;
+    }
+
+    public function addNoteduservice(Note $noteduservice): static
+    {
+        if (!$this->noteduservice->contains($noteduservice)) {
+            $this->noteduservice->add($noteduservice);
+            $noteduservice->addService($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNoteduservice(Note $noteduservice): static
+    {
+        if ($this->noteduservice->removeElement($noteduservice)) {
+            $noteduservice->removeService($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Note>
+     */
+    public function getNotesd(): Collection
+    {
+        return $this->notesd;
+    }
+
+    public function addNotesd(Note $notesd): static
+    {
+        if (!$this->notesd->contains($notesd)) {
+            $this->notesd->add($notesd);
+            $notesd->addSousdirection($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNotesd(Note $notesd): static
+    {
+        if ($this->notesd->removeElement($notesd)) {
+            $notesd->removeSousdirection($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Note>
+     */
+    public function getNotedir(): Collection
+    {
+        return $this->notedir;
+    }
+
+    public function addNotedir(Note $notedir): static
+    {
+        if (!$this->notedir->contains($notedir)) {
+            $this->notedir->add($notedir);
+            $notedir->addDirection($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNotedir(Note $notedir): static
+    {
+        if ($this->notedir->removeElement($notedir)) {
+            $notedir->removeDirection($this);
         }
 
         return $this;

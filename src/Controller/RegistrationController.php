@@ -48,12 +48,12 @@ class RegistrationController extends AbstractController
             $matricule = $data['matricule'];
             $datenaiss = $data['datenaiss'];
 
-            // Effectuer la vérification du matricule
+            // Effectuer la vérification
             $memberRepository = $entityManager->getRepository(Personne::class);
             $existingMember = $memberRepository->findOneBy(['matricule' => $matricule, 'datenaiss' => $datenaiss]);
-
             if ($existingMember) {
-                // Le matricule existe, rediriger vers la page d'affichage des informations de la personne
+                // Le matricule existe, rediriger vers la page d'inscription
+                $this->addFlash('succes', 'Vérification réussie');
                 return $this->redirectToRoute('app_register', ['matricule' => $matricule, 'datenaiss' => $datenaiss->format('Y-m-d')]);
             } else {
                 // Le matricule n'existe pas, afficher un message flash
@@ -69,9 +69,6 @@ class RegistrationController extends AbstractController
     #[Route('/register/{matricule?0}/{datenaiss?0}', name: 'app_register')]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager, string $matricule, DateTime $datenaiss): Response
     {
-        if ($matricule === 0 || $datenaiss->getTimestamp() === 0) {
-            return $this->redirectToRoute('app_verify_matricule');
-        }
         
         $existingPersonne = $entityManager->getRepository(Personne::class)->findOneBy(['matricule' => $matricule, 'datenaiss' => $datenaiss]);
 

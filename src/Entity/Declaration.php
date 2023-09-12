@@ -61,26 +61,26 @@ class Declaration
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $matriculedeces = null;
 
-    // #[ORM\Column(length: 255, nullable: true)]
-    // private ?string $fichiernaiss = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $fichiernaiss = null;
 
-    // #[ORM\Column(length: 255, nullable: true)]
-    // private ?string $fichierdeces = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $fichierdeces = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $typedeclaration = null;
 
-    #[ORM\OneToMany(mappedBy: 'declaration', targetEntity: FileNaiss::class)]
-    private Collection $fichiernaiss;
+    // #[ORM\OneToMany(mappedBy: 'declaration', targetEntity: FileNaiss::class)]
+    // private Collection $fichiernaiss;
 
-    #[ORM\OneToMany(mappedBy: 'declaration', targetEntity: FileDeces::class)]
-    private Collection $fichierdeces;
+    // #[ORM\OneToMany(mappedBy: 'declaration', targetEntity: FileDeces::class)]
+    // private Collection $fichierdeces;
 
-    public function __construct()
-    {
-        $this->fichiernaiss = new ArrayCollection();
-        $this->fichierdeces = new ArrayCollection();
-    }
+    // public function __construct()
+    // {
+    //     $this->fichiernaiss = new ArrayCollection();
+    //     $this->fichierdeces = new ArrayCollection();
+    // }
 
     public function getId(): ?int
     {
@@ -220,29 +220,29 @@ class Declaration
         return $this;
     }
 
-    // public function getFichiernaiss(): ?string
-    // {
-    //     return $this->fichiernaiss;
-    // }
+    public function getFichiernaiss(): ?string
+    {
+        return $this->fichiernaiss;
+    }
 
-    // public function setFichiernaiss(string $fichiernaiss): self
-    // {
-    //     $this->fichiernaiss = $fichiernaiss;
+    public function setFichiernaiss(string $fichiernaiss): self
+    {
+        $this->fichiernaiss = $fichiernaiss;
 
-    //     return $this;
-    // }
+        return $this;
+    }
 
-    // public function getFichierdeces(): ?string
-    // {
-    //     return $this->fichierdeces;
-    // }
+    public function getFichierdeces(): ?string
+    {
+        return $this->fichierdeces;
+    }
 
-    // public function setFichierdeces(string $fichierdeces): self
-    // {
-    //     $this->fichierdeces = $fichierdeces;
+    public function setFichierdeces(string $fichierdeces): self
+    {
+        $this->fichierdeces = $fichierdeces;
 
-    //     return $this;
-    // }
+        return $this;
+    }
 
     public function getTypedeclaration(): ?string
     {
@@ -256,63 +256,63 @@ class Declaration
         return $this;
     }
 
-    /**
-     * @return Collection<int, FileNaiss>
-     */
-    public function getFichiernaiss(): Collection
-    {
-        return $this->fichiernaiss;
-    }
+    // /**
+    //  * @return Collection<int, FileNaiss>
+    //  */
+    // public function getFichiernaiss(): Collection
+    // {
+    //     return $this->fichiernaiss;
+    // }
 
-    public function addFichiernaiss(FileNaiss $fichiernaiss): self
-    {
-        if (!$this->fichiernaiss->contains($fichiernaiss)) {
-            $this->fichiernaiss->add($fichiernaiss);
-            $fichiernaiss->setDeclaration($this);
-        }
+    // public function addFichiernaiss(FileNaiss $fichiernaiss): self
+    // {
+    //     if (!$this->fichiernaiss->contains($fichiernaiss)) {
+    //         $this->fichiernaiss->add($fichiernaiss);
+    //         $fichiernaiss->setDeclaration($this);
+    //     }
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
-    public function removeFichiernaiss(FileNaiss $fichiernaiss): self
-    {
-        if ($this->fichiernaiss->removeElement($fichiernaiss)) {
-            // set the owning side to null (unless already changed)
-            if ($fichiernaiss->getDeclaration() === $this) {
-                $fichiernaiss->setDeclaration(null);
-            }
-        }
+    // public function removeFichiernaiss(FileNaiss $fichiernaiss): self
+    // {
+    //     if ($this->fichiernaiss->removeElement($fichiernaiss)) {
+    //         // set the owning side to null (unless already changed)
+    //         if ($fichiernaiss->getDeclaration() === $this) {
+    //             $fichiernaiss->setDeclaration(null);
+    //         }
+    //     }
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
-    /**
-     * @return Collection<int, FileDeces>
-     */
-    public function getFichierdeces(): Collection
-    {
-        return $this->fichierdeces;
-    }
+    // /**
+    //  * @return Collection<int, FileDeces>
+    //  */
+    // public function getFichierdeces(): Collection
+    // {
+    //     return $this->fichierdeces;
+    // }
 
-    public function addFichierdece(FileDeces $fichierdece): self
-    {
-        if (!$this->fichierdeces->contains($fichierdece)) {
-            $this->fichierdeces->add($fichierdece);
-            $fichierdece->setDeclaration($this);
-        }
+    // public function addFichierdece(FileDeces $fichierdece): self
+    // {
+    //     if (!$this->fichierdeces->contains($fichierdece)) {
+    //         $this->fichierdeces->add($fichierdece);
+    //         $fichierdece->setDeclaration($this);
+    //     }
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
-    public function removeFichierdece(FileDeces $fichierdece): self
-    {
-        if ($this->fichierdeces->removeElement($fichierdece)) {
-            // set the owning side to null (unless already changed)
-            if ($fichierdece->getDeclaration() === $this) {
-                $fichierdece->setDeclaration(null);
-            }
-        }
+    // public function removeFichierdece(FileDeces $fichierdece): self
+    // {
+    //     if ($this->fichierdeces->removeElement($fichierdece)) {
+    //         // set the owning side to null (unless already changed)
+    //         if ($fichierdece->getDeclaration() === $this) {
+    //             $fichierdece->setDeclaration(null);
+    //         }
+    //     }
 
-        return $this;
-    }
+    //     return $this;
+    // }
 }

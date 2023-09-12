@@ -2,15 +2,18 @@
 
 namespace App\Controller;
 
+use Knp\Snappy\Pdf;
 use App\Entity\User;
 use App\Entity\Personne;
 use App\Entity\Permission;
 use App\Service\PdfService;
+use App\Entity\Notification;
 use App\Form\PermissionType;
 use App\Service\UploaderService;
 use App\Exception\StatutErrorException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Repository\NotificationRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,15 +34,16 @@ class PermissionController extends AbstractController
         ]);
     }
 
-    #[Route('grh/permission/liste/{id?0}', name: 'grh-permission.liste')]
+    #[Route('permissiongrh/liste/{id?0}', name: 'grh-permission.liste')]
     public function afficherbygrh(
         Permission $permission = null,
         EntityManagerInterface $entityManager,
         Request $request,
         UploaderService $uploaderService,
         UserInterface $user,
+        NotificationRepository $notificationRepository
     ): Response {
-        $roles = ['ROLE_GRH', 'ROLE_DIRCAB', 'ROLE_MIN', 'ROLE_DIR', 'ROLE_CS', 'ROLE_SD'];
+        $roles = ['ROLE_GRH','ROLE_DIR', 'ROLE_CS', 'ROLE_SD'];
 
         $granted = false;
         foreach ($roles as $role) {
@@ -65,68 +69,37 @@ class PermissionController extends AbstractController
 
          // ...
  
-         $personne = $entityManager->getRepository(Personne::class)->find($personneId);
+        $personne = $entityManager->getRepository(Personne::class)->find($personneId);
 
-        if (!$personne) {
-            throw $this->createNotFoundException('Personne non trouvée.');
-        }
-
-        $new = false;
-        if (!$permission) {
-            $permission = new Permission();
-            $new = true;
-        }
-
-        $form = $this->createForm(PermissionType::class, $permission);
-        $form->remove('createdAt');
-        $form->remove('updatedAt');
-
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $permission->setStatut("en attente");
-            $photo = $form->get('photo')->getData();
-
-            // Vérifie si une photo a été téléchargée
-            if ($photo) {
-                $directory = $this->getParameter('preuve_permission_directory');
-                $permission->setPreuve($uploaderService->uploadFile($photo, $directory));
-            }
-
-            if ($new) {
-                $personne->addPermission($permission);
-            }
-
-            $entityManager->persist($permission);
-            $entityManager->flush();
-
-            $message = $new ? "a été ajouté avec succès" : "a été mis à jour avec succès";
-            $this->addFlash("success", $permission->getId() . ' ' . $message);
-
-            return $this->redirectToRoute('permission.afficher');
-        }
         $repository = $entityManager->getRepository(Permission::class);
-        $nbPermission = $repository->count([]);
-        $permissions = $repository->findAll();
-
+        $permissions = $repository->createQueryBuilder('p')
+        ->where('p.delai > :delai')
+        ->setParameter('delai', 3)
+        ->orderBy('p.datedebut', 'DESC')
+        ->getQuery()
+        ->getResult();
+        $nbPermission = count($permissions);
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
 
         return $this->render('permission/liste-permission-grh.html.twig', [
-            'form' => $form->createView(),
             'personne' => $personne,
             'nbPermission' => $permission,
             'permissions' => $permissions,
-            'user' => $user
+            'user' => $user,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
         ]);
     }
 
-    #[Route('dir/permission/liste/{id?0}', name: 'dir-permission.liste')]
+    #[Route('permissiondir/liste/{id?0}', name: 'dir-permission.liste')]
     public function afficherbydir(
         Permission $permission = null,
         EntityManagerInterface $entityManager,
-        Request $request,
-        UploaderService $uploaderService,
-        UserInterface $user, // Ajout de UserInterface comme paramètre
+        UserInterface $user,
+        NotificationRepository $notificationRepository
     ): Response {
-        $roles = ['ROLE_GRH', 'ROLE_DIRCAB', 'ROLE_MIN', 'ROLE_DIR', 'ROLE_CS', 'ROLE_SD'];
+        $roles = ['ROLE_GRH','ROLE_DIR', 'ROLE_CS', 'ROLE_SD'];
 
         $granted = false;
         foreach ($roles as $role) {
@@ -137,83 +110,122 @@ class PermissionController extends AbstractController
         }
 
         if (!$granted) {
-            $this->addFlash('error',"vous n'avez pas la permission d'acceder à cette page");       
+            $this->addFlash('error',"vous n'avez pas la permission d'acceder à cette page");
         }
         
-        // $this->denyAccessUnlessGranted($role,'Vous n\'avez pas la permission d\'accéder à cette page.');
-        // Vérifier si l'utilisateur est authentifié
          if (!$user) {
-            $this->addFlash('error',"Accès réfusé ! vous devez avoir un compte");         }
+            $this->addFlash('error',"Accès réfusé ! vous devez avoir un compte");
+         }
  
          // Récupérer l'ID de la personne à partir de l'utilisateur
         
             if ($user && $user->getPersonne()) {
                 $personneId = $user->getPersonne()->getId();
             }
-
-         // ...
  
          $personne = $entityManager->getRepository(Personne::class)->find($personneId);
 
-        if (!$personne) {
-            throw $this->createNotFoundException('Personne non trouvée.');
-        }
-
-        $new = false;
-        if (!$permission) {
-            $permission = new Permission();
-            $new = true;
-        }
-
-        $form = $this->createForm(PermissionType::class, $permission);
-        $form->remove('createdAt');
-        $form->remove('updatedAt');
-
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $permission->setStatut("en attente");
-            $photo = $form->get('photo')->getData();
-
-            // Vérifie si une photo a été téléchargée
-            if ($photo) {
-                $directory = $this->getParameter('preuve_permission_directory');
-                $permission->setPreuve($uploaderService->uploadFile($photo, $directory));
-            }
-
-            if ($new) {
-                $personne->addPermission($permission);
-            }
-
-            $entityManager->persist($permission);
-            $entityManager->flush();
-
-            $message = $new ? "a été ajouté avec succès" : "a été mis à jour avec succès";
-            $this->addFlash("success", $permission->getId() . ' ' . $message);
-
-            return $this->redirectToRoute('permission.afficher');
-        }
-        $repository = $entityManager->getRepository(Permission::class);
-        $nbPermission = $repository->count([]);
-        $permissions = $repository->findAll();
-
+         $repository = $entityManager->getRepository(Permission::class);
+         $qb = $repository->createQueryBuilder('p')
+             ->innerJoin('p.personne', 'per')
+             ->innerJoin('per.fonction', 'fonc')
+             ->where('fonc.designation = :designationAgent OR fonc.designation = :designationChefService OR fonc.designation = :designationSD')
+             ->setParameters([
+                 'designationAgent' => 'Agent', 
+                 'designationChefService' => 'Chef de service',
+                 'designationSD' => 'Sous-directeur',
+             ]);
+     
+         $permissions = $qb->orderBy('p.datedebut', 'DESC')
+             ->getQuery()
+             ->getResult();
+    
+        $nbPermission = count($permissions);
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
 
         return $this->render('permission/liste-permission-dir.html.twig', [
-            'form' => $form->createView(),
             'personne' => $personne,
-            'permission' => $nbPermission,
+            'nbPermission' => $nbPermission,
             'permissions' => $permissions,
-            'user' => $user
+            'user' => $user,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
         ]);
     }
-    #[Route('sd/permission/liste/{id?0}', name: 'sd-permission.liste')]
+
+    #[Route('permissiondrh/liste/{id?0}', name: 'drh-permission.liste')]
+    public function afficherbyDRH(
+        Permission $permission = null,
+        EntityManagerInterface $entityManager,
+        UserInterface $user,
+        NotificationRepository $notificationRepository
+    ): Response {
+        $roles = ['ROLE_GRH','ROLE_DIR', 'ROLE_CS', 'ROLE_SD'];
+
+        $granted = false;
+        foreach ($roles as $role) {
+            if ($this->isGranted($role)) {
+                $granted = true;
+                break;
+            }
+        }
+
+        if (!$granted) {
+            $this->addFlash('error',"vous n'avez pas la permission d'acceder à cette page");
+        }
+        
+         if (!$user) {
+            $this->addFlash('error',"Accès réfusé ! vous devez avoir un compte");
+         }
+ 
+         // Récupérer l'ID de la personne à partir de l'utilisateur
+        
+            if ($user && $user->getPersonne()) {
+                $personneId = $user->getPersonne()->getId();
+            }
+ 
+         $personne = $entityManager->getRepository(Personne::class)->find($personneId);
+
+         $repository = $entityManager->getRepository(Permission::class);
+         $qb = $repository->createQueryBuilder('p')
+             ->innerJoin('p.personne', 'per')
+             ->innerJoin('per.fonction', 'fonc')
+             ->where('fonc.designation = :designationAgent OR fonc.designation = :designationChefService OR fonc.designation = :designationSD')
+             ->setParameters([
+                 'designationAgent' => 'Agent', 
+                 'designationChefService' => 'Chef de service',
+                 'designationSD' => 'Sous-directeur',
+             ]);
+     
+         $permissions = $qb->orderBy('p.datedebut', 'DESC')
+             ->getQuery()
+             ->getResult();
+    
+        $nbPermission = count($permissions);
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
+
+        return $this->render('permission/liste-permission-drh.html.twig', [
+            'personne' => $personne,
+            'nbPermission' => $nbPermission,
+            'permissions' => $permissions,
+            'user' => $user,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
+        ]);
+    }
+
+    #[Route('permissionsd/liste/{id?0}', name: 'sd-permission.liste')]
     public function afficherbysd(
         Permission $permission = null,
         EntityManagerInterface $entityManager,
         Request $request,
         UploaderService $uploaderService,
-        UserInterface $user, // Ajout de UserInterface comme paramètre
+        UserInterface $user,
+        NotificationRepository $notificationRepository
     ): Response {
-        $roles = ['ROLE_GRH', 'ROLE_DIRCAB', 'ROLE_MIN', 'ROLE_DIR', 'ROLE_CS', 'ROLE_SD'];
+        $roles = ['ROLE_GRH','ROLE_DIR', 'ROLE_CS', 'ROLE_SD'];
 
         $granted = false;
         foreach ($roles as $role) {
@@ -224,13 +236,10 @@ class PermissionController extends AbstractController
         }
 
         if (!$granted) {
-            $this->addFlash('error',"vous n'avez pas la permission d'acceder à cette page");        
+            $this->addFlash('error',"vous n'avez pas la permission d'acceder à cette page");
         }
-        
-        // $this->denyAccessUnlessGranted($role,'Vous n\'avez pas la permission d\'accéder à cette page.');
-        // Vérifier si l'utilisateur est authentifié
          if (!$user) {
-            $this->addFlash('error',"Accès refusé ! vous devez avoir un compte");
+            $this->addFlash('error',"Accès réfusé ! vous devez avoir un compte");
          }
  
          // Récupérer l'ID de la personne à partir de l'utilisateur
@@ -243,66 +252,44 @@ class PermissionController extends AbstractController
  
          $personne = $entityManager->getRepository(Personne::class)->find($personneId);
 
-        if (!$personne) {
-            throw $this->createNotFoundException('Personne non trouvée.');
-        }
-
-        $new = false;
-        if (!$permission) {
-            $permission = new Permission();
-            $new = true;
-        }
-
-        $form = $this->createForm(PermissionType::class, $permission);
-        $form->remove('createdAt');
-        $form->remove('updatedAt');
-
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $permission->setStatut("en attente");
-            $photo = $form->get('photo')->getData();
-
-            // Vérifie si une photo a été téléchargée
-            if ($photo) {
-                $directory = $this->getParameter('preuve_permission_directory');
-                $permission->setPreuve($uploaderService->uploadFile($photo, $directory));
-            }
-
-            if ($new) {
-                $personne->addPermission($permission);
-            }
-
-            $entityManager->persist($permission);
-            $entityManager->flush();
-
-            $message = $new ? "a été ajouté avec succès" : "a été mis à jour avec succès";
-            $this->addFlash("success", $permission->getId() . ' ' . $message);
-
-            return $this->redirectToRoute('permission.afficher');
-        }
-        $repository = $entityManager->getRepository(Permission::class);
-        $nbPermission = $repository->count([]);
-        $permissions = $repository->findAll();
-
+         $repository = $entityManager->getRepository(Permission::class);
+         $qb = $repository->createQueryBuilder('p')
+             ->innerJoin('p.personne', 'per')
+             ->innerJoin('per.fonction', 'fonc')
+             ->where('fonc.designation = :designationAgent OR fonc.designation = :designationChefService')
+             ->setParameters([
+                 'designationAgent' => 'Agent', 
+                 'designationChefService' => 'Chef de service',
+             ]);
+     
+         $permissions = $qb->orderBy('p.datedebut', 'DESC')
+             ->getQuery()
+             ->getResult();
+     
+         $nbPermission = count($permissions);
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
 
         return $this->render('permission/liste-permission-sd.html.twig', [
-            'form' => $form->createView(),
             'personne' => $personne,
             'nbPermission' => $nbPermission,
             'permissions' => $permissions,
-            'user' => $user
+            'user' => $user,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
         ]);
     }
 
-    #[Route('cs/permission/liste/{id?0}', name: 'cs-permission.liste')]
+    #[Route('permissioncs/liste/{id?0}', name: 'cs-permission.liste')]
     public function afficherbycs(
         Permission $permission = null,
         EntityManagerInterface $entityManager,
         Request $request,
         UploaderService $uploaderService,
-        UserInterface $user, // Ajout de UserInterface comme paramètre
+        UserInterface $user,
+        NotificationRepository $notificationRepository
     ): Response {
-        $roles = ['ROLE_GRH', 'ROLE_DIRCAB', 'ROLE_MIN', 'ROLE_DIR', 'ROLE_CS', 'ROLE_SD'];
+        $roles = ['ROLE_GRH','ROLE_DIR', 'ROLE_CS', 'ROLE_SD'];
 
         $granted = false;
         foreach ($roles as $role) {
@@ -315,12 +302,9 @@ class PermissionController extends AbstractController
         if (!$granted) {
             $this->addFlash('error',"vous n'avez pas la permission d'acceder à cette page");
         }
-        
-        // $this->denyAccessUnlessGranted($role,'Vous n\'avez pas la permission d\'accéder à cette page.');
-        // Vérifier si l'utilisateur est authentifié
-        if (!$user) {
+         if (!$user) {
             $this->addFlash('error',"Accès réfusé ! vous devez avoir un compte");
-        }
+         }
  
          // Récupérer l'ID de la personne à partir de l'utilisateur
         
@@ -332,66 +316,43 @@ class PermissionController extends AbstractController
  
          $personne = $entityManager->getRepository(Personne::class)->find($personneId);
 
-        if (!$personne) {
-            throw $this->createNotFoundException('Personne non trouvée.');
-        }
-
-        $new = false;
-        if (!$permission) {
-            $permission = new Permission();
-            $new = true;
-        }
-
-        $form = $this->createForm(PermissionType::class, $permission);
-        $form->remove('createdAt');
-        $form->remove('updatedAt');
-
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $permission->setStatut("en attente");
-            $photo = $form->get('photo')->getData();
-
-            // Vérifie si une photo a été téléchargée
-            if ($photo) {
-                $directory = $this->getParameter('preuve_permission_directory');
-                $permission->setPreuve($uploaderService->uploadFile($photo, $directory));
-            }
-
-            if ($new) {
-                $personne->addPermission($permission);
-            }
-
-            $entityManager->persist($permission);
-            $entityManager->flush();
-
-            $message = $new ? "a été ajouté avec succès" : "a été mis à jour avec succès";
-            $this->addFlash("success", $permission->getId() . ' ' . $message);
-
-            return $this->redirectToRoute('permission.afficher');
-        }
-        $repository = $entityManager->getRepository(Permission::class);
-        $nbPermission = $repository->count([]);
-        $permissions = $repository->findAll();
-
+        
+         $repository = $entityManager->getRepository(Permission::class);
+         $qb = $repository->createQueryBuilder('p')
+             ->innerJoin('p.personne', 'per')
+             ->innerJoin('per.fonction', 'fonc')
+             ->where('fonc.designation = :designationAgent')
+             ->setParameters([
+                 'designationAgent' => 'Agent', 
+             ]);
+     
+         $permissions = $qb->orderBy('p.datedebut', 'DESC')
+             ->getQuery()
+             ->getResult();
+        $nbPermission = count($permissions);
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
 
         return $this->render('permission/liste-permission-cs.html.twig', [
-            'form' => $form->createView(),
             'personne' => $personne,
             'nbPermission' => $nbPermission,
             'permissions' => $permissions,
-            'user' => $user
+            'user' => $user,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
         ]);
     }
 
-    #[Route('dircab/permission/liste/{id?0}', name: 'dircab-permission.liste')]
+    #[Route('permissiondircab/liste/{id?0}', name: 'dircab-permission.liste')]
     public function afficherbydircab(
         Permission $permission = null,
         EntityManagerInterface $entityManager,
         Request $request,
         UploaderService $uploaderService,
-        UserInterface $user, // Ajout de UserInterface comme paramètre
+        UserInterface $user,
+        NotificationRepository $notificationRepository
     ): Response {
-        $roles = ['ROLE_GRH', 'ROLE_DIRCAB', 'ROLE_MIN', 'ROLE_DIR', 'ROLE_CS', 'ROLE_SD'];
+        $roles = ['ROLE_GRH','ROLE_DIR', 'ROLE_CS', 'ROLE_SD','ROLE_DIRCAB'];
 
         $granted = false;
         foreach ($roles as $role) {
@@ -404,71 +365,37 @@ class PermissionController extends AbstractController
         if (!$granted) {
             $this->addFlash('error',"vous n'avez pas la permission d'acceder à cette page");
         }
-        
-        // $this->denyAccessUnlessGranted($role,'Vous n\'avez pas la permission d\'accéder à cette page.');
-        // Vérifier si l'utilisateur est authentifié
-        if (!$user) {
+         if (!$user) {
             $this->addFlash('error',"Accès réfusé ! vous devez avoir un compte");
-        }
- 
-         // Récupérer l'ID de la personne à partir de l'utilisateur
-        
+         }
+         
             if ($user && $user->getPersonne()) {
                 $personneId = $user->getPersonne()->getId();
             }
-
-         // ...
  
-         $personne = $entityManager->getRepository(Personne::class)->find($personneId);
+        $personne = $entityManager->getRepository(Personne::class)->find($personneId);
 
-        if (!$personne) {
-            throw $this->createNotFoundException('Personne non trouvée.');
-        }
-
-        $new = false;
-        if (!$permission) {
-            $permission = new Permission();
-            $new = true;
-        }
-
-        $form = $this->createForm(PermissionType::class, $permission);
-        $form->remove('createdAt');
-        $form->remove('updatedAt');
-
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $permission->setStatut("en attente");
-            $photo = $form->get('photo')->getData();
-
-            // Vérifie si une photo a été téléchargée
-            if ($photo) {
-                $directory = $this->getParameter('preuve_permission_directory');
-                $permission->setPreuve($uploaderService->uploadFile($photo, $directory));
-            }
-
-            if ($new) {
-                $personne->addPermission($permission);
-            }
-
-            $entityManager->persist($permission);
-            $entityManager->flush();
-
-            $message = $new ? "a été ajouté avec succès" : "a été mis à jour avec succès";
-            $this->addFlash("success", $permission->getId() . ' ' . $message);
-
-            return $this->redirectToRoute('permission.afficher');
-        }
         $repository = $entityManager->getRepository(Permission::class);
-        $nbPermission = $repository->count([]);
-        $permissions = $repository->findAll();
+        $qb = $repository->createQueryBuilder('p')
+            ->innerJoin('p.personne', 'per')
+            ->innerJoin('per.fonction', 'fonc')
+            ->where('fonc.designation = :designation')
+            ->setParameter('designation', 'Directeur'); // Remplacez 'Directeur' par la désignation recherchée
 
+        $permissions = $qb->orderBy('p.datedebut', 'DESC')
+            ->getQuery()
+            ->getResult();
+        $nbPermission = count($permissions);
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
 
         return $this->render('permission/liste-permission-dircab.html.twig', [
-            'form' => $form->createView(),
             'personne' => $personne,
             'nbPermission' => $nbPermission,
             'permissions' => $permissions,
-            'user' => $user
+            'user' => $user,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
         ]);
     }
 
@@ -479,25 +406,21 @@ class PermissionController extends AbstractController
         EntityManagerInterface $entityManager,
         Request $request,
         UploaderService $uploaderService,
-        UserInterface $user, // Ajout de UserInterface comme paramètre
+        UserInterface $user, 
+        NotificationRepository $notificationRepository
     ): Response {
-         // Récupérer l'utilisateur actuellement connecté
 
-
-         // Vérifier si l'utilisateur est authentifié
-         if (!$user) {
-            $this->addFlash('error',"accès réfusé ! vous devez avoir un compte");
-         }
+        // Vérifier si l'utilisateur est authentifié
+        if (!$user) {
+        $this->addFlash('error',"accès réfusé ! vous devez avoir un compte");
+        }
  
-         // Récupérer l'ID de la personne à partir de l'utilisateur
-        
-            if ($user && $user->getPersonne()) {
-                $personneId = $user->getPersonne()->getId();
-            }
+        // Récupérer l'ID de la personne à partir de l'utilisateur
+        if ($user && $user->getPersonne()) {
+            $personneId = $user->getPersonne()->getId();
+        }
 
-         // ...
- 
-         $personne = $entityManager->getRepository(Personne::class)->find($personneId);
+        $personne = $entityManager->getRepository(Personne::class)->find($personneId);
 
         if (!$personne) {
             $this->addFlash('error',"Agent introuvable !");
@@ -515,7 +438,12 @@ class PermissionController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $permission->calculerEtDefinirDelai();
             $permission->setStatut("en attente");
+            $permission->setEtatdircab("en attente");
+            $permission->setEtatdir("en attente");
+            $permission->setEtatsd("en attente");
+            $permission->setEtatcs("en attente");
             $photo = $form->get('photo')->getData();
 
             // Vérifie si une photo a été téléchargée
@@ -528,26 +456,61 @@ class PermissionController extends AbstractController
                 $personne->addPermission($permission);
             }
 
+            if ($permission->getDuree() == "02 jours" && $permission->getDelai() > 2) {
+                $this->addFlash('error', 'La durée de la permission ne peut pas dépasser la durée maximale autorisée.');
+                return $this->redirectToRoute('permission.add');
+            }
+            if ($permission->getDuree() == "03 jours" && $permission->getDelai() > 3) {
+                $this->addFlash('error', 'La durée de la permission ne peut pas dépasser la durée maximale autorisée.');
+                return $this->redirectToRoute('permission.add');
+
+            }
+            if($permission->getDuree() == "05 jours" && $permission->getDelai() > 5) {
+                $this->addFlash('error', 'La durée de la permission ne peut pas dépasser la durée maximale autorisée.');
+                return $this->redirectToRoute('permission.add');
+            }
+
+            $fonction = $personne->getFonction();
+
+            // Initialiser un tableau pour stocker les désignations de fonctions spécifiques
+            $fonctionsSpecifiques = ["Directeur", "Sous-directeur", "Chef de service"];
+
+            // Vérifier si la fonction de la personne correspond à l'une des fonctions spécifiques
+            if ($fonction && in_array($fonction->getDesignation(), $fonctionsSpecifiques)) {
+                // Créer et envoyer une notification à la personne
+                $notification = new Notification();
+                $notification->setMessage('Une nouvelle demande de permission a été envoyée.');
+                $notification->addDestinataire($personne);
+                $notification->setDateenvoi(new \DateTime());
+                $entityManager->persist($notification);
+            }
+
             $entityManager->persist($permission);
             $entityManager->flush();
 
             $message = $new ? "a été ajouté avec succès" : "a été mis à jour avec succès";
-            $this->addFlash("success", $permission->getId() . ' ' . $message);
+            $this->addFlash("success",'Votre demande ' . $message);
 
-            return $this->redirectToRoute('permission.afficher');
+            if ($permission->getDelai() <= 3) {
+                return $this->redirectToRoute('permissionCD.afficher');
+            }else {
+                return $this->redirectToRoute('permissionLD.afficher');
+            }
         }
         $repository = $entityManager->getRepository(Permission::class);
         $permissions = $repository->findAll();
-
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
 
         return $this->render('permission/edit-permission.html.twig', [
             'form' => $form->createView(),
             'personne' => $personne,
             'permissions' => $permissions,
-            'user' => $user           
+            'user' => $user,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif         
         ]);
     }
-
 
     #[Route('permission/edit/{id?0}', name: 'permission.edit')]
     public function edit(
@@ -555,10 +518,9 @@ class PermissionController extends AbstractController
         EntityManagerInterface $entityManager,
         Request $request,
         UploaderService $uploaderService,
-        UserInterface $user, // Ajout de UserInterface comme paramètre
+        UserInterface $user,
+        NotificationRepository $notificationRepository
     ): Response {
-         // Récupérer l'utilisateur actuellement connecté
-
          // Vérifier si l'utilisateur est authentifié
          if (!$user) {
             $this->addFlash('error',"Accès réfusé ! Vous devez avoir un compte");
@@ -566,22 +528,16 @@ class PermissionController extends AbstractController
  
          // Récupérer l'ID de la personne à partir de l'utilisateur
         
-            if ($user && $user->getPersonne()) {
-                $personneId = $user->getPersonne()->getId();
-            }
-
-         // ...
+        if ($user && $user->getPersonne()) {
+            $personneId = $user->getPersonne()->getId();
+        }
  
          $personne = $entityManager->getRepository(Personne::class)->find($personneId);
 
         if (!$personne) {
             $this->addFlash('error',"Agent introuvable");
         }
-        // Vérifier le statut de la déclaration
-        if ($permission->getStatut() !== Permission::STATUT_EN_ATTENTE) {
-            // throw new StatutErrorException('La déclaration ne peut pas être annulée car son statut est différent de "en attente".',400);
-            $this->addFlash('error',"Impossible de modifier la demande de permission !");
-        }
+        
         $new = false;
         if (!$permission) {
             $permission = new Permission();
@@ -594,7 +550,12 @@ class PermissionController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $permission->calculerEtDefinirDelai();
             $permission->setStatut("en attente");
+            $permission->setEtatdircab("en attente");
+            $permission->setEtatdir("en attente");
+            $permission->setEtatsd("en attente");
+            $permission->setEtatcs("en attente");
             $photo = $form->get('photo')->getData();
 
             // Vérifie si une photo a été téléchargée
@@ -607,23 +568,75 @@ class PermissionController extends AbstractController
                 $personne->addPermission($permission);
             }
 
+            if ($permission->getDuree() == "02 jours" && $permission->getDelai() > 2) {
+                $this->addFlash('error', 'La durée de la permission ne peut pas dépasser la durée maximale autorisée.');
+                
+                return $this->redirectToRoute('permission.edit',['permissionId'=> $permission->getId()]);
+            }
+
+            if ($permission->getDuree() == "03 jours" && $permission->getDelai() > 3) {
+                $this->addFlash('error', 'La durée de la permission ne peut pas dépasser la durée maximale autorisée.');
+                
+                return $this->redirectToRoute('permission.edit',['permissionId'=> $permission->getId()]);
+
+            }
+
+            if($permission->getDuree() == "05 jours" && $permission->getDelai() > 5) {
+                $this->addFlash('error', 'La durée de la permission ne peut pas dépasser la durée maximale autorisée.');
+                
+                return $this->redirectToRoute('permission.edit',['permissionId'=> $permission->getId()]);
+            }
+
+            if($permission->getDuree() == "05 jours" && $permission->getTypepermission() == "autres") {
+                $this->addFlash('error', 'La durée de votre permission ne doit pas dépasser 05 jours.');
+                return $this->redirectToRoute('permission.edit',['permissionId'=> $permission->getId()]);
+            }
+            
+            $fonction = $personne->getFonction();
+
+            // Initialiser un tableau pour stocker les désignations de fonctions spécifiques
+            $fonctionsSpecifiques = ["Directeur", "Sous-directeur", "Chef de service"];
+
+            // Vérifier si la fonction de la personne correspond à l'une des fonctions spécifiques
+            if ($fonction && in_array($fonction->getDesignation(), $fonctionsSpecifiques)) {
+                // Créer et envoyer une notification à la personne
+                $notification = new Notification();
+                $notification->setMessage('Une nouvelle demande de permission a été envoyée.');
+                $notification->addDestinataire($personne);
+                $notification->setDateenvoi(new \DateTime());
+                $entityManager->persist($notification);
+            }
+
+    
             $entityManager->persist($permission);
             $entityManager->flush();
 
-            $message = $new ? "a été ajouté avec succès" : "a été mis à jour avec succès";
-            $this->addFlash("success", $permission->getId() . ' ' . $message);
+            $message = $new ? "a été envoyé avec succès" : "a été mis à jour avec succès";
+            $this->addFlash("success", 'Votre demande ' . $message);
 
-            return $this->redirectToRoute('permission.afficher');
+            if ($permission->getDelai() <= 3) {
+                return $this->redirectToRoute('permissionCD.afficher');
+            }else {
+                return $this->redirectToRoute('permissionLD.afficher');
+            }
+        }
+        //Vérifier le statut de la demande
+        if ($permission->getStatut() !== Permission::STATUT_EN_ATTENTE && $permission->getEtatcs() !== Permission::STATUT_EN_ATTENTE && $permission->getEtatsd() !== Permission::STATUT_EN_ATTENTE && $permission->getEtatdir()) {
+            $this->addFlash('error',"Vous ne pouvez plus modifier cette demande de permission");
+            return $this->redirectToRoute('permissionCD.afficher', ['permissionId' => $permission]);
         }
         $repository = $entityManager->getRepository(Permission::class);
         $permissions = $repository->findAll();
-
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
 
         return $this->render('permission/edit-permission.html.twig', [
             'form' => $form->createView(),
             'personne' => $personne,
             'permissions' => $permissions,
-            'user' => $user
+            'user' => $user,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
         ]);
     }
 
@@ -651,7 +664,7 @@ class PermissionController extends AbstractController
         ]);
     }
      
-    #[Route('/mespermission/{id<\d+>}', name: 'mespermission.show')]
+    #[Route('/mespermission/show/{id<\d+>}', name: 'mespermission.show')]
     public function showMesPermissions(UserInterface $user,Permission $permission = null,EntityManagerInterface $entityManager): Response
     {
         // Vérifier si l'utilisateur est authentifié
@@ -675,7 +688,7 @@ class PermissionController extends AbstractController
         ]);
     }
 
-    #[Route('/mespermissionvalidees/{id<\d+>}', name: 'mespermissionvalidees.show')]
+    #[Route('/mespermissionvalidees/show/{id<\d+>}', name: 'mespermissionvalidees.show')]
     public function showPermissionValidee(UserInterface $user,Permission $permission = null,EntityManagerInterface $entityManager,PdfService $pdf): Response
     {
         // Vérifier si l'utilisateur est authentifié
@@ -702,16 +715,16 @@ class PermissionController extends AbstractController
         return new Response("PDF généré avec succès.");
     }
 
-    #[Route('permission/mesPermissions/{id?0}', name: 'permission.afficher')]
-    public function afficherPermissions(
+    #[Route('permission/mesPermissionsCourteDurée/liste/{id?0}', name: 'permissionCD.afficher')]
+    public function afficherPermissionsCD(
         Permission $permission = null,
         EntityManagerInterface $entityManager,
         Request $request,
         UploaderService $uploaderService,
         UserInterface $user,
+        NotificationRepository $notificationRepository
     ): Response {
          // Récupérer l'utilisateur actuellement connecté
-
 
          // Vérifier si l'utilisateur est authentifié
          if (!$user) {
@@ -744,7 +757,12 @@ class PermissionController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $permission->calculerEtDefinirDelai();
             $permission->setStatut("en attente");
+            $permission->setEtatdircab("en attente");
+            $permission->setEtatdir("en attente");
+            $permission->setEtatsd("en attente");
+            $permission->setEtatcs("en attente");
             $photo = $form->get('photo')->getData();
 
             // Vérifie si une photo a été téléchargée
@@ -757,35 +775,175 @@ class PermissionController extends AbstractController
                 $personne->addPermission($permission);
             }
 
+            if ($permission->getDuree() == "02 jours" && $permission->getDelai() > 2) {
+                $this->addFlash('error', 'La durée de la permission ne peut pas dépasser la durée maximale autorisée.');
+                return $this->redirectToRoute('permissionCD.afficher');
+            }
+            if ($permission->getDuree() == "03 jours" && $permission->getDelai() > 3) {
+                $this->addFlash('error', 'La durée de la permission ne peut pas dépasser la durée maximale autorisée.');
+                return $this->redirectToRoute('permissionCD.afficher');
+
+            }
+            if($permission->getDuree() == "05 jours" && $permission->getDelai() > 5) {
+                $this->addFlash('error', 'La durée de la permission ne peut pas dépasser la durée maximale autorisée.');
+                return $this->redirectToRoute('permissionCD.afficher');
+            }
+
+            if($permission->getDuree() == "05 jours" && $permission->getTypepermission() == "autres") {
+                $this->addFlash('error', 'La durée de votre permission ne doit pas dépasser 05 jours.');
+                return $this->redirectToRoute('permissionCD.afficher');
+            }
+
             $entityManager->persist($permission);
             $entityManager->flush();
 
-            $message = $new ? "a été ajouté avec succès" : "a été mis à jour avec succès";
-            $this->addFlash("success", $permission->getId() . ' ' . $message);
-
-            return $this->redirectToRoute('permission.afficher');
+            if ($permission->getDelai() <= 3) {
+                $message = $new ? "a été ajouté avec succès" : "a été mis à jour avec succès";
+                $this->addFlash("success", $permission->getId() . ' ' . $message);
+                return $this->redirectToRoute('permissionCD.afficher');
+            }else {
+                $message = $new ? "a été ajouté avec succès" : "a été mis à jour avec succès";
+                $this->addFlash("success", $permission->getId() . ' ' . $message);
+                return $this->redirectToRoute('permissionLD.afficher');
+            }
         }
         $repository = $entityManager->getRepository(Permission::class);
         $nbMesPermission = $repository->count([]);
-        $permissions = $personne->getPermission();
+        $permissions = $personne->getPermission()->filter(function ($permission) {
+            return $permission->getDelai() <= 3;
+        });
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
 
-
-        return $this->render('permission/mespermissions.html.twig', [
+        return $this->render('permission/mespermissionsCD.html.twig', [
             'form' => $form->createView(),
             'personne' => $personne,
             'nbMesPermission' => $nbMesPermission,
             'permissions' => $permissions,
-            'user' => $user
+            'user' => $user,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
         ]);
     }
 
-    #[Route('permission/mesPermissionsValidees/{id?0}', name: 'permissionsValidees.afficher')]
+    #[Route('permission/mesPermissionsLongueDurée/liste/{id?0}', name: 'permissionLD.afficher')]
+    public function afficherPermissionsLD(
+        Permission $permission = null,
+        EntityManagerInterface $entityManager,
+        Request $request,
+        UploaderService $uploaderService,
+        UserInterface $user,
+        NotificationRepository $notificationRepository
+    ): Response {
+
+         // Vérifier si l'utilisateur est authentifié
+         if (!$user) {
+            $this->addFlash('error',"Accès réfusé ! Vous devez avoir un compte");
+         }
+ 
+         // Récupérer l'ID de la personne à partir de l'utilisateur
+        
+            if ($user && $user->getPersonne()) {
+                $personneId = $user->getPersonne()->getId();
+            }
+
+         // ...
+ 
+         $personne = $entityManager->getRepository(Personne::class)->find($personneId);
+
+        if (!$personne) {
+            $this->addFlash('error',"Agent introuvable !");
+        }
+
+        $new = false;
+        if (!$permission) {
+            $permission = new Permission();
+            $new = true;
+        }
+
+        $form = $this->createForm(PermissionType::class, $permission);
+        $form->remove('createdAt');
+        $form->remove('updatedAt');
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $permission->calculerEtDefinirDelai();
+            $permission->setStatut("en attente");
+            $permission->setEtatdircab("en attente");
+            $permission->setEtatdir("en attente");
+            $permission->setEtatsd("en attente");
+            $permission->setEtatcs("en attente");
+            $photo = $form->get('photo')->getData();
+
+            // Vérifie si une photo a été téléchargée
+            if ($photo) {
+                $directory = $this->getParameter('preuve_permission_directory');
+                $permission->setPreuve($uploaderService->uploadFile($photo, $directory));
+            }
+
+            if ($new) {
+                $personne->addPermission($permission);
+            }
+
+            if ($permission->getDuree() == "02 jours" && $permission->getDelai() > 2) {
+                $this->addFlash('error', 'La durée de la permission ne peut pas dépasser la durée maximale autorisée.');
+                return $this->redirectToRoute('permissionLD.afficher');
+            }
+            if ($permission->getDuree() == "03 jours" && $permission->getDelai() > 3) {
+                $this->addFlash('error', 'La durée de la permission ne peut pas dépasser la durée maximale autorisée.');
+                return $this->redirectToRoute('permissionLD.afficher');
+
+            }
+            if($permission->getDuree() == "05 jours" && $permission->getDelai() > 5) {
+                $this->addFlash('error', 'La durée de la permission ne peut pas dépasser la durée maximale autorisée.');
+                return $this->redirectToRoute('permissionLD.afficher');
+            }
+
+            if($permission->getDuree() == "05 jours" && $permission->getTypepermission() == "autres") {
+                $this->addFlash('error', 'La durée de votre permission ne doit pas dépasser 05 jours.');
+                return $this->redirectToRoute('permissionLD.afficher');
+            }
+
+            $entityManager->persist($permission);
+            $entityManager->flush();
+
+            if ($permission->getDelai() <= 3) {
+                $message = $new ? "a été ajouté avec succès" : "a été mis à jour avec succès";
+                $this->addFlash("success", $permission->getId() . ' ' . $message);
+                return $this->redirectToRoute('permissionCD.afficher');
+            }else {
+                $message = $new ? "a été ajouté avec succès" : "a été mis à jour avec succès";
+                $this->addFlash("success", $permission->getId() . ' ' . $message);
+                return $this->redirectToRoute('permissionLD.afficher');
+            }
+        }
+        $repository = $entityManager->getRepository(Permission::class);
+        $nbMesPermission = $repository->count([]);
+        $permissions = $personne->getPermission()->filter(function ($permission) {
+            return $permission->getDelai() > 3;
+        });
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
+
+        return $this->render('permission/mespermissionsLD.html.twig', [
+            'form' => $form->createView(),
+            'personne' => $personne,
+            'nbMesPermission' => $nbMesPermission,
+            'permissions' => $permissions,
+            'user' => $user,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
+        ]);
+    }
+
+    #[Route('permission/mesPermissionsValidees/liste/{id?0}', name: 'permissionsValidees.afficher')]
     public function afficherPermissionsValidees(
         Permission $permission = null,
         EntityManagerInterface $entityManager,
         Request $request,
         UploaderService $uploaderService,
         UserInterface $user,
+        NotificationRepository $notificationRepository
     ): Response {
          // Récupérer l'utilisateur actuellement connecté
 
@@ -820,7 +978,12 @@ class PermissionController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $permission->calculerEtDefinirDelai();
             $permission->setStatut("en attente");
+            $permission->setEtatdircab("en attente");
+            $permission->setEtatdir("en attente");
+            $permission->setEtatsd("en attente");
+            $permission->setEtatcs("en attente");
             $photo = $form->get('photo')->getData();
 
             // Vérifie si une photo a été téléchargée
@@ -833,27 +996,385 @@ class PermissionController extends AbstractController
                 $personne->addPermission($permission);
             }
 
+            if ($permission->getDuree() == "02 jours" && $permission->getDelai() > 2) {
+                $this->addFlash('error', 'La durée de la permission ne peut pas dépasser la durée maximale autorisée.');
+                return $this->redirectToRoute('permissionsValidees.afficher');
+            }
+            if ($permission->getDuree() == "03 jours" && $permission->getDelai() > 3) {
+                $this->addFlash('error', 'La durée de la permission ne peut pas dépasser la durée maximale autorisée.');
+                return $this->redirectToRoute('permissionsValidees.afficher');
+
+            }
+            if($permission->getDuree() == "05 jours" && $permission->getDelai() > 5) {
+                $this->addFlash('error', 'La durée de la permission ne peut pas dépasser la durée maximale autorisée.');
+                return $this->redirectToRoute('permissionsValidees.afficher');
+            }
+
+            if($permission->getDuree() == "05 jours" && $permission->getTypepermission() == "autres") {
+                $this->addFlash('error', 'La durée de votre permission ne doit pas dépasser 05 jours.');
+                return $this->redirectToRoute('permissionLD.afficher');
+            }
+            
             $entityManager->persist($permission);
             $entityManager->flush();
+            if ($permission->getDelai() <= 3) {
+                $message = $new ? "a été ajouté avec succès" : "a été mis à jour avec succès";
+                $this->addFlash("success", $permission->getId() . ' ' . $message);
+                return $this->redirectToRoute('permissionCD.afficher');
+            }else {
+                $message = $new ? "a été ajouté avec succès" : "a été mis à jour avec succès";
+                $this->addFlash("success", $permission->getId() . ' ' . $message);
+                return $this->redirectToRoute('permissionLD.afficher');
+            }
 
-            $message = $new ? "a été ajouté avec succès" : "a été mis à jour avec succès";
-            $this->addFlash("success", $permission->getId() . ' ' . $message);
-
-            return $this->redirectToRoute('permission.afficher');
         }
         $repository = $entityManager->getRepository(Permission::class);
         $nbMesPermissionValidees = $repository->count([]);
         $permissions = $personne->getPermission()->filter(function ($permission) {
-            return $permission->getStatut() === 'validée';
+            return $permission->getEtatcs() === 'validée' && $permission->getEtatsd() === 'validée' && $permission->getEtatdir() === 'validée';
         });
         
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
 
         return $this->render('permission/mespermissionsvalidees.html.twig', [
             'form' => $form->createView(),
             'personne' => $personne,
             'nbMesPermissionValidees' => $nbMesPermissionValidees,
             'permissions' => $permissions,
-            'user' => $user
+            'user' => $user,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
+        ]);
+    }
+
+    #[Route('permission/grhPermissionsNonValidees/{id?0}', name: 'grh-permissionsNonValidees.afficher')]
+    public function afficherGRHPermissionsNonValidees(
+        Permission $permission = null,
+        EntityManagerInterface $entityManager,
+        Request $request,
+        UploaderService $uploaderService,
+        UserInterface $user,
+        NotificationRepository $notificationRepository
+    ): Response {
+         // Récupérer l'utilisateur actuellement connecté
+
+         // Vérifier si l'utilisateur est authentifié
+         if (!$user) {
+            $this->addFlash('error',"Accès réfusé ! Vous devez avoir un compte");
+         }
+ 
+         // Récupérer l'ID de la personne à partir de l'utilisateur
+        
+            if ($user && $user->getPersonne()) {
+                $personneId = $user->getPersonne()->getId();
+            }
+ 
+         $personne = $entityManager->getRepository(Personne::class)->find($personneId);
+
+        
+         $repository = $entityManager->getRepository(Permission::class);
+         $qb = $repository->createQueryBuilder('p')
+             ->where('p.statut = :statut')
+             ->andWhere('p.delai > :delaiMax')
+             ->setParameters([
+                 'statut' => 'en attente',
+                 'delaiMax' => 3,
+             ]);
+         
+         $permissions = $qb->orderBy('p.datedebut', 'DESC')
+             ->getQuery()
+             ->getResult();
+         
+ 
+        $nbPermissionValidees = count($permissions);
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
+
+        return $this->render('permission/grh-mespermissionsnonvalidees.html.twig', [
+            'personne' => $personne,
+            'nbMesPermissionValidees' => $nbPermissionValidees,
+            'permissions' => $permissions,
+            'user' => $user,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
+        ]);
+    }
+
+    #[Route('permission/dirPermissionsNonValidees/{id?0}', name: 'dir-permissionsNonValidees.afficher')]
+    public function afficherDirPermissionsNonValidees(
+        Permission $permission = null,
+        EntityManagerInterface $entityManager,
+        Request $request,
+        UploaderService $uploaderService,
+        UserInterface $user,
+        NotificationRepository $notificationRepository
+    ): Response {
+         // Récupérer l'utilisateur actuellement connecté
+
+         // Vérifier si l'utilisateur est authentifié
+         if (!$user) {
+            $this->addFlash('error',"Accès réfusé ! Vous devez avoir un compte");
+         }
+ 
+         // Récupérer l'ID de la personne à partir de l'utilisateur
+        
+            if ($user && $user->getPersonne()) {
+                $personneId = $user->getPersonne()->getId();
+            }
+
+         // ...
+ 
+        $personne = $entityManager->getRepository(Personne::class)->find($personneId);
+
+        $repository = $entityManager->getRepository(Permission::class);
+        $qb = $repository->createQueryBuilder('p')
+            ->innerJoin('p.personne', 'per')
+            ->innerJoin('per.fonction', 'fonc')
+            ->where('fonc.designation = :designationAgent OR fonc.designation = :designationChefService OR fonc.designation = :designationSD')
+            ->andWhere('p.etatdir = :etatdir')
+            ->setParameters([
+                'designationAgent' => 'Agent', 
+                'designationChefService' => 'Chef de service',
+                'designationSD' => 'Sous-directeur',
+                'etatdir' => 'en attente',
+            ]);
+    
+        $permissions = $qb->orderBy('p.datedebut', 'DESC')
+            ->getQuery()
+            ->getResult();
+ 
+         $nbPermissionValidees = count($permissions);
+         $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+         $nbNotif = count($notifications);
+        return $this->render('permission/dir-mespermissionsnonvalidees.html.twig', [
+            'personne' => $personne,
+            'nbMesPermissionValidees' => $nbPermissionValidees,
+            'permissions' => $permissions,
+            'user' => $user,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
+        ]);
+    }
+
+    #[Route('permission/drhPermissionsNonValidees/{id?0}', name: 'drh-permissionsNonValidees.afficher')]
+    public function afficherDRHPermissionsNonValidees(
+        Permission $permission = null,
+        EntityManagerInterface $entityManager,
+        Request $request,
+        UploaderService $uploaderService,
+        UserInterface $user,
+        NotificationRepository $notificationRepository
+    ): Response {
+         // Récupérer l'utilisateur actuellement connecté
+
+         // Vérifier si l'utilisateur est authentifié
+         if (!$user) {
+            $this->addFlash('error',"Accès réfusé ! Vous devez avoir un compte");
+         }
+ 
+         // Récupérer l'ID de la personne à partir de l'utilisateur
+        
+            if ($user && $user->getPersonne()) {
+                $personneId = $user->getPersonne()->getId();
+            }
+
+         // ...
+ 
+        $personne = $entityManager->getRepository(Personne::class)->find($personneId);
+
+        $repository = $entityManager->getRepository(Permission::class);
+        $qb = $repository->createQueryBuilder('p')
+            ->innerJoin('p.personne', 'per')
+            ->innerJoin('per.fonction', 'fonc')
+            ->where('fonc.designation = :designationAgent OR fonc.designation = :designationChefService OR fonc.designation = :designationSD')
+            ->andWhere('p.etatdir = :etatdir')
+            ->setParameters([
+                'designationAgent' => 'Agent', 
+                'designationChefService' => 'Chef de service',
+                'designationSD' => 'Sous-directeur',
+                'etatdir' => 'en attente',
+            ]);
+    
+        $permissions = $qb->orderBy('p.datedebut', 'DESC')
+            ->getQuery()
+            ->getResult();
+ 
+         $nbPermissionValidees = count($permissions);
+         $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+         $nbNotif = count($notifications);
+        return $this->render('permission/drh-mespermissionsnonvalidees.html.twig', [
+            'personne' => $personne,
+            'nbMesPermissionValidees' => $nbPermissionValidees,
+            'permissions' => $permissions,
+            'user' => $user,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
+        ]);
+    }
+
+    #[Route('permission/dircabPermissionsNonValidees/{id?0}', name: 'dircab-permissionsNonValidees.afficher')]
+    public function afficherPermissionsDIRCABNonValidees(
+        Permission $permission = null,
+        EntityManagerInterface $entityManager,
+        Request $request,
+        UploaderService $uploaderService,
+        UserInterface $user,
+        NotificationRepository $notificationRepository
+    ): Response {
+         // Récupérer l'utilisateur actuellement connecté
+
+         // Vérifier si l'utilisateur est authentifié
+         if (!$user) {
+            $this->addFlash('error',"Accès réfusé ! Vous devez avoir un compte");
+         }
+ 
+         // Récupérer l'ID de la personne à partir de l'utilisateur
+        
+            if ($user && $user->getPersonne()) {
+                $personneId = $user->getPersonne()->getId();
+            }
+
+         // ...
+ 
+         $personne = $entityManager->getRepository(Personne::class)->find($personneId);
+
+        $repository = $entityManager->getRepository(Permission::class);
+        $qb = $repository->createQueryBuilder('p')
+            ->innerJoin('p.personne', 'per')
+            ->innerJoin('per.fonction', 'fonc')
+            ->where('fonc.designation = :designationDirecteur')
+            ->andWhere('p.etatdircab = :etatdircab')
+            ->setParameters([
+                'designationDirecteur' => 'Directeur',
+                'etatdircab' => 'en attente',
+            ]);
+            
+        $permissions = $qb->orderBy('p.datedebut', 'DESC')
+            ->getQuery()
+            ->getResult();
+
+ 
+         $nbPermissionValidees = count($permissions);
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
+
+        return $this->render('permission/dircab-mespermissionsnonvalidees.html.twig', [
+            'personne' => $personne,
+            'nbMesPermissionValidees' => $nbPermissionValidees,
+            'permissions' => $permissions,
+            'user' => $user,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
+        ]);
+    }
+
+    #[Route('permission/sdmesPermissionsNonValidees/{id?0}', name: 'sd-permissionsNonValidees.afficher')]
+    public function afficherSDPermissionsNonValidees(
+        Permission $permission = null,
+        EntityManagerInterface $entityManager,
+        Request $request,
+        UploaderService $uploaderService,
+        UserInterface $user,
+        NotificationRepository $notificationRepository
+    ): Response {
+         // Récupérer l'utilisateur actuellement connecté
+
+         // Vérifier si l'utilisateur est authentifié
+         if (!$user) {
+            $this->addFlash('error',"Accès réfusé ! Vous devez avoir un compte");
+         }
+ 
+         // Récupérer l'ID de la personne à partir de l'utilisateur
+        
+            if ($user && $user->getPersonne()) {
+                $personneId = $user->getPersonne()->getId();
+            }
+ 
+         $personne = $entityManager->getRepository(Personne::class)->find($personneId);
+
+        $repository = $entityManager->getRepository(Permission::class);
+        $qb = $repository->createQueryBuilder('p')
+            ->innerJoin('p.personne', 'per')
+            ->innerJoin('per.fonction', 'fonc')
+            ->where('fonc.designation = :designationAgent OR fonc.designation = :designationChefService')
+            ->andWhere('p.etatsd = :etatsd')
+            ->setParameters([
+                'designationAgent' => 'Agent', 
+                'designationChefService' => 'Chef de service',
+                'etatsd' => 'en attente',
+            ]);
+    
+        $permissions = $qb->orderBy('p.datedebut', 'DESC')
+            ->getQuery()
+            ->getResult();
+
+
+        $nbPermissionValidees = count($permissions);
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
+
+        return $this->render('permission/sd-mespermissionsnonvalidees.html.twig', [
+            'personne' => $personne,
+            'nbMesPermissionValidees' => $nbPermissionValidees,
+            'permissions' => $permissions,
+            'user' => $user,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
+        ]);
+    }
+
+    #[Route('permission/csmesPermissionsNonValidees/{id?0}', name: 'cs-permissionsNonValidees.afficher')]
+    public function afficherCSPermissionsNonValidees(
+        Permission $permission = null,
+        EntityManagerInterface $entityManager,
+        Request $request,
+        UploaderService $uploaderService,
+        UserInterface $user,
+        NotificationRepository $notificationRepository
+    ): Response {
+         // Récupérer l'utilisateur actuellement connecté
+
+         // Vérifier si l'utilisateur est authentifié
+         if (!$user) {
+            $this->addFlash('error',"Accès réfusé ! Vous devez avoir un compte");
+         }
+ 
+         // Récupérer l'ID de la personne à partir de l'utilisateur
+        
+            if ($user && $user->getPersonne()) {
+                $personneId = $user->getPersonne()->getId();
+            }
+ 
+         $personne = $entityManager->getRepository(Personne::class)->find($personneId);
+
+         $repository = $entityManager->getRepository(Permission::class);
+         $qb = $repository->createQueryBuilder('p')
+             ->innerJoin('p.personne', 'per')
+             ->innerJoin('per.fonction', 'fonc')
+             ->where('fonc.designation = :designation')
+             ->andWhere('p.etatcs = :etatcs')
+             ->setParameters([
+                 'designation' => 'Agent', 
+                 'etatcs' => 'en attente',
+             ]);
+         
+         $permissions = $qb->orderBy('p.datedebut', 'DESC')
+             ->getQuery()
+             ->getResult();
+         
+
+        $nbPermissionValidees = count($permissions);
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
+
+        return $this->render('permission/cs-mespermissionsnonvalidees.html.twig', [
+            'personne' => $personne,
+            'nbMesPermissionValidees' => $nbPermissionValidees,
+            'permissions' => $permissions,
+            'user' => $user,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
         ]);
     }
 
@@ -903,34 +1424,6 @@ class PermissionController extends AbstractController
 
         return $this->redirectToRoute('permission.afficher', ['personneId' => $personneId]);
     }
-
-    #[Route('/permission/changer-statut/{permissionId}/{nouveauStatut}', name: 'permission.changer_statut')]
-    public function changerStatutPermission(
-        UserInterface $user,
-        ManagerRegistry $doctrine,
-        Request $request,
-        $permissionId,
-        $nouveauStatut
-    ): Response {
-
-        // Vérifier si l'utilisateur est authentifié
-        if (!$user) {
-            $this->addFlash('error',"Accès réfusé ! Vous devez avoir un compte");
-        }
-        $permission = $doctrine->getRepository(Permission::class)->find($permissionId);
-
-        if (!$permission) {
-            $this->addFlash('error',"Demande de permission introuvable");
-        }
-
-        // Modifier le statut de la permission
-        $permission->setStatut($nouveauStatut);
-
-        $entityManager = $doctrine->getManager();
-        $entityManager->flush();
-
-        return $this->redirectToRoute('permission.detail', ['id' => $permissionId]);
-    }
     
     #[Route('/permission/annuler/{permissionId}', name: 'permission.annuler')]
     public function annulerPermission(
@@ -960,9 +1453,9 @@ class PermissionController extends AbstractController
             $this->addFlash('error','Vous n\'êtes pas autorisé à annuler cette permission.');
         }
         // Vérifier le statut de la permission
-        if ($permission->getStatut() !== Permission::STATUT_EN_ATTENTE) {
-            $this->addFlash('error',"Impossible d'annuler cette demande de permission");
-            return $this->redirectToRoute('permission.afficher', ['permissionId' => $permissionId]);
+        if ($permission->getStatut() !== Permission::STATUT_EN_ATTENTE && $permission->getEtatcs() !== Permission::STATUT_EN_ATTENTE && $permission->getEtatsd() !== Permission::STATUT_EN_ATTENTE && $permission->getEtatdir()) {
+            $this->addFlash('error',"Vous ne pouvez plus annuler cette demande");
+            return $this->redirectToRoute('permissionCD.afficher', ['permissionId' => $permissionId]);
         }
         
         $personne->removePermission($permission);
@@ -970,8 +1463,8 @@ class PermissionController extends AbstractController
         $entityManager = $doctrine->getManager();
         $entityManager->remove($permission);
         $entityManager->flush();
-
-        return $this->redirectToRoute('permission.afficher', ['permissionId' => $permissionId]);
+        $this->addFlash('success','Demande annulée avec succès ');
+        return $this->redirectToRoute('permissionCD.afficher', ['permissionId' => $permissionId]);
 
 
     }
@@ -980,7 +1473,8 @@ class PermissionController extends AbstractController
     public function validerPermission(
         ManagerRegistry $doctrine,
         Request $request,
-        $permissionId
+        $permissionId,
+        NotificationRepository $notificationRepository
     ): Response {
         $roles = ['ROLE_GRH', 'ROLE_DIRCAB','ROLE_DIR', 'ROLE_SD','ROLE_CS','ROLE_MIN'];
 
@@ -1013,20 +1507,65 @@ class PermissionController extends AbstractController
             $this->addFlash('error','Vous n\'êtes pas autorisé à valider cette permission.');
         }
 
-        // Vérifier le statut de la permission
-        if ($permission->getStatut() !== Permission::STATUT_EN_ATTENTE) {
-            // throw new StatutErrorException('La permission ne peut pas être validée car son statut est différent de "en attente".',400);
-            $this->addFlash('error',"Impossible de valider cette demande de permission");
-            return $this->redirectToRoute('permission.show', ['id' => $permission->getId()]);
-
+        if ($this->isGranted('ROLE_GRH')) {
+            if ($permission->getStatut() !== Permission::STATUT_EN_ATTENTE) {
+                // throw new StatutErrorException('La permission ne peut pas être validée car son statut est différent de "en attente".',400);
+                $this->addFlash('error',"Impossible de rejeter cette demande de permission");
+                return $this->redirectToRoute('permission.show', ['id' => $permission->getId()]);
+            }
+    
+            // rejeter la permission en changeant son statut
+            $permission->setStatut(Permission::STATUT_VALIDEE);
         }
 
-        // valider la permission en changeant son statut
-        $permission->setStatut(Permission::STATUT_VALIDEE);
+        if ($this->isGranted('ROLE_DIRCAB')) {
+            if ($permission->getEtatdircab() !== Permission::STATUT_EN_ATTENTE) {
+                // throw new StatutErrorException('La permission ne peut pas être validée car son statut est différent de "en attente".',400);
+                $this->addFlash('error',"Impossible de rejeter cette demande de permission");
+                return $this->redirectToRoute('permission.show', ['id' => $permission->getId()]);
+            }
+    
+            // rejeter la permission en changeant son statut
+            $permission->setEtatdircab(Permission::STATUT_VALIDEE);
+        }
+
+        if ($this->isGranted('ROLE_DIR')) {
+            if ($permission->getEtatdir() !== Permission::STATUT_EN_ATTENTE) {
+                // throw new StatutErrorException('La permission ne peut pas être validée car son statut est différent de "en attente".',400);
+                $this->addFlash('error',"Impossible de rejeter cette demande de permission");
+                return $this->redirectToRoute('permission.show', ['id' => $permission->getId()]);
+            }
+    
+            // rejeter la permission en changeant son statut
+            $permission->setEtatdir(Permission::STATUT_VALIDEE);
+        }
+
+        if ($this->isGranted('ROLE_SD')) {
+            if ($permission->getEtatsd() !== Permission::STATUT_EN_ATTENTE) {
+                // throw new StatutErrorException('La permission ne peut pas être validée car son statut est différent de "en attente".',400);
+                $this->addFlash('error',"Impossible de rejeter cette demande de permission");
+                return $this->redirectToRoute('permission.show', ['id' => $permission->getId()]);
+            }
+    
+            // rejeter la permission en changeant son statut
+            $permission->setEtatsd(Permission::STATUT_VALIDEE);
+        }
+
+        if ($this->isGranted('ROLE_CS')) {
+            if ($permission->getEtatcs() !== Permission::STATUT_EN_ATTENTE) {
+                // throw new StatutErrorException('La permission ne peut pas être validée car son statut est différent de "en attente".',400);
+                $this->addFlash('error',"Impossible de rejeter cette demande de permission");
+                return $this->redirectToRoute('permission.show', ['id' => $permission->getId()]);
+            }
+    
+            // rejeter la permission en changeant son statut
+            $permission->setEtatcs(Permission::STATUT_VALIDEE);
+        }
+        
 
         $entityManager = $doctrine->getManager();
         $entityManager->flush();
-
+        $this->addFlash('success','Demande validée avec succès');
         // Redirection vers la route spécifique en fonction du rôle
         if ($this->isGranted('ROLE_GRH')) {
             return $this->redirectToRoute('grh-permission.liste');
@@ -1038,9 +1577,8 @@ class PermissionController extends AbstractController
             return $this->redirectToRoute('sd-permission.liste');
         }elseif ($this->isGranted('ROLE_CS')) {
             return $this->redirectToRoute('cs-permission.liste');
-        }elseif ($this->isGranted('ROLE_MIN')) {
-            return $this->redirectToRoute('ministre-permission.liste');
-        }
+        
+    }
     }
 
     #[Route('/permission/rejeter/{permissionId}', name: 'permission.rejeter')]
@@ -1083,20 +1621,64 @@ class PermissionController extends AbstractController
             // throw new StatutErrorException('Vous n\'êtes pas autorisé à annuler cette permission.',400);
             $this->addFlash('error','Vous n\'êtes pas autorisé à rejeter cette permission.');
         }
-
-        // Vérifier le statut de la permission
-        if ($permission->getStatut() !== Permission::STATUT_EN_ATTENTE) {
-            // throw new StatutErrorException('La permission ne peut pas être validée car son statut est différent de "en attente".',400);
-            $this->addFlash('error',"Impossible de rejeter cette demande de permission");
-            return $this->redirectToRoute('permission.show', ['id' => $permission->getId()]);
+        if ($this->isGranted('ROLE_GRH')) {
+            if ($permission->getStatut() !== Permission::STATUT_EN_ATTENTE) {
+                // throw new StatutErrorException('La permission ne peut pas être validée car son statut est différent de "en attente".',400);
+                $this->addFlash('error',"Impossible de rejeter cette demande de permission");
+                return $this->redirectToRoute('permission.show', ['id' => $permission->getId()]);
+            }
+    
+            // rejeter la permission en changeant son statut
+            $permission->setStatut(Permission::STATUT_REJETEE);
         }
 
-        // rejeter la permission en changeant son statut
-        $permission->setStatut(Permission::STATUT_REJETEE);
+        if ($this->isGranted('ROLE_DIRCAB')) {
+            if ($permission->getEtatdircab() !== Permission::STATUT_EN_ATTENTE) {
+                // throw new StatutErrorException('La permission ne peut pas être validée car son statut est différent de "en attente".',400);
+                $this->addFlash('error',"Impossible de rejeter cette demande de permission");
+                return $this->redirectToRoute('permission.show', ['id' => $permission->getId()]);
+            }
+    
+            // rejeter la permission en changeant son statut
+            $permission->setEtatdircab(Permission::STATUT_REJETEE);
+        }
+
+        if ($this->isGranted('ROLE_DIR')) {
+            if ($permission->getEtatdir() !== Permission::STATUT_EN_ATTENTE) {
+                // throw new StatutErrorException('La permission ne peut pas être validée car son statut est différent de "en attente".',400);
+                $this->addFlash('error',"Impossible de rejeter cette demande de permission");
+                return $this->redirectToRoute('permission.show', ['id' => $permission->getId()]);
+            }
+    
+            // rejeter la permission en changeant son statut
+            $permission->setEtatdir(Permission::STATUT_REJETEE);
+        }
+
+        if ($this->isGranted('ROLE_SD')) {
+            if ($permission->getEtatsd() !== Permission::STATUT_EN_ATTENTE) {
+                // throw new StatutErrorException('La permission ne peut pas être validée car son statut est différent de "en attente".',400);
+                $this->addFlash('error',"Impossible de rejeter cette demande de permission");
+                return $this->redirectToRoute('permission.show', ['id' => $permission->getId()]);
+            }
+    
+            // rejeter la permission en changeant son statut
+            $permission->setEtatsd(Permission::STATUT_REJETEE);
+        }
+
+        if ($this->isGranted('ROLE_CS')) {
+            if ($permission->getEtatcs() !== Permission::STATUT_EN_ATTENTE) {
+                // throw new StatutErrorException('La permission ne peut pas être validée car son statut est différent de "en attente".',400);
+                $this->addFlash('error',"Impossible de rejeter cette demande de permission");
+                return $this->redirectToRoute('permission.show', ['id' => $permission->getId()]);
+            }
+    
+            // rejeter la permission en changeant son statut
+            $permission->setEtatcs(Permission::STATUT_REJETEE);
+        }
 
         $entityManager = $doctrine->getManager();
         $entityManager->flush();
-
+        $this->addFlash('success','Demande rejetéé avec succès');
         if ($this->isGranted('ROLE_GRH')) {
             return $this->redirectToRoute('grh-permission.liste');
         } elseif ($this->isGranted('ROLE_DIRCAB')) {

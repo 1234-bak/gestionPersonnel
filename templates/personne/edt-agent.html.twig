@@ -23,172 +23,210 @@
     <img class="rounded-circle" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" width="30" alt="Admin">
 {% endblock %}
 {% block main %}
-            <h3 class="font-weight-bold text-center">Enregistrement d'un agent</h3>
-            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
-            <div class="search" style="position: relative !important;" style="position: relative !important;">
-                {{ form_row(form.nom,{
-                    'attr':{
-                        'class': 'input',
-                        'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
-                    }
-                    }) }}
-            </div>
-            <div class="search" style="position: relative !important;">
-                {{ form_row(form.prenom,{
-                'attr':{
-                    'class': 'input',
-                    'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
-                }
-                }) }}
-            </div>
-            <div class="search" style="position: relative !important;">
-                {{ form_row(form.matricule,{
-                'attr':{
-                    'class': 'input',
-                    'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
-                }
-                }) }}
-            </div>
-            <div class="search" style="position: relative !important;">
-                {{ form_row(form.civilite,{
-                'attr':{
-                    'class': 'input',
-                    'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
-                }
-                }) }}
-            </div>
-            <div class="search" style="position: relative !important;">
-                {{ form_row(form.structure,{
-                'attr':{
-                    'class': 'input',
-                    'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
-                }
-                }) }}
-            </div>
-            {{ form_label(form.fonction, 'Fonction', {
+    <h3 class="font-weight-bold text-center">Enregistrement d'un agent</h3>
+    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+    <div class="search" style="position: relative !important;" style="position: relative !important;">
+        {{ form_row(form.nom,{
+            'attr':{
+                'class': 'input',
+                'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
+            }
+            }) }}
+    </div>
+    <div class="search" style="position: relative !important;">
+        {{ form_row(form.prenom,{
+        'attr':{
+            'class': 'input',
+            'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
+        }
+        }) }}
+    </div>
+    <div class="search" style="position: relative !important;">
+        {{ form_row(form.matricule,{
+        'attr':{
+            'readonly': true,
+            'class': 'input',
+            'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
+        }
+        }) }}
+    </div>
+    <div class="search" style="position: relative !important;">
+        {{ form_label(form.civilite, 'Civilité', {
             'label_attr': {
                 'class': 'label',
             }
-            }) }}</br>
-            {{ form_widget(form.fonction,{'attr':{'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'}}) }}</br></br>
-            {{ form_label(form.direction, 'Direction', {
-            'label_attr': {
-                'class': 'label',
-            }
-            }) }}</br>
-            {{ form_widget(form.direction,{'attr':{'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'}}) }}</br></br>
+        }) }} <br>
+        {{ form_widget(form.civilite,{
+        'attr':{
+            'class': 'choice',
+            'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
+        }
+        }) }}
+    </div>
+    </br>
+    <div class="search" style="position: relative !important;">
+        {{ form_row(form.structure,{
+        'attr':{
+            'readonly': true,
+            'class': 'input',
+            'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
+        }
+        }) }}
+    </div>
+    {{ form_label(form.fonction, 'Fonction', {
+    'label_attr': {
+        'class': 'label',
+    }
+    }) }}</br>
+    {{ form_widget(form.fonction,{'attr':{'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'}}) }}</br></br>
+    {{ form_label(form.direction, 'Direction', {
+    'label_attr': {
+        'class': 'label',
+    }
+    }) }}</br>
+    {{ form_widget(form.direction,{'attr':{'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'}}) }}</br></br>
 
-            {{ form_label(form.sousdirection, 'Sous-direction', {
+    {{ form_label(form.sousdirection, 'Sous-direction', {
+    'label_attr': {
+        'class': 'label',
+    }
+    }) }}</br>
+    {{ form_widget(form.sousdirection,{'attr':{'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'}}) }}</br></br>
+    {{ form_label(form.service, 'Service', {
+    'label_attr': {
+        'class': 'label',
+    }
+    }) }}</br>
+    {{ form_widget(form.service,{'attr':{'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'}}) }}</br></br>
+    <div class="search" style="position: relative !important;">
+        {{ form_row(form.datenaiss, {
+        'attr': {
+            'class': 'input',
+            'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;',
+            'value': "now"|date("Y-m-d")
+        }
+        }) }}
+    </div>
+    <div class="search" style="position: relative !important;">
+        {{ form_row(form.lieunaiss,{
+        'attr':{
+            'class': 'input',
+            'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
+        }
+        }) }}
+    </div>
+    <div class="search" style="position: relative !important;">
+        {{ form_row(form.nompere,{
+        'attr':{
+            'class': 'input',
+            'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
+        }
+        }) }}
+    </div>
+    <div class="search" style="position: relative !important;">
+        {{ form_row(form.nommere,{
+        'attr':{
+            'class': 'input',
+            'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
+        }
+        }) }}
+    </div>
+    <div class="search" style="position: relative !important;">
+        {{ form_row(form.nbreenfant,{
+        'attr':{
+            'class': 'input',
+            'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
+        }
+        }) }}
+    </div>
+    <div class="search" style="position: relative !important;">
+        {{ form_label(form.grade, 'Grade', {
             'label_attr': {
                 'class': 'label',
             }
-            }) }}</br>
-            {{ form_widget(form.sousdirection,{'attr':{'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'}}) }}</br></br>
-            {{ form_label(form.service, 'Service', {
+        }) }} <br>
+        {{ form_widget(form.grade,{
+        'attr':{
+            'class': 'choice',
+            'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
+        }
+        }) }}
+    </div> <br>
+    <div class="search" style="position: relative !important;">
+        {{ form_label(form.sexe, 'Sexe', {
             'label_attr': {
                 'class': 'label',
             }
-            }) }}</br>
-            {{ form_widget(form.service,{'attr':{'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'}}) }}</br></br>
-            {% set currentDate = "now"|date("d/m/Y") %}
-            <div class="search" style="position: relative !important;">
-                {{ form_row(form.datenaiss, {
-                'attr': {
-                    'class': 'input',
-                    'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;',
-                    'value': currentDate
-                }
-                }) }}
-            </div>
-            <div class="search" style="position: relative !important;">
-                {{ form_row(form.lieunaiss,{
-                'attr':{
-                    'class': 'input',
-                    'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
-                }
-                }) }}
-            </div>
-            <div class="search" style="position: relative !important;">
-                {{ form_row(form.nompere,{
-                'attr':{
-                    'class': 'input',
-                    'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
-                }
-                }) }}
-            </div>
-            <div class="search" style="position: relative !important;">
-                {{ form_row(form.nommere,{
-                'attr':{
-                    'class': 'input',
-                    'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
-                }
-                }) }}
-            </div>
-            <div class="search" style="position: relative !important;">
-                {{ form_row(form.nbreenfant,{
-                'attr':{
-                    'class': 'input',
-                    'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
-                }
-                }) }}
-            </div>
-            <div class="search" style="position: relative !important;">
-                {{ form_row(form.grade,{
-                'attr':{
-                    'class': 'input',
-                    'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
-                }
-                }) }}
-            </div>
-            <div class="search" style="position: relative !important;">
-                {{ form_row(form.sexe,{
-                'attr':{
-                    'class': 'input',
-                    'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
-                }
-                }) }}
-            </div>
-            <div class="search" style="position: relative !important;">
-                {{ form_row(form.telephone,{
-                'attr':{
-                    'class': 'input',
-                    'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
-                }
-                }) }}
-            </div>
-            <div class="profile_content bg-light pr-2 pl-2 pb-2 mb-2 " style="width:80%;">
-                <img id="profile-image-preview" src="{{ user.personne.image ? asset('uploads/image_personne/' ~ user.personne.image) : '' }}" class="mt-5" style="width: 8em;position: relative; left: 50%; transform:translateX(-50%); height: 8em; margin-top: 5em;border-radius:50%;" alt="image de profile">
-                <div class="search text-center">
-                {{ form_row(form.photo, {
-                    'attr': {
-                        'class': 'input',
-                        'style': 'width: 80% !important;position: relative; left: 50%; transform:translateX(-50%);border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;',
-                        'id': 'profile-image-input',
-                    }
-                }) }}
-                
-                </div>
-            </div>
-            <div class="signature_content bg-light pr-2 pl-2 pb-2 mb-2 " style="width:80%;">
-                <img id="profile-image-preview" src="{{ user.personne.signature ? asset('uploads/image_personne/' ~ user.personne.signature) : '' }}" class="mt-5" style="width: 8em;position: relative; left: 50%; transform:translateX(-50%); height: 8em; margin-top: 5em;border-radius:50%;" alt="Signature">
-                <div class="search text-center">
-                {{ form_row(form.signature, {
-                    'attr': {
-                        'class': 'input',
-                        'style': 'width: 80% !important;position: relative; left: 50%; transform:translateX(-50%);border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;',
-                        'id': 'profile-image-input',
-                    }
-                }) }}
-                
-                </div>
-            </div>
-            {{ form_row(form.editer, {'attr': {'class': 'orange-button mb-4'}}) }}
-            {{ form_end(form) }}
+        }) }} <br>
+        {{ form_widget(form.sexe,{
+        'attr':{
+            'class': 'choice',
+            'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
+        }
+        }) }}
+    </div> <br>
+    <div class="search" style="position: relative !important;">
+        {{ form_row(form.telephone,{
+        'attr':{
+            'class': 'input',
+            'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;'
+        }
+        }) }}
+    </div>
+    <div class="profile_content bg-light pr-2 pl-2 pb-2 mb-2 " style="width:80%;">
+        <img id="profile-image-preview" src="{{ user.personne.image ? asset('uploads/image_personne/' ~ user.personne.image) : '' }}" class="mt-5" style="width: 8em;position: relative; left: 50%; transform:translateX(-50%); height: 8em; margin-top: 5em;border-radius:50%;" alt="image de profile">
+        <div class="search text-center">
+        {{ form_row(form.photo, {
+            'attr': {
+                'class': 'input',
+                'style': 'width: 80% !important;position: relative; left: 50%; transform:translateX(-50%);border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;',
+                'id': 'profile-image-input',
+            }
+        }) }}
+        
+        </div>
+    </div>
+    <div class="signature_content bg-light pr-2 pl-2 pb-2 mb-2 " style="width:80%;">
+        <img id="signature-image-preview" src="{{ user.personne.signature ? asset('uploads/image_signature/' ~ user.personne.signature) : '' }}" class="mt-5" style="width: 8em;position: relative; left: 50%; transform:translateX(-50%); height: 8em; margin-top: 5em;border-radius:50%;" alt="Signature">
+        <div class="search text-center">
+        {{ form_row(form.signature, {
+            'attr': {
+                'class': 'input',
+                'style': 'width: 80% !important;position: relative; left: 50%; transform:translateX(-50%);border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;',
+                'id': 'signature-image-input',
+            }
+        }) }}
+        
+        </div>
+    </div>
+    
+    {{ form_row(form.editer, {'attr': {'class': 'orange-button mb-4'}}) }}
+    {{ form_end(form) }}
         
 {% endblock %}
 
 {% block javascripts %}
     <script>
+        $(document).ready(function() {
+            $('.choice').select2();
+        
+        });
+        
+        {% for flashMessage in app.session.flashbag.get('error') %}
+			Swal.fire({
+				title: 'Erreur',
+				text: '{{ flashMessage|e }}',
+				icon: 'error'
+			});
+		{% endfor %}
+
+		{% for flashMessage in app.session.flashbag.get('success') %}
+			Swal.fire({
+				title: 'Succès',
+				text: '{{ flashMessage|e }}',
+				icon: 'success'
+			});
+		{% endfor %}
         function handleDelete() {
         event.preventDefault();
         if (confirm('Êtes-vous sûr de vouloir supprimer ?')) {

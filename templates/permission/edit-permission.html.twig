@@ -40,10 +40,10 @@
     </style>
 {% endblock %}
 {% block editprofile %}
-    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Edit Profile</a>
+    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Modifier son compte</a>
 {% endblock %}
 {% block showprofile %}
-    <a class="dropdown-item" href="{{path('user_show',{id: user.id})}}">Edit Profile</a>
+    <a class="dropdown-item" href="{{path('user_show',{id: user.id})}}">Mon Profil</a>
 {% endblock %}
 {% block notifpro %}
     <img alt="John Doe" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" class="img-fluid rounded-circle">
@@ -63,7 +63,7 @@
         <div class="search mt-4" style="position: relative !important">
             <label for="inputEmploi">Fonction</label>
             {# <i class="fas fa-envelope"></i> #}
-            <input type="email" value="{{ personne.fonction.designation }}" name="email" id="inputEmploi" class="form-control" autocomplete="email" required autofocus readonly>
+            <input type="text" value="{{ personne.fonction.designation }}" name="email" id="inputEmploi" class="form-control" autocomplete="email" required autofocus readonly>
         </div>
 
         <div class="search mt-4" style="position: relative !important">
@@ -72,19 +72,22 @@
             <input type="text" value="{{ personne.matricule }}" name="matricule" id="inputMatricule" class="form-control" autocomplete="off" required autofocus readonly>
         </div><br>
 
-        {{ form_label(form.typepermission, 'Motif de la permission', {
+        {{ form_label(form.typepermission, 'Motif de la demande', {
             'label_attr': {
                 'class': 'label',
             }
         }) }}</br>
-        {{ form_widget(form.typepermission, {'attr':{'class': 'custom-radio','style': 'width: 80% !important;'}}) }}</br>
+        {{ form_widget(form.typepermission, {'attr':{'class': 'custom-radio', 'style': 'width: 80% !important;' }}) }}</br>
         <div class="search">
             <div id="motif" style="display: none;">
                 {{ form_row(form.motif) }}
             </div>
         </div>
-        <div class="search" style="position: relative !important">
+        <div id="duree" class="search" style="display:none; position: relative !important">
             {{ form_row(form.duree, {'attr': {'class': 'input', 'readonly': 'readonly', 'id' : 'permission_duree'}}) }}
+        </div>
+        <div class="search" style="display: none; position: relative !important">
+            {{ form_row(form.delai) }}
         </div>
         <div class="search" style="position: relative !important">
             {{form_row(form.datedebut)}}
@@ -110,29 +113,40 @@
 {% block javascripts %}
     <script>
         $(document).ready(function() {
+            $('.mySelect').select2();
             $('input[name="permission[typepermission]"]').on('change', function() {
                 var selectedValue = $(this).val();
+
+                var dureeInput = $('#permission_duree');
+
                 if (selectedValue === "autres") {
+                    dureeInput.val('05 jours');
+                    dureeInput.prop('readonly', true);
                     $('#motif').show();
+                    $('#duree').hide();
                 } else {
                     $('#motif').hide();
                 }
 
-                var dureeInput = $('#permission_duree');
-
                 if (selectedValue === "Décès d'un ascendant ou d'un descendant en ligne directe" ) {
                     dureeInput.val('05 jours');
                     dureeInput.prop('readonly', true);
-                } else if (selectedValue === "Mariage de l'agent ou d'un enfant de l'agent") {
+                    $('#duree').show();
+                } 
+
+                if (selectedValue === "Mariage de l'agent ou d'un enfant de l'agent") {
                     dureeInput.val('02 jours');
                     dureeInput.prop('readonly', true);
-                } else if (selectedValue === "Naissance survenue au foyer du fonctionnaire") {
+                    $('#duree').show();
+                } 
+                
+                if (selectedValue === "Naissance survenue au foyer du fonctionnaire") {
                     dureeInput.val('03 jours');
                     dureeInput.prop('readonly', true);
-                } else {
-                    dureeInput.val('');
-                    dureeInput.prop('readonly', false);
-                }
+                    $('#duree').show();
+                } 
+
+
             });
         });
         

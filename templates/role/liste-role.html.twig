@@ -89,9 +89,6 @@
                                     <td rowspan="{{ privilegeCount }}">{{ role.description|slice(0,150) }}...</td>
                                     <td>{{ privilege.libelle }}</td>
                                     <td rowspan="{{ privilegeCount }}" class="text-right">
-                                        <a href="#" class="btn btn-warning btn-sm mb-1">
-                                            <i class="far fa-thin fa-eye text-light"></i>
-                                        </a>
                                         <a href="{{path('role.edit',{id: role.id})}}" class="btn btn-primary btn-sm mb-1">
                                             <i class="far fa-edit"></i>
                                         </a>
@@ -113,6 +110,10 @@
 
 {% block javascripts %}
     <script>
+        $(document).ready(function() {
+            $('.choice').select2();
+        
+        });
         function handleDelete() {
         event.preventDefault();
         if (confirm('Êtes-vous sûr de vouloir supprimer ?')) {

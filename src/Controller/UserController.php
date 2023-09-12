@@ -5,6 +5,7 @@ use App\Entity\User;
 use App\Form\UserType;
 use App\Form\AdminEditUserType;
 use App\Form\RegistrationFormType;
+use App\Repository\NotificationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,7 +24,13 @@ class UserController extends AbstractController
         $this->passwordHasher = $passwordHasher;
     }
     #[Route('admin/userAdminEdit/{id}', name: 'edit_admin_user')]
-    public function editAdminUser(User $user=null, Request $request, EntityManagerInterface $entityManager,UserInterface $utilisateur): Response
+    public function editAdminUser(
+        User $user=null,
+         Request $request,
+          EntityManagerInterface $entityManager,
+          UserInterface $utilisateur,
+          NotificationRepository $notificationRepository
+    ): Response
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN', null, 'Vous n\'avez pas la permission d\'accéder à cette page.');
         $new = false;
@@ -42,19 +49,22 @@ class UserController extends AbstractController
                 $entityManager->persist($user);
             }
             $entityManager->flush();
-
+            
             $this->addFlash('success', 'Utilisateur de matricule '.$user->getMatricule().' mis à jour avec succès.');
 
             return $this->redirectToRoute('user_list');
         }
-
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
         return $this->render('user/edit_admin_user.html.twig', [
             'registrationForm' => $form->createView(),
             'user' => $utilisateur,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
         ]);
     }
     #[Route('/user/edit/{id}', name: 'user_edit')]
-    public function edit(User $user=null, Request $request, EntityManagerInterface $entityManager,UserInterface $utilisateur): Response
+    public function edit(User $user=null, Request $request, EntityManagerInterface $entityManager,UserInterface $utilisateur, NotificationRepository $notificationRepository): Response
     {
         $roles = 'ROLE_USER';
         $this->denyAccessUnlessGranted($roles, null, 'Vous n\'avez pas la permission d\'accéder à cette page.');
@@ -81,10 +91,13 @@ class UserController extends AbstractController
 
         return $this->redirectToRoute('user');
     }
-
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
         return $this->render('user/edit.html.twig', [
             'registrationForm' => $form->createView(),
             'user' => $utilisateur,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
         ]);
     }
 
@@ -102,7 +115,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/user/show/{id}', name: 'user_show')]
-    public function show(User $user=null,UserInterface $utilisateur): Response
+    public function show(User $user=null,UserInterface $utilisateur, NotificationRepository $notificationRepository): Response
     {
         $roles = 'ROLE_USER';
         $this->denyAccessUnlessGranted($roles, null, 'Vous n\'avez pas la permission d\'accéder à cette page.');
@@ -111,13 +124,17 @@ class UserController extends AbstractController
             return $this->redirectToRoute('user_list');
 
         }
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
         return $this->render('user/show.html.twig', [
-            'user' => $utilisateur,  
+            'user' => $utilisateur,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
         ]);
     }
 
     #[Route('/user/detail/{userId}', name: 'detail_user_show')]
-    public function detailUser($userId, EntityManagerInterface $entityManager): Response
+    public function detailUser($userId, EntityManagerInterface $entityManager,NotificationRepository $notificationRepository): Response
     {
         $userRepository = $entityManager->getRepository(User::class);
         $user = $userRepository->find($userId);
@@ -126,14 +143,17 @@ class UserController extends AbstractController
             $this->addFlash('error', "L'utilisateur n'existe pas");
             return $this->redirectToRoute('user_list');
         }
-    
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
         return $this->render('user/detail_user_show.html.twig', [
             'user' => $user,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
         ]);
     }
     
     #[Route('admin/user/list/', name: 'user_list')]
-    public function list(EntityManagerInterface $entityManager, Request $request, UserInterface $utilisateur, User $user = null): Response
+    public function list(EntityManagerInterface $entityManager, Request $request, UserInterface $utilisateur, User $user = null,NotificationRepository $notificationRepository): Response
     {   
         $roles = 'ROLE_ADMIN';
         $this->denyAccessUnlessGranted($roles, null, 'Vous n\'avez pas la permission d\'accéder à cette page.');
@@ -159,13 +179,16 @@ class UserController extends AbstractController
         $nbUser = $userRepository->count([]);
         $adminUserCount = $userRepository->count(['roles' => 'ROLE_ADMIN']);
         $users = $userRepository->findAll();
-
+        $notifications = $notificationRepository->findNotificationsForUser($utilisateur->getPersonne());
+        $nbNotif = count($notifications);
         return $this->render('user/list.html.twig', [
             'user' => $utilisateur,
             'users' => $users,
             'nbUser' => $nbUser,
             'adminUserCount' => $adminUserCount,
-            'registrationForm' => $form
+            'registrationForm' => $form,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
         ]);
     }
     

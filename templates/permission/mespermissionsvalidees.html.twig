@@ -53,17 +53,80 @@
     <img class="rounded-circle" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" width="30" alt="Admin">
 {% endblock %}
 {% block main %}
+    <div id="newpermission" class="modal fade" role="dialog" style="display: none;position: fixed;z-index: 9999;left: 0;top: 0;width: 100%;height: 100%;overflow: auto;background-color: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content" style="position: absolute;top: 10px;background-color: #fff;padding: 20px;border-radius: 5px;left: 50%; transform: translateX(-50%);max-width: 800px;max-height: 2000px;">
+            <span data-dismiss="modal" id="close" class="newmodal-close float-right" style="cursor: pointer;font-size: 20px;font-weight: bolder;color: #ccc;">&times;</span>
+            <h3 class="font-weight-bold text-center">Formulaire de demande de permission</h3>
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+            <div class="search" style="position: relative !important">
+                <label for="inputNom">Nom et Prénoms</label>
+                {# <i class="fas fa-envelope"></i> #}
+                <input type="nom" value="{{ personne.nom }} {{ personne.prenom }}" name="nom" id="inputNom" class="form-control" autocomplete="email" required autofocus readonly>
+            </div>
+
+            <div class="search mt-4" style="position: relative !important">
+                <label for="inputEmploi">Fonction</label>
+                {# <i class="fas fa-envelope"></i> #}
+                <input type="text" value="{{ personne.fonction.designation }}" name="email" id="inputEmploi" class="form-control" autocomplete="email" required autofocus readonly>
+            </div>
+
+            <div class="search mt-4" style="position: relative !important">
+                <label for="inputMatricule">Matricule</label>
+                {# <i class="fas fa-envelope"></i> #}
+                <input type="text" value="{{ personne.matricule }}" name="matricule" id="inputMatricule" class="form-control" autocomplete="off" required autofocus readonly>
+            </div><br>
+
+            {{ form_label(form.typepermission, 'Motif de la demande', {
+                'label_attr': {
+                    'class': 'label',
+                }
+            }) }}</br>
+            {{ form_widget(form.typepermission, {'attr':{'class': 'custom-radio','style': 'width: 80% !important;' }}) }}</br>
+            <div class="search">
+                <div id="motif" style="display: none;">
+                    {{ form_row(form.motif) }}
+                </div>
+            </div>
+            <div id="duree" class="search" style="display:none; position: relative !important">
+                {{ form_row(form.duree, {'attr': {'class': 'input', 'readonly': 'readonly', 'id' : 'permission_duree'}}) }}
+            </div>
+            <div class="search" style="display: none; position: relative !important">
+                {{ form_row(form.delai) }}
+            </div>
+            <div class="search" style="position: relative !important">
+                {{form_row(form.datedebut)}}
+            </div>
+            <div class="search style="position: relative !important"">
+            {{form_row(form.datefin)}}
+            </div>
+            <div class="search" style="position: relative !important">
+                {{form_row(form.datereprise)}}
+            </div>
+            <div class="search" style="position: relative !important;display: none;">
+                {{ form_row(form.statut) }}
+            </div>
+            <div class="search" style="position: relative !important">
+                {{ form_row(form.photo, {'attr': {'class': 'input'}}) }}
+            </div>
+
+            {{ form_row(form.envoyer, {'attr': {'class': 'orange-button mb-2'}}) }}
+            {{ form_end(form) }}
+        </div>
+        </div>
+    </div>
+
     <div class="page-header">
     <div class="row">
     <div class="col-md-6">
-    <h3 class="page-title text-lowercase mb-0">Mes permissions validées</h3>
+    <h3 class="page-title text-lowercase mb-0">Mes demandes de permissions validées</h3>
     </div>
     <div class="col-md-6">
     <button class="float-right text-muted p-1" style="border: none;" data-toggle="modal" data-target="#newpermission"><i class="fa fa-solid fa-plus"></i> nouvelle permission </button>
     </div>
     </div>
     </div>
-    <div class="d-flex justify-content-center">
+    {# <div class="d-flex justify-content-center">
         <div class="card-deck">
             {% for permission in permissions %}
                 <a href="{{path('mespermissionvalidees.show',{id: permission.id})}}"  class="btn btn-outline-danger mr-2">
@@ -72,6 +135,54 @@
                 </a>
             {% endfor %}
         </div>
+    </div> #}
+    <div class="card-body mb-2" style="box-shadow: 1px 3px 5px #aaa;">
+        <div class="table-responsive ">
+            <table id="example" class="table custom-table ">
+                <thead class="thead-light">
+                <tr>
+                    <th></th>
+                    <th>Motif </th>
+                    <th>Date de prise</th>
+                    <th>Statut</th>
+                    <th class="text-right">Imprimer</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for permission in permissions %}
+                    <tr>
+                        <td class="custom-checkbox">
+                            <input type="checkbox" name="permissions[]" class="permission-checkbox" value="{{ permission.id }}">
+                        </td>
+                        <td>
+                            {% if permission.typepermission is same as("Décès d'un ascendant ou d'un descendant en ligne directe")
+                                or permission.typepermission is same as("Mariage de l'agent ou d'un enfant de l'agent")
+                                or permission.typepermission is same as("Naissance survenue au foyer du fonctionnaire") %}
+                                {{ permission.typepermission }}
+                            {% else %}
+                                {{ permission.motif }}
+                            {% endif %}
+                        </td>
+
+                        <td>{{permission.getFormattedDatedebut()}}</td>
+                        <td>
+                            {% if permission.etatcs == "validée" and permission.etatsd == "validée" and permission.etatdir == "validée"  %}
+                                <span style="font-size: 10px;padding: 6px 16px;color: var(--light);border-radius: 20px;font-weight: 700;background: #2fdf84;">validée</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-right">
+                            <a href="{{path('mespermissionvalidees.show',{id: permission.id})}}"  class="btn btn-outline-danger mr-2">
+                                <img src="{{asset('assets/asset/img/pdf.png')}}" alt="" height="18">
+                                <span class="ml-2">PDF</span>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <td colspan="5">Vous n'avez effectué aucune demande</td>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
 {% endblock %}
@@ -79,29 +190,38 @@
 {% block javascripts %}
     <script>
         $(document).ready(function() {
+            $('.choice').select2();
             $('input[name="permission[typepermission]"]').on('change', function() {
                 var selectedValue = $(this).val();
+
+                var dureeInput = $('#permission_duree');
+
                 if (selectedValue === "autres") {
+                    dureeInput.val('');
+                    dureeInput.prop('readonly', true);
                     $('#motif').show();
+                    $('#duree').hide();
                 } else {
                     $('#motif').hide();
                 }
 
-                var dureeInput = $('#permission_duree');
-
                 if (selectedValue === "Décès d'un ascendant ou d'un descendant en ligne directe" ) {
                     dureeInput.val('05 jours');
                     dureeInput.prop('readonly', true);
-                } else if (selectedValue === "Mariage de l'agent ou d'un enfant de l'agent") {
+                    $('#duree').show();
+                } 
+
+                if (selectedValue === "Mariage de l'agent ou d'un enfant de l'agent") {
                     dureeInput.val('02 jours');
                     dureeInput.prop('readonly', true);
-                } else if (selectedValue === "Naissance survenue au foyer du fonctionnaire") {
+                    $('#duree').show();
+                } 
+                
+                if (selectedValue === "Naissance survenue au foyer du fonctionnaire") {
                     dureeInput.val('03 jours');
                     dureeInput.prop('readonly', true);
-                } else {
-                    dureeInput.val('');
-                    dureeInput.prop('readonly', false);
-                }
+                    $('#duree').show();
+                } 
             });
         });
         

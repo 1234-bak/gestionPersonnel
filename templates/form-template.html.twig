@@ -9,6 +9,7 @@
 	<link rel="stylesheet" href="{{asset('node_modules/select2/dist/css/select2.min.css')}}">
 	<link rel="stylesheet" href="{{asset('assets/css/style.css')}}">
 	<link rel="stylesheet" href="{{asset('node_modules/sweetalert2/dist/sweetalert2.min.css')}}" />
+	<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
 	{% block stylesheets %}
 		
@@ -186,6 +187,14 @@
 		{% endfor %}
 
 		{% for flashMessage in app.session.flashbag.get('success') %}
+			Swal.fire({
+				title: 'Succès',
+				text: '{{ flashMessage|e }}',
+				icon: 'success'
+			});
+		{% endfor %}
+
+		{% for flashMessage in app.session.flashbag.get('succes') %}
 			Swal.fire({
 				title: 'Succès',
 				text: '{{ flashMessage|e }}',

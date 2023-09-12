@@ -23,6 +23,7 @@
 <link rel="stylesheet" href="{{asset('assets/asset/css/style.css')}}">
 <link rel="stylesheet" href="{{asset('node_modules/@fortawesome/fontawesome-free/css/all.min.css')}}" rel="stylsheet" />
 <link rel="stylesheet" href="{{asset('node_modules/sweetalert2/dist/sweetalert2.min.css')}}" />
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
 {% block stylesheets %}
     
@@ -66,82 +67,45 @@
 <li class="nav-item dropdown d-none d-sm-block">
 <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
 <img src="{{asset('assets/asset/img/sidebar/icon-22.png')}}" alt="">
+<span class="num" style="position: absolute;top: 14px;right: 14px;width: 20px;height: 20px;border-radius: 50%;border: 2px solid var(--light);background: var(--red);color: var(--light);font-weight: 700;font-size: 12px;display: flex;justify-content: center;align-items: center;">
+  {{nbNotif}}
+</span>
 </a>
 <div class="dropdown-menu notifications">
-<div class="topnav-dropdown-header">
-<span>Notifications</span>
-</div>
-<div class="drop-scroll">
-<ul class="notification-list">
-<li class="notification-message">
-<a href="#">
-<div class="media">
-<span class="avatar">
-    {% block notifpro %}
-        <img alt="John Doe" src="{{ asset('uploads/image_personne/' ~ utilisateur.personne.image)}}" class="img-fluid rounded-circle">
-    {% endblock %}
-</span>
-<div class="media-body">
-<p class="noti-details"><span class="noti-title">John Doe</span> is now following you </p>
-<p class="noti-time"><span class="notification-time">4 mins ago</span></p>
-</div>
-</div>
-</a>
-</li>
-<li class="notification-message">
-<a href="#">
-<div class="media">
-<span class="avatar">T</span>
-<div class="media-body">
-<p class="noti-details"><span class="noti-title">Tarah Shropshire</span> sent you a message.</p>
-<p class="noti-time"><span class="notification-time">6 mins ago</span></p>
-</div>
-</div>
-</a>
-</li>
-<li class="notification-message">
-<a href="#">
-<div class="media">
-<span class="avatar">L</span>
-<div class="media-body">
-<p class="noti-details"><span class="noti-title">Misty Tison</span> like your photo.</p>
-<p class="noti-time"><span class="notification-time">8 mins ago</span></p>
-</div>
-</div>
-</a>
-</li>
-<li class="notification-message">
-<a href="#">
-<div class="media">
-<span class="avatar">G</span>
-<div class="media-body">
-<p class="noti-details"><span class="noti-title">Rolland Webber</span> booking appoinment for meeting.</p>
-<p class="noti-time"><span class="notification-time">12 mins ago</span></p>
-</div>
-</div>
-</a>
-</li>
-<li class="notification-message">
-<a href="#">
-<div class="media">
-<span class="avatar">T</span>
-<div class="media-body">
-<p class="noti-details"><span class="noti-title">Bernardo Galaviz</span> like your photo.</p>
-<p class="noti-time"><span class="notification-time">2 days ago</span></p>
-</div>
-</div>
-</a>
-</li>
-</ul>
-</div>
-<div class="topnav-dropdown-footer">
-<a href="#">Voir toute les notifications</a>
-</div>
+    <div class="topnav-dropdown-header">
+        <span>Notifications</span>
+    </div>
+    <div class="drop-scroll">
+        <ul class="notification-list">
+            {% for notification in notifications %}
+              {% for destinataire in notification.destinataire %}
+                  <a href="{{path('notification.delete',{id: notification.id})}}" class="mt-2 mb-2 pl-2">
+                    <li class="notification-message">
+                        {# <a href="#"> #}
+                            <div class="media" data-id={{ notification.id }}>
+                                <span class="avatar">
+                                    <img alt="photo destinataire" src="{{ asset('uploads/image_personne/' ~ destinataire.image)}}" class="img-fluid rounded-circle">
+                                </span>
+                                <div class="media-body">
+                                    <p class="noti-details"><span class="noti-title">{{ destinataire.nom }}</span> {{ notification.message }}</p>
+                                    <p class="noti-time"><span class="notification-time">{{ notification.getFormattedDateenvoi }}</span></p>
+                                </div>
+                            </div>
+                        {# </a> #}
+                    </li>
+                  </a>
+              {% endfor %}
+          {% else %}
+              <center class="pt-5">Vous n'avez reçu aucune notification</center>
+          {% endfor %}
+        </ul>
+    </div>
+    <div class="topnav-dropdown-footer">
+        <a href="#">Voir toutes les notifications</a>
+    </div>
 </div>
 </li>
-<li class="nav-item dropdown d-none d-sm-block">
-<a href="javascript:void(0);" id="open_msg_box" class="hasnotifications nav-link"><img src="{{asset('assets/asset/img/sidebar/icon-23.png')}}" alt=""> </a>
-</li>
+
  <li class="nav-item dropdown has-arrow">
 <a href="#" class=" nav-link user-link" data-toggle="dropdown">
 <span class="user-img">
@@ -197,9 +161,9 @@
 <li class="submenu">
 <a href="#"><img src="{{asset('assets/img/sidebar/nsicon.png')}}" alt="icon_note" style="width: 30px; height: 30px"> <span> Notes de services</span> <span class="menu-arrow"></span></a>
 <ul class="list-unstyled" style="display: none;">
-    <li><a href="{{path('note.create')}}"><span>Produire une note</span></a></li>
+    <li><a href="{{path('dircab-note.create')}}"><span>Produire une note</span></a></li>
     <li><a href="{{path('dircab-note.liste')}}"><span>liste des notes</span></a></li>
-    <li><a href="#"><span>notes à diffuser</span></a></li>
+    <li><a href="{{path('dircab-note2.liste')}}"><span>notes à diffuser</span></a></li>
 </ul>
 </li>
 
@@ -207,20 +171,11 @@
 <a href="#"><img src="{{asset('assets/img/sidebar/permissionicon2.png')}}" alt="icon_permission" style="width: 30px; height: 30px"> <span> permissions</span> <span class="menu-arrow"></span></a>
 <ul class="list-unstyled" style="display: none;">
     <li><a href="{{path('dircab-permission.liste')}}"><span>liste des permissions</span></a></li>
-    <li><a href=""><span>permissions à valider</span></a></li>
+    <li><a href="{{path('dircab-permissionsNonValidees.afficher')}}"><span>permissions à valider</span></a></li>
 </ul>
 </li>
 
 
-{# <li>
-<a href="#"><img src="{{asset('assets/asset/img/sidebar/icon-14.png')}}" alt="icon"> <span>Paramètres</span></a>
-</li>
-
-<li class="menu-title">STATS</li>
-<li class="submenu">
-<a href="#"><img src="{{asset('assets/asset/img/sidebar/icon-27.png')}}" alt="icon"> <span> Statistiques</span> <span class="menu-arrow"></span></a>
-<li><a href="#">permission</a></li>
-</li> #}
 
 </ul>
 </div>
@@ -247,58 +202,28 @@
 </div>
 
 <div class="row">
-<div class="col-md-6 col-sm-6 col-lg-6 col-xl-3">
-<div class="dash-widget dash-widget5">
-<span class="float-left"><img src="{{asset('assets/asset/img/dash/logons.jpg')}}" alt="" width="80"></span>
-<div class="dash-widget-info text-right">
-<span>TOTAL NOTES PRODUITES </span>
-<h3>{{nbNote}} </h3><br>
-<a href="{{path('dircab-note.liste')}}"><P style="color: #2fdf84"><i class="fa fa-info-circle"></i> Voir détails</P></a>
-</div>
-</div>
-</div>
-<div class="col-md-6 col-sm-6 col-lg-6 col-xl-3">
-<div class="dash-widget dash-widget5">
-<div class="dash-widget-info d-inline-block text-left">
-<span>TOTAL PERMISSIONS </span>
-<h3>{{nbPermission}} </h3><br>
-<a href="{{path('permission.liste')}}"><P style="color: #2fdf84"><i class="fa fa-info-circle"></i> Voir détails</P></a></div>
-<span class="float-right"><img src="{{asset('assets/asset/img/dash/logoperm.jpg')}}" alt="" width="80"></span>
-</div>
-</div>
-</div>
+  <div class="col-md-6 col-sm-6 col-lg-6 col-xl-6 mb-4">
+    <div class="dash-widget dash-widget5">
+      <span class="float-left"><img src="{{asset('assets/asset/img/dash/logons.jpg')}}" alt="" width="80"></span>
+      <div class="dash-widget-info text-right">
+        <span>TOTAL NOTES PRODUITES </span>
+        <h3>{{nbNote}} </h3><br>
+        <a href="{{path('dircab-note.liste')}}"><p style="color: #2fdf84"><i class="fa fa-info-circle"></i> Voir détails</p></a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 col-sm-6 col-lg-6 col-xl-6 mb-4">
+    <div class="dash-widget dash-widget5">
+      <div class="dash-widget-info d-inline-block text-left">
+        <span>TOTAL PERMISSIONS</span>
+        <h3>{{nbPermission}} </h3><br>
+        <a href="{{path('dircab-permission.liste')}}"><p style="color: #2fdf84"><i class="fa fa-info-circle"></i> Voir détails</p></a>
+      </div>
+      <span class="float-right"><img src="{{asset('assets/asset/img/dash/logoperm.jpg')}}" alt="" width="80"></span>
+    </div>
+  </div>
 </div>
 
-{# <div class="row">
-<div class="col-lg-6 d-flex">
-<div class="card flex-fill">
-<div class="card-header">
-<div class="row align-items-center">
-<div class="col-auto">
-<div class="page-title">
-Aperçu des demandes permissions
-</div>
-</div>
-<div class="col text-right">
-<div class=" mt-sm-0 mt-2">
-<button class="btn btn-light" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-h"></i></button>
- <div class="dropdown-menu dropdown-menu-right">
-<a class="dropdown-item" href="#">Action</a>
-<div role="separator" class="dropdown-divider"></div>
-<a class="dropdown-item" href="#">Another action</a>
-<div role="separator" class="dropdown-divider"></div>
-<a class="dropdown-item" href="#">Something else here</a>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="card-body">
-<div id="chart1"></div>
-</div>
-</div>
-</div>
-</div> #}
 {% endblock %}
 
 <div class="notification-box">

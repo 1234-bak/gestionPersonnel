@@ -52,6 +52,10 @@
 
 {% block javascripts %}
     <script>
+        $(document).ready(function() {
+            $('.choice').select2();
+        
+        });
         function handleDelete() {
         event.preventDefault();
         if (confirm('Êtes-vous sûr de vouloir supprimer ?')) {

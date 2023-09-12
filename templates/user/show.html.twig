@@ -8,10 +8,10 @@
   
 {% endblock %}
 {% block showprofile %}
-    <a class="dropdown-item" href="{{path('user_show',{id: user.id})}}">Mon Profile</a>
+    <a class="dropdown-item" href="{{path('user_show',{id: user.id})}}">Mon Profil</a>
 {% endblock %}
 {% block editprofile %}
-    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Edit Profile</a>
+    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Modifier son compte</a>
 {% endblock %}
 {% block editprofile2 %}
   <li><a href="{{path('user_edit',{id: user.id})}}"><span>Créer compte agent</span></a></li>

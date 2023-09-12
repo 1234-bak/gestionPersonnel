@@ -140,28 +140,42 @@
                                             <p>Nom et Prénoms : <strong>{{permission.personne.nom}} {{permission.personne.prenom}}</strong></p>
                                             <p>Emploi : <strong>{{permission.personne.fonction.designation}}</strong></p>
                                             <p>Matricule : <strong>{{permission.personne.matricule}}</strong></p>
-                                            <p>Motif : <strong>{{permission.typepermission}}</strong></p>
-                                            <p>Durée de l'absence : <strong class="mr-5">{{permission.duree}}</strong>  Du : <strong class="mr-5"> {{ permission.getFormattedDatedebut() }}</strong>  Au :<strong> {{ permission.getFormattedDatereprise() }}</strong></p>
-                                            </div>
+                                            <p>Motif : 
+                                                <strong>
+                                                {% if permission.typepermission == "autres" %}
+                                                    {{permission.motif}}
+                                                {% else %}
+                                                    {{permission.typepermission}}
+                                                {% endif %}
+                                                </strong>
+                                            </p>
+                                            <p>Durée de l'absence : <strong class="mr-5">{{permission.delai}} jours</strong>  Du : <strong class="mr-5"> {{ permission.getFormattedDatedebut() }}</strong>  Au :<strong> {{ permission.getFormattedDatefin() }}</strong></p>
+                                        </div>
 
-                                            <div class="signature-row ml-3">
+                                        <div class="signature-row ml-3">
                                             <div class="signature mr-5">
                                                 <div class="titre text-center">Signature de l'agent:</div>
-                                                {# <div class="contenu"><img src="{{ asset('uploads/image_signature/' ~ permission.personne.signature.path)}}" alt=""></div> #}
+                                                <div class="contenu"><img src="{{ user.personne.signature ? asset('uploads/image_signature/' ~ user.personne.signature) : '' }}" alt=""></div>
                                             </div>
                                             <div class="signature mr-5">
                                                 <div class="titre text-center">Visa du Chef de service:</div>
-                                                {# <div class="contenu"><img src="{{ asset('uploads/image_signature/' ~ permission.personne.signature.path)}}" alt=""></div> #}
+                                                {% if permission.etatcs == "validée" %}
+                                                    <div class="contenu"><img src="{{ user.personne.signature ? asset('uploads/image_signature/' ~ user.personne.signature) : '' }}" alt=""></div>
+                                                {% endif %}
                                             </div>
                                             <div class="signature mr-5">
                                                 <div class="titre text-center">Visa du Sous-Directeur:</div>
-                                                {# <div class="contenu"><img src="{{ asset('uploads/image_signature/' ~ permission.personne.signature.path)}}" alt=""></div> #}
+                                                {% if permission.etatsd == "validée" %}
+                                                    <div class="contenu"><img src="{{ user.personne.signature ? asset('uploads/image_signature/' ~ user.personne.signature) : '' }}" alt=""></div>
+                                                {% endif %}
                                             </div>
                                             <div class="signature">
                                                 <div class="titre text-center">Signature du Directeur:</div>
-                                                {# <div class="contenu"><img src="{{ asset('uploads/image_signature/' ~ permission.personne.signature.path)}}" alt=""></div> #}
+                                                {% if permission.etatdir == "validée" %}
+                                                    <div class="contenu"><img src="{{ user.personne.signature ? asset('uploads/image_signature/' ~ user.personne.signature) : '' }}" alt=""></div>
+                                                {% endif %}
                                             </div>
-                                        </div>                                    
+                                        </div>
                                     </div>
                                 </div>
                             </div>

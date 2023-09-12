@@ -1,0 +1,248 @@
+{% extends 'dircab-template.html.twig' %}
+
+{% block stylesheets %}
+  <link rel="stylesheet" href="{{asset('assets/css/datatables/datatables.min.css')}}">
+  <link rel="stylesheet" href="{{ asset('assets/css/datatables/tables-style.css') }}">
+  <link rel="stylesheet" href="{{ asset('assets/css/edit-agent.css') }}">
+  <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100&family=Roboto:wght@100&display=swap');
+        .logo-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        #container{
+            font-family: Robotto, Poppins sans-serif;
+        }
+
+        .title_contenair{
+            width: 50%;
+            margin: 0 auto;
+            padding: 10px;
+            border: 2px solid #000;
+        }
+        h2 {
+            margin: 0 auto;
+            text-align: center;
+
+        }
+
+        .newright p {
+            margin-bottom: 0;
+        }
+      
+        .direction_info {
+            margin-bottom: 10px;
+        }
+
+        .cabinet {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .dsi {
+            text-align: center;
+            font-size: 16px;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        .date {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        } 
+  </style>
+{% endblock %}
+{% block editprofile %}
+    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Edit Profile</a>
+{% endblock %}
+{% block editprofile2 %}
+  <li><a href="{{path('user_edit',{id: user.id})}}"><span>Créer compte agent</span></a></li>
+{% endblock %}
+{% block showprofile %}
+    <a class="dropdown-item" href="{{path('user_show',{id: user.id})}}">Edit Profile</a>
+{% endblock %}
+{% block notifpro %}
+    <img alt="John Doe" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" class="img-fluid rounded-circle">
+{% endblock %}
+{% block photoprofile %}
+    <img class="rounded-circle" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" width="30" alt="Admin">
+{% endblock %}
+
+{% block main %}
+{{ form_start(form) }}
+    <section id="container">
+        <!--main content start-->
+        <section id="main-content mb-3" style="background-color: white;max-width: 800px;margin: 0 auto;padding: 20px;" >
+            <section class="wrapper">
+                <div class="form-w3layouts" style="background-color: white; opacity:0.8; box-shadow: rgb(38, 57, 77) 0px 5px 5px 5px;">
+                    <!-- page start -->
+
+                    <div class="row pt-3 pb-3">
+                        <div class="col-md-12">
+                            <div data-collapsed="0" class="panel">
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="logo-container ml-3 mr-3">
+                                            <div class="newleft">
+                                                <p>MINISTERE DE LA FONCTION PUBLIQUE</p>
+                                                <img class="logodoc pl-5" src="{{asset('assets/img/logomfp.jpeg')}}" alt="Coat of Arms" style="width: 150px">
+                                                <p>DIRECTEUR DE CABINET</p>
+                                            </div>
+                                            
+                                            <div class="newright">
+                                                <p>REPUBLIQUE DE COTE D'IVOIRE</p>
+                                                <img class="logodoc pl-5" src="{{asset('assets/img/armoirie-vert.svg')}}" alt="Coat of Arms" style="width: 150px">
+                                                <p>UNION-DISCIPLINE-TRAVAIL</p>
+                                            </div>
+                                        </div>
+                                        <p class="pl-5">
+                                                --------------
+                                        </p>
+                                        <div class="row w-100 ml-3 mr-3">
+                                            <div class="date btn-success col-md-12" data-toggle="modal" data-target="#date">
+                                                <p class="temp">Abidjan le ---------- </p>
+                                            </div>
+                                            
+                                            <div class="btn-success col-md-5" data-toggle="modal" data-target="#numref">
+                                                <p class="temp">N° ----------  /MFP/DIRCAB/DRH</p>
+                                            </div>
+                                            
+                                        </div>
+                                        <div class="title_contenair mt-5 mb-2">
+                                            <h2>Note de service</h2>
+                                        </div>
+                                        
+                                        <div class="col-md-12 form-group">
+                                            <p><strong class="underline">Destinataires: </strong> Mesdames et Messieurs</p>
+                                        </div>
+                                        {# <ul style="margin-left: 120px;">
+                                            <li>le Chef de Cabinet</li>
+                                            <li>l'Inspecteur Général</li>
+                                            <li>le Président du conseil de Discipline</li>
+                                            <li>les Directeurs Généraux</li>
+                                            <li>les Directeurs Centraux</li>
+                                        </ul> #}
+                                        <div class="col-md-12 form-group">
+                                            <br><br>
+                                            <div class="col-md-12">
+                                                <div class="btn-success panel-title" data-toggle="modal" data-target="#objet">
+                                                    <p class="temp">Objet: ------------------------------------</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        {# <div class="btn-success col-md-12" data-toggle="modal" data-target="#part1">
+                                            <p class="temp">Partie 1 du corps ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ </p>
+                                        </div>
+                                        
+                                        <div class="btn-success col-md-12" data-toggle="modal" data-target="#part2">
+                                            <p class="temp">Partie 2 du corps ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  </p>
+                                        </div>
+                                        
+                                        
+                                        <div class="btn-success col-md-12" data-toggle="modal" data-target="#part3">
+                                            <p class="temp">Partie 3 du corps ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  </p>
+                                        </div>
+                                        
+                                        <div class="btn-success col-md-12" data-toggle="modal" data-target="#part4">
+                                            <p class="temp">Partie 4 du corps ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  </p>
+                                        </div>
+                                        
+                                        <div class="btn-success col-md-12" data-toggle="modal" data-target="#part5">
+                                            <p class="temp">Partie 5 du corps ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  </p>
+                                        </div> #}
+
+                                        <div class="btn-success col-md-12" data-toggle="modal" data-target="#contenu">
+                                            <p class="temp">Contenu ---------------------------------------------------------
+                                                ---------------------------------------------------------
+                                                ---------------------------------------------------------
+                                                ---------------------------------------------------------
+                                                ---------------------------------------------------------
+                                                ---------------------------------------------------------
+                                                ---------------------------------------------------------
+                                                ---------------------------------------------------------
+                                            </p>
+                                        </div>
+                                        {# <div class="col-md-12 form-group"> #}
+                                        <div class="btn-success col-md-12 mt-2" data-toggle="modal" data-target="#pj">
+                                            <p class="temp">Pièce jointe: --------------------------------------------------------- </p>
+                                        </div>
+                                        <span class="display: none;" data-toggle="modal" data-target="#statut"></span>
+
+                                        <div class="col-md-8 form-group"></div>
+                                        <div class="row float-right" style="display:flex; flex-direction: column">
+                                            <div class="col form-group">
+                                                <p>Fait à Abidjan, le ---------- </p>
+                                            </div>
+                                            <div class="col form-group">
+                                                <center>Nom de l'emmeteur</center>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- page end-->
+                </div>
+            </section>
+        </section>
+        <!--main content end-->
+    </section>
+
+    {% include 'includes/templateedit/numref.html.twig' %}
+    {% include 'includes/templateedit/statut.html.twig' %}
+    {% include 'includes/templateedit/objet.html.twig' %}
+    {# {% include 'includes/templateedit/part1.html.twig' %}
+    {% include 'includes/templateedit/part2.html.twig' %}
+    {% include 'includes/templateedit/part3.html.twig' %}
+    {% include 'includes/templateedit/part4.html.twig' %}
+    {% include 'includes/templateedit/part5.html.twig' %} #}
+    {% include 'includes/templateedit/pj.html.twig' %}
+    {% include 'includes/templateedit/date.html.twig' %}
+    {% include 'includes/templateedit/contenu.html.twig' %}
+    <div class="mb-2 text-center">
+        {{ form_row(form.submit) }}
+    </div>
+{{ form_end(form) }}
+{% endblock %}
+{% block javascripts %}
+    
+    <script>
+        $(document).ready(function() {
+             $('.part-field').on('input', function() {
+                var fieldId = $(this).attr('id');
+
+                var fieldValue = $(this).val();
+
+                $('.btn-success[data-target="#' + fieldId + '"]').find('.temp').text(fieldValue);
+            });
+
+            // $('.part-field').on('input', function() {
+            //     updateContenuField();
+            // });
+
+            // function updateContenuField() {
+            //     var part1Value = $('#form_part1').val();
+            //     var part2Value = $('#form_part2').val();
+            //     var part3Value = $('#form_part3').val();
+            //     var part4Value = $('#form_part4').val();
+            //     var part5Value = $('#form_part5').val();
+
+            //     var contenuValue = part1Value + '\n' +
+            //                     part2Value + '\n' +
+            //                     part3Value + '\n' +
+            //                     part4Value + '\n' +
+            //                     part5Value;
+
+            //     $('#form_contenu').val(contenuValue);
+            // }
+            // updateContenuField();
+        });
+    </script>
+{% endblock %}

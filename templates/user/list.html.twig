@@ -79,10 +79,10 @@
     
 {% endblock %}
 {% block showprofile %}
-    <a class="dropdown-item" href="{{path('user_show',{id: user.id})}}">Mon Profile</a>
+    <a class="dropdown-item" href="{{path('user_show',{id: user.id})}}">Mon Profil</a>
 {% endblock %}
 {% block editprofile %}
-    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Edit Profile</a>
+    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Modifier son compte</a>
 {% endblock %}
 {% block editprofile2 %}
   <li><a href="{{path('user_edit',{id: user.id})}}"><span>Créer compte agent</span></a></li>
@@ -98,28 +98,7 @@
         <div class="newmodal-content" style="position: absolute;top: 10px;background-color: #fff;padding: 20px;border-radius: 5px;left: 50%; transform: translateX(-50%);max-width: 800px;max-height: 2000px;">
             <span id="close" onclick="closeModal('close')" class="newmodal-close" style="float: right;cursor: pointer;font-size: 20px;font-weight: bolder;color: #ccc;">&times;</span>
             <h3 class="font-weight-bold text-center">Enregistrement d'un agent</h3>
-            {# {{ form_start(registrationForm) }}
-                <div class="search">
-                    <i class="fa fa-envelope"></i>
-                    {{ form_row(registrationForm.email,{
-                    'attr':{
-                        'class': 'input'
-                    }
-                }) }}
-                </div>
-                <div class="search">
-                    <i class="fa fa-lock"></i>
-                    {{ form_row(registrationForm.roles,{
-                    'attr':{
-                        'class': 'input'
-                    }
-                }) }}
-                </div>
-                {{ form_row(registrationForm.submit, { 
-                    'attr':{
-                        'class': 'btn'
-                    }  }) }}
-            {{ form_end(registrationForm) }} #}
+            
         </div>
     </div>
     
@@ -173,8 +152,8 @@
                                     Sous-directeur,
                                 {% elseif role == "ROLE_SD" %}
                                     Sous directeur, 
-                                {% elseif role == "ROLE_MIN" %}
-                                    Ministre, 
+                                {% elseif role == "ROLE_DIRCAB" %}
+                                    Dircab,
                                 {% elseif role == "ROLE_USER" %}
                                     Agent
                                 {% endif %}
@@ -205,6 +184,10 @@
 
 {% block javascripts %}
     <script>
+        $(document).ready(function() {
+            $('.choice').select2();
+        
+        });
         function handleDelete() {
         event.preventDefault();
         if (confirm('Êtes-vous sûr de vouloir supprimer ?')) {

@@ -121,12 +121,11 @@
                                             <p><strong class="underline">Destinataires: </strong> Mesdames et Messieurs</p>
                                         </div>
                                         <ul style="margin-left: 120px;">
-                                            <li>le Chef de Cabinet</li>
-                                            <li>l'Inspecteur Général</li>
-                                            <li>le Président du conseil de Discipline</li>
-                                            <li>les Directeurs Généraux</li>
-                                            <li>les Directeurs Centraux</li>
-                                        </ul>                                       
+                                            {% for destinataire in selectedDestinataires %}
+                                                <li>{{ destinataire.designation }}</li>
+                                            {% endfor %}
+
+                                        </ul>
                                         <div class="col-md-12 form-group">
                                             <br><br>
                                             <div class=" col-md-12">

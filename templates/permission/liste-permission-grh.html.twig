@@ -7,10 +7,10 @@
     
 {% endblock %}
 {% block editprofile %}
-    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Edit Profile</a>
+    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Modifier son compte</a>
 {% endblock %}
 {% block showprofile %}
-    <a class="dropdown-item" href="{{path('user_show',{id: user.id})}}">Edit Profile</a>
+    <a class="dropdown-item" href="{{path('user_show',{id: user.id})}}">Editer Profil</a>
 {% endblock %}
 {% block notifpro %}
     <img alt="John Doe" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" class="img-fluid rounded-circle">
@@ -37,8 +37,11 @@
                 <tr>
                     <th></th>
                     <th>Type </th>
-                    <th>Durée</th>
-                    <th>Statut</th>
+                    <th>Date de prise</th>
+                    {# <th>ETAT_GRH</th> #}
+                    <th>ETAT_DIR</th>
+                    <th>ETAT_SD</th>
+                    <th>ETAT_CS</th>
                     <th class="text-right">Action</th>
                 </tr>
                 </thead>
@@ -57,8 +60,43 @@
                                 {{ permission.motif }}
                             {% endif %}
                         </td>
-                        <td>{{permission.duree}}</td>
-                        <td>{{permission.statut}}</td>
+                        <td>{{permission.getFormattedDatedebut()}}</td>
+                        {# <td>
+                            {% if permission.statut == "en attente" %}
+                                <span style="font-size: 10px;padding: 6px 16px;color: var(--light);border-radius: 20px;font-weight: 700;background: orange;">{{permission.statut}}</span>
+                            {% elseif permission.statut == "validée" %}
+                                <span style="font-size: 10px;padding: 6px 16px;color: var(--light);border-radius: 20px;font-weight: 700;background: #2fdf84;">{{permission.statut}}</span>
+                            {% elseif permission.statut == "rejeté" %}
+                                <span style="font-size: 10px;padding: 6px 16px;color: var(--light);border-radius: 20px;font-weight: 700;background: red;">{{permission.statut}}</span>
+                            {% endif %}
+                        </td> #}
+                        <td>
+                            {% if permission.etatdir == "en attente" %}
+                                <span style="font-size: 10px;padding: 6px 16px;color: var(--light);border-radius: 20px;font-weight: 700;background: orange;">{{permission.etatdir}}</span>
+                            {% elseif permission.etatdir == "validée" %}
+                                <span style="font-size: 10px;padding: 6px 16px;color: var(--light);border-radius: 20px;font-weight: 700;background: #2fdf84;">{{permission.etatdir}}</span>
+                            {% elseif permission.etatdir == "rejeté" %}
+                                <span style="font-size: 10px;padding: 6px 16px;color: var(--light);border-radius: 20px;font-weight: 700;background: red;">{{permission.etatdir}}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if permission.etatsd == "en attente" %}
+                                <span style="font-size: 10px;padding: 6px 16px;color: var(--light);border-radius: 20px;font-weight: 700;background: orange;">{{permission.etatsd}}</span>
+                            {% elseif permission.etatsd == "validée" %}
+                                <span style="font-size: 10px;padding: 6px 16px;color: var(--light);border-radius: 20px;font-weight: 700;background: #2fdf84;">{{permission.etatsd}}</span>
+                            {% elseif permission.etatsd == "rejeté" %}
+                                <span style="font-size: 10px;padding: 6px 16px;color: var(--light);border-radius: 20px;font-weight: 700;background: red;">{{permission.etatsd}}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if permission.etatcs == "en attente" %}
+                                <span style="font-size: 10px;padding: 6px 16px;color: var(--light);border-radius: 20px;font-weight: 700;background: orange;">{{permission.etatcs}}</span>
+                            {% elseif permission.etatcs == "validée" %}
+                                <span style="font-size: 10px;padding: 6px 16px;color: var(--light);border-radius: 20px;font-weight: 700;background: #2fdf84;">{{permission.etatcs}}</span>
+                            {% elseif permission.etatcs == "rejeté" %}
+                                <span style="font-size: 10px;padding: 6px 16px;color: var(--light);border-radius: 20px;font-weight: 700;background: red;">{{permission.etatcs}}</span>
+                            {% endif %}
+                        </td>
                         <td class="text-right">
                             <a href="{{path('permission.show',{id: permission.id})}}" class="btn btn-warning btn-sm mb-1">
                                 <i class="far fa-thin fa-eye text-light"></i>
@@ -66,7 +104,7 @@
                         </td>
                     </tr>
                 {% else %}
-                    <td colspan="5">Aucune démande n'a été trouvée</td>    
+                    <td colspan="5">Aucune demande n'a été trouvée</td>    
                 {% endfor %}
                 </tbody>
             </table>

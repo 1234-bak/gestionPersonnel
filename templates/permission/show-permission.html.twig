@@ -157,7 +157,15 @@
             <p>Nom et Prénoms : <strong>{{personne.nom}} {{personne.prenom}}</strong></p>
             <p>Emploi : <strong>{{personne.fonction.designation}}</strong></p>
             <p>Matricule : <strong>{{personne.matricule}}</strong></p>
-            <p>Motif : <strong>{{permission.typepermission}}</strong></p>
+            <p>Motif : 
+                <strong>
+                {% if permission.typepermission == "autres" %}
+                    {{permission.motif}}
+                {% else %}
+                    {{permission.typepermission}}
+                {% endif %}
+                </strong>
+            </p>
             <p>Durée de l'absence : <strong class="strong1">{{permission.duree}}</strong> Du : <strong class="strong1"> {{permission.datedebut|date('d-m-Y')}}</strong> Au :<strong> {{permission.datefin|date('d-m-Y')}}</strong></p>
         </div>
 

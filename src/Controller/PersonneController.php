@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Entity\Personne;
 // use App\Service\MailerService;
+use App\Entity\Permission;
 use App\Form\PersonneType;
 use App\Service\UploaderService;
 use App\Repository\NoteRepository;
@@ -13,8 +14,8 @@ use App\Repository\PersonneRepository;
 use App\Repository\PermissionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\DeclarationRepository;
-use App\Repository\NotificationRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Repository\NotificationRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -34,6 +35,7 @@ class PersonneController extends AbstractController
         EntityManagerInterface $entityManager,
         UserInterface $user,
         PersonneRepository $personneRepository,
+        NotificationRepository $notificationRepository,
         int $id = 0
     ): Response {
         $agent = $personneRepository->find($id);
@@ -41,76 +43,176 @@ class PersonneController extends AbstractController
         $personne = $currentUser->getPersonne();
         $nbUser = $userRepository->count([]);
         $adminUserCount = $userRepository->count(['roles' => ['ROLE_ADMIN']]);
-        // $adminUserCount = $userRepository->countAdminAndUser();
         $nbPersonne = $personneRepository->count([]);
         $userRepository = $entityManager->getRepository(User::class);
         $users = $userRepository->findAll();
         $personneRepository = $entityManager->getRepository(Personne::class);
         $personnes = $personneRepository->findBy([], ['nom' => 'ASC','prenom' => 'ASC']);
-        return $this->render('admin-template.html.twig',['utilisateur'=>$user,'users'=>$users,'personnes'=>$personnes,'personne'=>$personne,'nbPersonne'=>$nbPersonne,'nbUser'=>$nbUser,'adminUserCount'=>$adminUserCount]);
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
+        return $this->render('admin-template.html.twig',[
+            'utilisateur'=>$user,
+            'users'=>$users,
+            'personnes'=>$personnes,
+            'personne'=>$personne,
+            'nbPersonne'=>$nbPersonne,
+            'nbUser'=>$nbUser,
+            'adminUserCount'=>$adminUserCount,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
+        ]);
     }
     #[Route('/cs/index/{id?0}', name: 'cs')]
     public function cs(PermissionRepository $permissionRepository,
         UserInterface $user,
         PersonneRepository $personneRepository,
+        EntityManagerInterface $entityManager,
+        NotificationRepository $notificationRepository,
         int $id = 0
     ): Response {
         $agent = $personneRepository->find($id);
         $currentUser = $this->getUser();
         $personne = $currentUser->getPersonne();
-        $nbPermission = $permissionRepository->count([]);
-        return $this->render('cs-template.html.twig',['utilisateur'=>$user,'personne'=>$personne,'nbPermission'=>$nbPermission]);
+        $repository = $entityManager->getRepository(Permission::class);
+        $qb = $repository->createQueryBuilder('p')
+            ->innerJoin('p.personne', 'per')
+            ->innerJoin('per.fonction', 'fonc')
+            ->where('fonc.designation = :designationAgent')
+            ->setParameters([
+                'designationAgent' => 'Agent', 
+            ]);
+    
+        $permissions = $qb->orderBy('p.datedebut', 'DESC')
+             ->getQuery()
+             ->getResult();
+        $nbPermission = count($permissions);
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
+        return $this->render('cs-template.html.twig',[
+            'utilisateur'=>$user,
+            'personne'=>$personne,
+            'nbPermission'=>$nbPermission,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
+        ]);
     }
     #[Route('/sd/index/{id}', name: 'sd')]
     public function sd(PermissionRepository $permissionRepository,
         NoteRepository $noteRepository,
         UserInterface $user,
+        EntityManagerInterface $entityManager,
         PersonneRepository $personneRepository,
-        int $id = 0
+        NotificationRepository $notificationRepository,
+        int $id = 0,
     ): Response {
         $agent = $personneRepository->find($id);
         $currentUser = $this->getUser();
         $personne = $currentUser->getPersonne();
-        $nbPermission = $permissionRepository->count([]);
-        $nbNote = $permissionRepository->count([]);
-        return $this->render('sd-template.html.twig',['utilisateur'=>$user,'personne'=>$personne,'nbPermission'=>$nbPermission,'nbNote'=>$nbNote]);
+        $repository = $entityManager->getRepository(Permission::class);
+         $qb = $repository->createQueryBuilder('p')
+             ->innerJoin('p.personne', 'per')
+             ->innerJoin('per.fonction', 'fonc')
+             ->where('fonc.designation = :designationAgent OR fonc.designation = :designationChefService')
+             ->setParameters([
+                 'designationAgent' => 'Agent', 
+                 'designationChefService' => 'Chef de service',
+             ]);
+     
+         $permissions = $qb->orderBy('p.datedebut', 'DESC')
+             ->getQuery()
+             ->getResult();
+     
+         $nbPermission = count($permissions);
+         $nbNote = count($personne->getNote());
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
+        return $this->render('sd-template.html.twig',[
+            'utilisateur'=>$user,
+            'personne'=>$personne,
+            'nbPermission'=>$nbPermission,
+            'nbNote'=>$nbNote,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
+        ]);
     }
     #[Route('/dir/index/{id}', name: 'dir')]
     public function dir(PermissionRepository $permissionRepository,
         NoteRepository $noteRepository,
         UserInterface $user,
         PersonneRepository $personneRepository,
+        EntityManagerInterface $entityManager,
+        NotificationRepository $notificationRepository,
         int $id = 0
     ): Response {
         $agent = $personneRepository->find($id);
         $currentUser = $this->getUser();
         $personne = $currentUser->getPersonne();
-        $nbPermission = $permissionRepository->count([]);
-        $nbNote = $permissionRepository->count([]);
-        return $this->render('dir-template.html.twig',['utilisateur'=>$user,'personne'=>$personne,'nbPermission'=>$nbPermission,'nbNote'=>$nbNote]);
+        $repository = $entityManager->getRepository(Permission::class);
+         $qb = $repository->createQueryBuilder('p')
+             ->innerJoin('p.personne', 'per')
+             ->innerJoin('per.fonction', 'fonc')
+             ->where('fonc.designation = :designationAgent OR fonc.designation = :designationChefService OR fonc.designation = :designationSD')
+             ->setParameters([
+                 'designationAgent' => 'Agent', 
+                 'designationChefService' => 'Chef de service',
+                 'designationSD' => 'Sous-directeur',
+             ]);
+     
+         $permissions = $qb->orderBy('p.datedebut', 'DESC')
+             ->getQuery()
+             ->getResult();
+    
+        $nbPermission = count($permissions);
+        $nbNote = count($personne->getNote());
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
+        return $this->render('dir-template.html.twig',[
+            'utilisateur'=>$user,
+            'personne'=>$personne,
+            'nbPermission'=>$nbPermission,
+            'nbNote'=>$nbNote,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
+        ]);
     }
-    #[Route('/dircab/index', name: 'dircab')]
+    #[Route('/fc/index/{id?0}', name: 'dircab')]
     public function dircab(
         NoteRepository $noteRepository,
         PermissionRepository $permissionRepository,
         UserInterface $user,
         PersonneRepository $personneRepository,
+        EntityManagerInterface $entityManager,
+        NotificationRepository $notificationRepository,
         int $id = 0
     ): Response {
         $agent = $personneRepository->find($id);
         $currentUser = $this->getUser();
         $personne = $currentUser->getPersonne();
-        $nbPermission = $permissionRepository->count([]);
-        $nbNote = $permissionRepository->count([]);
-        return $this->render('dircab-template.html.twig',['utilisateur'=>$user,'personne'=>$personne,'nbDeclaration' => $nbNote,'nbPermission'=>$nbPermission]);
+        $repository = $entityManager->getRepository(Permission::class);
+        $qb = $repository->createQueryBuilder('p')
+            ->innerJoin('p.personne', 'per')
+            ->innerJoin('per.fonction', 'fonc')
+            ->where('fonc.designation = :designation')
+            ->setParameter('designation', 'Directeur'); // Remplacez 'Directeur' par la désignation recherchée
+
+        $permissions = $qb->orderBy('p.datedebut', 'DESC')
+            ->getQuery()
+            ->getResult();
+        $nbPermission = count($permissions);
+        $nbNote = count($personne->getNote());
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
+        return $this->render('dircab-template.html.twig',[
+            'utilisateur'=>$user,
+            'personne'=>$personne,
+            'nbNote' => $nbNote,
+            'nbPermission'=>$nbPermission,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
+        ]);
     }
-    // #[Route('/ministre/index', name: 'ministre')]
-    // public function ministre(PermissionRepository $permissionRepository,UserInterface $user): Response
-    // {
-    //     $nbPermission = $permissionRepository->count([]);
-    //     return $this->render('ministre-template.html.twig',['utilisateur'=>$user,'nbPermission' => $nbPermission]);
-    // }
-    #[Route('/grh/index/{id?0}', name: 'grh')]
+
+    #[Route('grh/index/{id?0}', name: 'grh')]
     public function grh(
         PermissionRepository $permissionRepository,
         DeclarationRepository $declarationRepository,
@@ -124,16 +226,28 @@ class PersonneController extends AbstractController
         $agent = $personneRepository->find($id);
         $currentUser = $this->getUser();
         $personne = $currentUser->getPersonne();
-        $nbNote = $noteRepository->count([]);
-        $nbPermission = $permissionRepository->count([]);
+        $nbNote = count($personne->getNote());
+        $repository = $entityManager->getRepository(Permission::class);
+         $qb = $repository->createQueryBuilder('p')
+             ->innerJoin('p.personne', 'per')
+             ->innerJoin('per.fonction', 'fonc')
+             ->where('fonc.designation = :designationAgent OR fonc.designation = :designationChefService OR fonc.designation = :designationSD')
+             ->setParameters([
+                 'designationAgent' => 'Agent', 
+                 'designationChefService' => 'Chef de service',
+                 'designationSD' => 'Sous-directeur',
+             ]);
+     
+         $permissions = $qb->orderBy('p.datedebut', 'DESC')
+             ->getQuery()
+             ->getResult();
+    
+        $nbPermission = count($permissions);
         $nbDeclaration = $declarationRepository->count([]);
         
         $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
-        // dd($notifications);
-        // Marquer les notifications comme lues
-        foreach ($notifications as $notification) {
-            $notification->setLu(true);
-        }
+        $nbNotif = count($notifications);
+
         $entityManager->flush();
         return $this->render('grh-template.html.twig',[
             'utilisateur'=>$user,
@@ -142,23 +256,45 @@ class PersonneController extends AbstractController
             'nbDeclaration'=>$nbDeclaration,
             'nbNote'=>$nbNote,
             'notifications' => $notifications,
+            'nbNotif' => $nbNotif
         ]);
     }
-    #[Route('/user/index/{id?0}', name: 'user')]
+    #[Route('user/index/{id?0}', name: 'user')]
     public function user(UserRepository $userRepository,
         PermissionRepository $permissionRepository,
         DeclarationRepository $declarationRepository,
         UserInterface $user,
         PersonneRepository $personneRepository,
+        EntityManagerInterface $entityManager,
+        NotificationRepository $notificationRepository,
         int $id = 0
     ): Response {
         $agent = $personneRepository->find($id);
         $currentUser = $this->getUser();
         $personne = $currentUser->getPersonne();
-        $nbMesPermission = $permissionRepository->count(['personne' => $personne]);
         $nbMesDeclaration = $declarationRepository->count(['personne' => $personne]);
-        
-        return $this->render('user-template.html.twig',['utilisateur'=>$user,'personne'=>$personne,'nbMesPermission'=>$nbMesPermission,'nbMesDeclaration'=>$nbMesDeclaration]);
+
+        $permissionsCD = $personne->getPermission()->filter(function ($permission) {
+            return $permission->getDelai() <= 3;
+        });
+        $nbMesPermissionCD = count($permissionsCD);
+
+        $permissionsLD = $personne->getPermission()->filter(function ($permission) {
+            return $permission->getDelai() > 3;
+        });
+        $nbMesPermissionLD = count($permissionsLD);
+
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
+        return $this->render('user-template.html.twig',[
+            'utilisateur'=>$user,
+            'personne'=>$personne,
+            'nbPermissionCD'=>$nbMesPermissionCD,
+            'nbPermissionLD'=>$nbMesPermissionLD,
+            'nbMesDeclaration'=>$nbMesDeclaration,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
+        ]);
     }
     
     #[Route("/personne/delete-multiple", name:"personne.delete_multiple", methods:["POST", "DELETE"])]
@@ -192,12 +328,12 @@ class PersonneController extends AbstractController
     }
     #[Route('personne/liste/{id?0}', name: 'personne.liste')]
     public function indexAll(
-    UserInterface $user,
-    Personne $personne = null,
-    EntityManagerInterface $entityManager,
-    Request $request,
-    UploaderService $uploaderService,
-    // MailerService $mailer
+        UserInterface $user,
+        Personne $personne = null,
+        EntityManagerInterface $entityManager,
+        Request $request,
+        UploaderService $uploaderService,
+        NotificationRepository $notificationRepository
     ): Response {
         $new = false;
         if (!$personne) {
@@ -224,7 +360,6 @@ class PersonneController extends AbstractController
             }
 
             $entityManager->flush();
-
             $message = $new ? "a été ajouté avec succès" : "a été mis à jour avec succès";
             // $mailMessage = $personne->getNom() . ' ' . $personne->getPrenom() . ' ' . $message;
             $this->addFlash("success", $personne->getPrenom() . ' ' . $message);
@@ -235,12 +370,15 @@ class PersonneController extends AbstractController
         $repository = $entityManager->getRepository(Personne::class);
         $nbPersonne = $repository->count([]);
         $personnes = $repository->findAll();
-
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
         return $this->render('personne/liste-agent.html.twig', [
             'user' => $user,
             'form' => $form->createView(),
             'nbPersonne' => $nbPersonne,
             'personnes' => $personnes,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
         ]);
     }
     
@@ -251,7 +389,7 @@ class PersonneController extends AbstractController
         EntityManagerInterface $entityManager,
         Request $request,
         UploaderService $uploaderService,
-        // MailerService $mailer
+        NotificationRepository $notificationRepository
     ): Response {
         $new = false;
         if (!$personne) {
@@ -267,10 +405,18 @@ class PersonneController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $photo = $form->get('photo')->getData();
 
+            $signature = $form->get('signature')->getData();
             // Vérifie si une photo a été téléchargée
             if ($photo) {
                 $directory = $this->getParameter('image_personne_directory');
                 $personne->setImage($uploaderService->uploadFile($photo, $directory));
+            }
+
+
+            // Vérifie si une signature a été téléchargée
+            if ($signature) {
+                $directory_signature = $this->getParameter('image_signature_directory');
+                $personne->setSignature($uploaderService->uploadFile($signature, $directory_signature));
             }
 
             if ($new) {
@@ -280,17 +426,20 @@ class PersonneController extends AbstractController
             $entityManager->flush();
 
             $message = $new ? "a été ajouté avec succès" : "a été mis à jour avec succès";
-            $this->addFlash("success", $personne->getNom() . ' ' .$personne->getPrenom().' '.'de matricule '.$personne->getMatricule().' '. $message);
+            $this->addFlash("success",$personne->getCivilite().' '.$personne->getNom().' de matricule '.$personne->getMatricule() .' ' . $message);
             return $this->redirectToRoute('personne.liste');
         }
 
         $repository = $entityManager->getRepository(Personne::class);
         $personnes = $repository->findAll();
-
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
         return $this->render('personne/edit-agent.html.twig', [
             'form' => $form->createView(),
             'personnes' => $personnes,
-            'user' => $user
+            'user' => $user,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
         ]);
     }
 
@@ -301,7 +450,7 @@ class PersonneController extends AbstractController
         EntityManagerInterface $entityManager,
         Request $request,
         UploaderService $uploaderService,
-        // MailerService $mailer
+        NotificationRepository $notificationRepository
     ): Response {
         $new = false;
         if (!$personne) {
@@ -316,18 +465,19 @@ class PersonneController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $photo = $form->get('photo')->getData();
-            $signature = $form->get('signature')->getData();
 
-            // Vérifier si une photo a été téléchargée
-            if ($photo instanceof UploadedFile) {
-                $directory = $this->getParameter('image_signature_directory');
+            $signature = $form->get('signature')->getData();
+            // Vérifie si une photo a été téléchargée
+            if ($photo) {
+                $directory = $this->getParameter('image_personne_directory');
                 $personne->setImage($uploaderService->uploadFile($photo, $directory));
             }
 
-            // Vérifier si une signature a été téléchargé
-            if ($signature instanceof UploadedFile) {
-                $directory = $this->getParameter('image_signature_directory');
-                $personne->setSignature($uploaderService->uploadFile($signature, $directory));
+
+            // Vérifie si une signature a été téléchargée
+            if ($signature) {
+                $directory_signature = $this->getParameter('image_signature_directory');
+                $personne->setSignature($uploaderService->uploadFile($signature, $directory_signature));
             }
 
             // Vérifie si une photo a été téléchargée
@@ -337,30 +487,105 @@ class PersonneController extends AbstractController
             }
 
             $entityManager->flush();
+            $message = $new ? "a été ajouté avec succès" : "a été mis à jour avec succès";
+            $this->addFlash("success",$personne->getCivilite().' '.$personne->getNom().' de matricule '.$personne->getMatricule() .' ' . $message);
 
-            $this->addFlash("success",'Vos informations ont été mis à jour avec succès ');
             // return $this->redirectToRoute('personne.liste');
         }
 
         $repository = $entityManager->getRepository(Personne::class);
         $personnes = $repository->findAll();
-
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
         return $this->render('personne/edit-profile.html.twig', [
             'form' => $form->createView(),
             'personnes' => $personnes,
-            'user' => $user
+            'user' => $user,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
         ]);
     }
 
+    #[Route('personne/add/{id?0}', name: 'personne.add')]
+    public function add(
+        Personne $personne = null,
+        EntityManagerInterface $entityManager,
+        Request $request,
+        UploaderService $uploaderService,
+        UserInterface $user, 
+        NotificationRepository $notificationRepository
+    ): Response {
+
+        $new = false;
+        if (!$personne) {
+            $personne = new Personne();
+            $new = true;
+        }
+
+        $form = $this->createForm(PersonneType::class, $personne);
+        $form->remove('createdAt');
+        $form->remove('updatedAt');
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $photo = $form->get('photo')->getData();
+
+            $signature = $form->get('signature')->getData();
+            // Vérifie si une photo a été téléchargée
+            if ($photo) {
+                $directory = $this->getParameter('image_personne_directory');
+                $personne->setImage($uploaderService->uploadFile($photo, $directory));
+            }
+
+
+            // Vérifie si une signature a été téléchargée
+            if ($signature) {
+                $directory_signature = $this->getParameter('image_signature_directory');
+                $personne->setSignature($uploaderService->uploadFile($signature, $directory_signature));
+            }
+
+
+            $entityManager->persist($personne);
+            $entityManager->flush();
+
+            $message = $new ? "a été ajouté avec succès" : "a été mis à jour avec succès";
+            $this->addFlash("success",$personne->getCivilite().' '.$personne->getNom().' de matricule '.$personne->getMatricule() .' ' . $message);
+
+            return $this->redirectToRoute('personne.liste');
+        }
+        $repository = $entityManager->getRepository(Personne::class);
+        $personnes = $repository->findAll();
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
+        return $this->render('personne/edit-agent.html.twig', [
+            'form' => $form->createView(),
+            'personnes' => $personnes,
+            'user' => $user,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
+        ]);
+    }
 
     #[Route('/personne/{id<\d+>}', name: 'personne.detail')]
-    public function detail(Personne $personne = null,UserInterface $user){     
+    public function detail(
+        Personne $personne = null,
+        UserInterface $user,
+        NotificationRepository $notificationRepository
+    )
+    {
         if (!$personne) {
             $this->addFlash('error',"Agent inconnu");
             return $this->redirectToRoute('personne.liste');
 
         }
-        return $this->render('personne/show-information.html.twig',['personne'=>$personne,'user'=>$user]);
+        $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+        $nbNotif = count($notifications);
+        return $this->render('personne/show-information.html.twig',[
+            'personne'=>$personne,
+            'user'=>$user,
+            'notifications' => $notifications,
+            'nbNotif' => $nbNotif
+        ]);
 
     }
     
@@ -372,9 +597,9 @@ class PersonneController extends AbstractController
         if ($personne) {
             $entityManager->remove($personne);
             $entityManager->flush();
-            $this->addFlash('success', 'Personne supprimée avec succès');
+            $this->addFlash('success', 'Agent supprimée avec succès');
         } else {
-            $this->addFlash('error', 'Personne inexistante');
+            $this->addFlash('error', 'Agent inexistante');
         }
         
         return $this->redirectToRoute('personne.liste');

@@ -2,11 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\NotificationRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use Carbon\Carbon;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\NotificationRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: NotificationRepository::class)]
 class Notification
@@ -71,6 +72,13 @@ class Notification
         return $this->dateenvoi;
     }
 
+    public function getFormattedDateenvoi(): string
+    {
+        $carbonDatefin = Carbon::instance($this->dateenvoi);
+        $formattedDateenvoi = $carbonDatefin->locale('fr')->isoFormat('D MMMM YYYY [à] HH:mm');
+        return ucfirst($formattedDateenvoi);
+    }
+    
     public function setDateenvoi(?\DateTimeInterface $dateenvoi): self
     {
         $this->dateenvoi = $dateenvoi;

@@ -2,10 +2,12 @@
 
 namespace App\Form;
 
+use DateTime;
 use App\Entity\Personne;
 use App\Entity\Permission;
 use App\Entity\TypePermission;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\DBAL\Types\BigIntType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -17,6 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 
 class PermissionType extends AbstractType
 {
@@ -24,6 +27,7 @@ class PermissionType extends AbstractType
     {
         $builder
         ->add('typepermission',ChoiceType::class,[
+            // 'attr' => ['class' => 'mySelect'],
             'choices' => [
                 "Décès d'un ascendant ou d'un descendant en ligne directe" => "Décès d'un ascendant ou d'un descendant en ligne directe",
                 "Mariage de l'agent ou d'un enfant de l'agent" => "Mariage de l'agent ou d'un enfant de l'agent",
@@ -34,7 +38,7 @@ class PermissionType extends AbstractType
             "multiple" => false,
             'mapped' => true, 
             'label_attr' => ['class' => 'radio-label'],
-            'attr' => ['class' => 'radio-input'],
+            // 'attr' => ['class' => 'radio-input'],
 
             ])
             ->add('datedebut', DateType::class, [
@@ -42,6 +46,12 @@ class PermissionType extends AbstractType
                 'widget' => 'single_text',
                 'attr' => [
                     'autocomplete' => 'off',
+                ],
+                'constraints' => [
+                    new GreaterThanOrEqual([
+                        'value' => "today",
+                        'message' => 'La date de début ne peut pas être ultérieure à la date d\'aujourd\'hui.',
+                    ]),
                 ],
             ])
             ->add('datefin', DateType::class, [
@@ -65,6 +75,10 @@ class PermissionType extends AbstractType
                     'readonly' => 'readonly',
                     
                 ],
+            ])
+            ->add('delai', TextType::class, [
+                'label' => 'Durée de la permission',
+                
             ])
             ->add('motif', TextareaType::class, ['label' => "Saisir le motif de la permission"])
             ->add('statut', TextType::class, [

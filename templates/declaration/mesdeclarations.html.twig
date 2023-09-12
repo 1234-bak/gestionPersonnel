@@ -41,10 +41,10 @@
     
 {% endblock %}
 {% block editprofile %}
-    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Edit Profile</a>
+    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Editer Profile</a>
 {% endblock %}
 {% block showprofile %}
-    <a class="dropdown-item" href="{{path('user_show',{id: user.id})}}">Edit Profile</a>
+    <a class="dropdown-item" href="{{path('user_show',{id: user.id})}}">Mon Profile</a>
 {% endblock %}
 {% block notifpro %}
     <img alt="John Doe" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" class="img-fluid rounded-circle">
@@ -151,8 +151,25 @@
                             <input type="checkbox" name="declarations[]" class="declaration-checkbox" value="{{ declaration.id }}">
                         </td>
                         <td>{{declaration.typedeclaration}}</td>
-                        <td>{{declaration.datenaiss|date('d-m-Y')}}</td>
-                        <td>{{declaration.statut}}</td>
+                        <td>
+                            {% if declaration.typedeclaration is same as("Naissance") %}
+                                {{declaration.getFormattedDatenaiss}}
+                            {% elseif declaration.typedeclaration is same as("Décès agent") %}
+                                {{declaration.getFormattedDatedeces}}
+                            {% elseif declaration.typedeclaration is same as("Décès parent") %}
+                                {{declaration.getFormattedDatedeces}}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if declaration.statut == "en attente" %}
+                                <span style="font-size: 10px;padding: 6px 16px;color: var(--light);border-radius: 20px;font-weight: 700;background: orange;">{{declaration.statut}}</span>
+                            {% elseif declaration.statut == "validée" %}
+                                <span style="font-size: 10px;padding: 6px 16px;color: var(--light);border-radius: 20px;font-weight: 700;background: #2fdf84;">{{declaration.statut}}</span>
+                            {% elseif declaration.statut == "rejeté" %}
+                                <span style="font-size: 10px;padding: 6px 16px;color: var(--light);border-radius: 20px;font-weight: 700;background: red;">{{declaration.statut}}</span>
+                            {% endif %}
+                            
+                        </td>
                         <td class="text-right">
                             <a href="{{path('mesdeclaration.detail',{id: declaration.id})}}" class="btn btn-warning btn-sm mb-1">
                                 <i class="far fa-thin fa-eye text-light"></i>
@@ -178,6 +195,7 @@
 {% block javascripts %}
     <script>
         $(document).ready(function() {
+            $('.choice').select2();
         $('input[name="declaration[typedeclaration]"]').on('change', function() {
             var selectedValue = $(this).val();
 
@@ -204,6 +222,7 @@
 
             // Gestion de l'affichage du champ "hasProgrammeObsq" et "datedeces" pour "Décès agent" ou "Décès parent"
             if (selectedValue === 'Décès agent' || selectedValue === 'Décès parent') {
+                $('#fichierdeces').show();
                 $('#hasProgrammeObsq').show();
                 if ($('input[name="declaration[hasProgrammeObsq]"]:checked').val() === '1') {
                     $('#programmeobsq').show();
@@ -212,6 +231,7 @@
                 }
                 $('#datedeces').show();
             } else {
+                $('#fichierdeces').hide();
                 $('#hasProgrammeObsq').hide();
                 $('#programmeobsq').hide();
                 $('#datedeces').hide();

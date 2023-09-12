@@ -13,6 +13,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: NoteRepository::class)]
 class Note
 {
+    public const STATUT_EN_ATTENTE = 'en attente';
+    public const STATUT_DIFFUSEE = 'diffusée';
+
+    public function someMethod()
+    {
+        $statut = self::STATUT_EN_ATTENTE;
+    }
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -30,7 +37,7 @@ class Note
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $date = null;
 
-    #[ORM\ManyToOne(inversedBy: 'note')]    
+    #[ORM\ManyToOne(inversedBy: 'note')]   
     private ?Personne $personne = null;
 
     // #[ORM\Column(length: 255, nullable: true)]
@@ -54,9 +61,24 @@ class Note
     #[ORM\ManyToMany(targetEntity: Personne::class, inversedBy: 'notes')]
     private Collection $destinataire;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $statut = null;
+
+    #[ORM\ManyToMany(targetEntity: Personne::class, inversedBy: 'noteduservice')]
+    private Collection $service;
+
+    #[ORM\ManyToMany(targetEntity: Personne::class, inversedBy: 'notesd')]
+    private Collection $sousdirection;
+
+    #[ORM\ManyToMany(targetEntity: Personne::class, inversedBy: 'notedir')]
+    private Collection $direction;
+
     public function __construct()
     {
         $this->destinataire = new ArrayCollection();
+        $this->service = new ArrayCollection();
+        $this->sousdirection = new ArrayCollection();
+        $this->direction = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -223,6 +245,90 @@ class Note
     public function removeDestinataire(Personne $destinataire): self
     {
         $this->destinataire->removeElement($destinataire);
+
+        return $this;
+    }
+
+    public function getStatut(): ?string
+    {
+        return $this->statut;
+    }
+
+    public function setStatut(?string $statut): self
+    {
+        $this->statut = $statut;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Personne>
+     */
+    public function getService(): Collection
+    {
+        return $this->service;
+    }
+
+    public function addService(Personne $service): static
+    {
+        if (!$this->service->contains($service)) {
+            $this->service->add($service);
+        }
+
+        return $this;
+    }
+
+    public function removeService(Personne $service): static
+    {
+        $this->service->removeElement($service);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Personne>
+     */
+    public function getSousdirection(): Collection
+    {
+        return $this->sousdirection;
+    }
+
+    public function addSousdirection(Personne $sousdirection): static
+    {
+        if (!$this->sousdirection->contains($sousdirection)) {
+            $this->sousdirection->add($sousdirection);
+        }
+
+        return $this;
+    }
+
+    public function removeSousdirection(Personne $sousdirection): static
+    {
+        $this->sousdirection->removeElement($sousdirection);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Personne>
+     */
+    public function getDirection(): Collection
+    {
+        return $this->direction;
+    }
+
+    public function addDirection(Personne $direction): static
+    {
+        if (!$this->direction->contains($direction)) {
+            $this->direction->add($direction);
+        }
+
+        return $this;
+    }
+
+    public function removeDirection(Personne $direction): static
+    {
+        $this->direction->removeElement($direction);
 
         return $this;
     }

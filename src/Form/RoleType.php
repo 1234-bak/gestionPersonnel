@@ -23,7 +23,8 @@ class RoleType extends AbstractType
             ->add('createdAt')
             ->add('updatedAt')
             ->add('privilege',EntityType::class,[
-                'expanded' => true,
+                'attr' => ['class' => 'choice'],
+                'expanded' => false,
                 'class' => Privilege::class,
                 'required' => false,
                 'multiple' => true,

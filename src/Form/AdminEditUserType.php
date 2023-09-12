@@ -56,6 +56,7 @@ class AdminEditUserType extends AbstractType
             //     ],
             // ])
             ->add('roles',ChoiceType::class,[
+                'attr' => ['class' => 'choice'],
                 'label' => 'Choisir le rôle de l\'utilisateur',
                 'choices' => [
                     "Agent" => "ROLE_USER",

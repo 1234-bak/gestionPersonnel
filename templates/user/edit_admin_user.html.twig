@@ -138,10 +138,10 @@
     <a class="dropdown-item" href="{{path('user_show',{id: user.id})}}">Mon Profile</a>
 {% endblock %}
 {% block editprofile %}
-    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Editer Profile</a>
+    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Modifier son compte</a>
 {% endblock %}
 {% block editprofile2 %}
-    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Edit Profile</a>
+    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Créer un compte agent</a>
 {% endblock %}
 {% block notifpro %}
     <img alt="John Doe" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" class="img-fluid rounded-circle">
@@ -156,6 +156,7 @@
             <i class="fa fa-envelope"></i>
             {{ form_row(registrationForm.matricule,{
             'attr':{
+                'readonly': true,
                 'class': 'input',
             }
         }) }}
@@ -192,6 +193,10 @@
 
 {% block javascripts %}
     <script>
+        $(document).ready(function() {
+            $('.choice').select2();
+        
+        });
         function handleDelete() {
         event.preventDefault();
         if (confirm('Êtes-vous sûr de vouloir supprimer ?')) {

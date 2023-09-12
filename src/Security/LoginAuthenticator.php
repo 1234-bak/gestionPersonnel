@@ -68,11 +68,11 @@ class LoginAuthenticator extends AbstractLoginFormAuthenticator
         }
         elseif (in_array('ROLE_DIRCAB', $roles)) {
             return new RedirectResponse($this->urlGenerator->generate('dircab'));
-        } 
+        }
 
         elseif (in_array('ROLE_USER', $roles)) {
             return new RedirectResponse($this->urlGenerator->generate('user'));
-        } 
+        }
         
     }
 

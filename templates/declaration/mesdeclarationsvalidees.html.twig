@@ -41,10 +41,10 @@
     
 {% endblock %}
 {% block editprofile %}
-    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Edit Profile</a>
+    <a class="dropdown-item" href="{{path('user_edit',{id: user.id})}}">Editer Profil</a>
 {% endblock %}
 {% block showprofile %}
-    <a class="dropdown-item" href="{{path('user_show',{id: user.id})}}">Edit Profile</a>
+    <a class="dropdown-item" href="{{path('user_show',{id: user.id})}}">Mon Profil</a>
 {% endblock %}
 {% block notifpro %}
     <img alt="John Doe" src="{{ asset('uploads/image_personne/' ~ user.personne.image)}}" class="img-fluid rounded-circle">
@@ -125,7 +125,7 @@
     <div class="page-header">
     <div class="row">
     <div class="col-md-6">
-    <h3 class="page-title text-lowercase mb-0">Mes déclarations</h3>
+    <h3 class="page-title text-lowercase mb-0">Mes déclarations validées</h3>
     </div>
     <div class="col-md-6">
     <button class="float-right text-muted p-1" style="border: none;" data-toggle="modal" data-target="#newdeclaration"><i class="fa fa-solid fa-plus"></i> nouvelle déclaration </button>
@@ -141,7 +141,7 @@
                     <th>Type </th>
                     <th>Date</th>
                     <th>Statut</th>
-                    <th class="text-right">Action</th>
+                    <th class="text-right">Imprimer</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -151,17 +151,29 @@
                             <input type="checkbox" name="declarations[]" class="declaration-checkbox" value="{{ declaration.id }}">
                         </td>
                         <td>{{declaration.typedeclaration}}</td>
-                        <td>{{declaration.datenaiss|date('d-m-Y')}}</td>
-                        <td>{{declaration.statut}}</td>
+                        <td>
+                            {% if declaration.typedeclaration is same as("Naissance") %}
+                                {{declaration.getFormattedDatenaiss}}
+                            {% elseif declaration.typedeclaration is same as("Décès agent") %}
+                                {{declaration.getFormattedDatedeces}}
+                            {% elseif declaration.typedeclaration is same as("Décès parent") %}
+                                {{declaration.getFormattedDatedeces}}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if declaration.statut == "en attente" %}
+                                <span style="font-size: 10px;padding: 6px 16px;color: var(--light);border-radius: 20px;font-weight: 700;background: orange;">{{declaration.statut}}</span>
+                            {% elseif declaration.statut == "validée" %}
+                                <span style="font-size: 10px;padding: 6px 16px;color: var(--light);border-radius: 20px;font-weight: 700;background: #2fdf84;">{{declaration.statut}}</span>
+                            {% elseif declaration.statut == "rejeté" %}
+                                <span style="font-size: 10px;padding: 6px 16px;color: var(--light);border-radius: 20px;font-weight: 700;background: red;">{{declaration.statut}}</span>
+                            {% endif %}
+                            
+                        </td>
                         <td class="text-right">
-                            <a href="{{path('declaration.show',{id: declaration.id})}}" class="btn btn-warning btn-sm mb-1">
-                                <i class="far fa-thin fa-eye text-light"></i>
-                            </a>
-                            <a href="{{path('declaration.edit',{id: declaration.id})}}" class="btn btn-primary btn-sm mb-1">
-                                <i class="far fa-edit"></i>
-                            </a>
-                            <a href="{{path('declaration.annuler',{declarationId:declaration.id})}}" class="btn btn-danger btn-sm mb-1">
-                                <i class="fa-sharp fa-solid fa-xmark"></i>
+                            <a href="{{path('declarationvalidees.detail',{id: declaration.id})}}"  class="btn btn-outline-danger mr-2">
+                                <img src="{{asset('assets/asset/img/pdf.png')}}" alt="" height="18">
+                                <span class="ml-2">PDF</span>
                             </a>
                         </td>
                     </tr>
@@ -178,6 +190,7 @@
 {% block javascripts %}
     <script>
         $(document).ready(function() {
+            $('.choice').select2();
         $('input[name="declaration[typedeclaration]"]').on('change', function() {
             var selectedValue = $(this).val();
 
@@ -204,6 +217,7 @@
 
             // Gestion de l'affichage du champ "hasProgrammeObsq" et "datedeces" pour "Décès agent" ou "Décès parent"
             if (selectedValue === 'Décès agent' || selectedValue === 'Décès parent') {
+                $('#fichierdeces').show();
                 $('#hasProgrammeObsq').show();
                 if ($('input[name="declaration[hasProgrammeObsq]"]:checked').val() === '1') {
                     $('#programmeobsq').show();
@@ -212,6 +226,7 @@
                 }
                 $('#datedeces').show();
             } else {
+                $('#fichierdeces').hide();
                 $('#hasProgrammeObsq').hide();
                 $('#programmeobsq').hide();
                 $('#datedeces').hide();

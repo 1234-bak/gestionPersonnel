@@ -120,13 +120,13 @@
                                         <div class="col-md-12 form-group">
                                             <p><strong class="underline">Destinataires: </strong> Mesdames et Messieurs</p>
                                         </div>
-                                        <ul style="margin-left: 120px;">
+                                        {# <ul style="margin-left: 120px;">
                                             <li>le Chef de Cabinet</li>
                                             <li>l'Inspecteur Général</li>
                                             <li>le Président du conseil de Discipline</li>
                                             <li>les Directeurs Généraux</li>
                                             <li>les Directeurs Centraux</li>
-                                        </ul>
+                                        </ul> #}
                                         <div class="col-md-12 form-group">
                                             <br><br>
                                             <div class="col-md-12">
@@ -172,6 +172,7 @@
                                         <div class="btn-success col-md-12 mt-2" data-toggle="modal" data-target="#pj">
                                             <p class="temp">Pièce jointe: --------------------------------------------------------- </p>
                                         </div>
+                                        <span class="display: none;" data-toggle="modal" data-target="#statut"></span>
 
                                         <div class="col-md-8 form-group"></div>
                                         <div class="row float-right" style="display:flex; flex-direction: column">
@@ -195,6 +196,7 @@
     </section>
 
     {% include 'includes/templateedit/numref.html.twig' %}
+    {% include 'includes/templateedit/statut.html.twig' %}
     {% include 'includes/templateedit/objet.html.twig' %}
     {# {% include 'includes/templateedit/part1.html.twig' %}
     {% include 'includes/templateedit/part2.html.twig' %}

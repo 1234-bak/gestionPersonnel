@@ -1,0 +1,33 @@
+
+
+<div class="modal fade" id="statut" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <center><h5 class="modal-title">MODIFICATION NUMREF</h5></center>
+            <button type="button" class="close float-left" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            {{ form_row(form.statut, {
+                'attr': {
+                    'class': 'input',
+                    'style': 'width: 80% !important;border-top: none !important;border-left: none !important;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;',
+                    'value': "en attente"
+                }
+            }) }}
+          </div>
+          <div class="modal-footer">
+            <input type="submit" name="enregistrecorps3" value="Modifier" class="btn btn-success" data-dismiss="modal">
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Annuler</button>
+          </div>
+        </div>  
+    </div>
+  </div>
+
+  
+
+
+
+
+
+

@@ -23,6 +23,7 @@
 {# <link rel="stylesheet" href="{{asset('assets/asset/css/style2.css')}}"> #}
 <link rel="stylesheet" href="{{asset('node_modules/@fortawesome/fontawesome-free/css/all.min.css')}}" rel="stylsheet" />
 <link rel="stylesheet" href="{{asset('node_modules/sweetalert2/dist/sweetalert2.min.css')}}" />
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
 {% block stylesheets %}
     
@@ -64,6 +65,9 @@
 <li class="nav-item dropdown d-none d-sm-block">
 <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
 <img src="{{asset('assets/asset/img/sidebar/icon-22.png')}}" alt="">
+<span id="notif-counter" class="num" style="position: absolute;top: 14px;right: 14px;width: 20px;height: 20px;border-radius: 50%;border: 2px solid var(--light);background: var(--red);color: var(--light);font-weight: 700;font-size: 12px;display: flex;justify-content: center;align-items: center;">
+  {{nbNotif}}
+</span>
 </a>
 <div class="dropdown-menu notifications">
     <div class="topnav-dropdown-header">
@@ -73,22 +77,25 @@
         <ul class="notification-list">
             {% for notification in notifications %}
               {% for destinataire in notification.destinataire %}
-                  <li class="notification-message">
-                      <a href="#">
-                          <div class="media">
-                              <span class="avatar">
-                                  <img alt="{{ destinataire.matricule }}" src="{{ asset('uploads/image_personne/' ~ destinataire.image)}}" class="img-fluid rounded-circle">
-                              </span>
-                              <div class="media-body">
-                                  <p class="noti-details"><span class="noti-title">{{ destinataire.nom }}</span> {{ notification.message }}</p>
-                                  <p class="noti-time"><span class="notification-time">{{ notification.dateenvoi|date('d-m-Y H:i') }}</span></p>
-                              </div>
-                          </div>
-                      </a>
-                  </li>
+                  <a href="{{path('notification.delete',{id: notification.id})}}" class="mt-2 mb-2 pl-2">
+                    <li class="notification-message">
+                        {# <a href="#"> #}
+                            <div class="media" data-id={{ notification.id }}>
+                                <span class="avatar">
+                                    <img alt="photo destinataire" src="{{ asset('uploads/image_personne/' ~ destinataire.image)}}" class="img-fluid rounded-circle">
+                                </span>
+                                <div class="media-body">
+                                    <p class="noti-details"><span class="noti-title">{{ destinataire.nom }}</span> {{ notification.message }}</p>
+                                    <p class="noti-time"><span class="notification-time">{{ notification.getFormattedDateenvoi }}</span></p>
+                                </div>
+                            </div>
+                        {# </a> #}
+                    </li>
+                  </a>
               {% endfor %}
+          {% else %}
+              <center class="pt-5">Vous n'avez reçu aucune notification</center>
           {% endfor %}
-
         </ul>
     </div>
     <div class="topnav-dropdown-footer">
@@ -97,9 +104,7 @@
 </div>
 
 </li>
-<li class="nav-item dropdown d-none d-sm-block">
-<a href="javascript:void(0);" id="open_msg_box" class="hasnotifications nav-link"><img src="{{asset('assets/asset/img/sidebar/icon-23.png')}}" alt=""> </a>
-</li>
+
  <li class="nav-item dropdown has-arrow">
 <a href="#" class=" nav-link user-link" data-toggle="dropdown">
 <span class="user-img">
@@ -142,6 +147,7 @@
 <div id="sidebar-menu" class="sidebar-menu">
 <div class="header-left">
 <a href="#" class="logo">
+
 <img src="{{asset('assets/img/logomfp.jpeg')}}" width="40" height="40" alt="logomfp">
 <span class="text-uppercase">GPA-MFP</span>
 </a>
@@ -153,19 +159,21 @@
 </li>
 
 <li class="submenu">
-<a href="#"><img src="{{asset('assets/img/sidebar/nsicon.png')}}" alt="icon_note" style="width: 30px; height: 30px"> <span> Notes de services</span> <span class="menu-arrow"></span></a>
-<ul class="list-unstyled" style="display: none;">
-    <li><a href="{{path('note.create')}}"><span>Produire une note</span></a></li>
-    <li><a href="{{path('grh-note.liste')}}"><span>liste des notes</span></a></li>
-    <li><a href="#"><span>notes à diffuser</span></a></li>
-</ul>
+  <a href="#"><img src="{{asset('assets/img/sidebar/nsicon.png')}}" alt="icon_note" style="width: 30px; height: 30px"> <span> Notes de services</span> <span class="menu-arrow"></span></a>
+  <ul class="list-unstyled" style="display: none;">
+      <li><a href="{{path('note.create')}}"><span>Produire une note</span></a></li>
+      <li><a href="{{path('grh-note.liste')}}"><span>liste des notes</span></a></li>
+      <li><a href="{{path('grh-note2.liste')}}"><span>notes à diffuser</span></a></li>
+  </ul>
 </li>
 
 <li class="submenu">
 <a href="#"><img src="{{asset('assets/img/sidebar/permissionicon2.png')}}" alt="icon_permission" style="width: 30px; height: 30px"> <span> permissions</span> <span class="menu-arrow"></span></a>
 <ul class="list-unstyled" style="display: none;">
-    <li><a href="{{path('grh-permission.liste')}}"><span>liste des permissions</span></a></li>
-    <li><a href="#"><span>permissions à valider</span></a></li>
+    <li><a href="{{path('drh-permission.liste')}}"><span>liste courte durée</span></a></li>
+    <li><a href="{{path('grh-permission.liste')}}"><span>liste longue durée</span></a></li>
+    <li><a href="{{path('drh-permissionsNonValidees.afficher')}}"><span>Valider courte durée</span></a></li>
+    <li><a href="{{path('grh-permissionsNonValidees.afficher')}}"><span>Valider longue durée</span></a></li>
 </ul>
 </li>
 
@@ -173,29 +181,14 @@
 <a href="#"><img src="{{asset('assets/img/sidebar/declarationicon2.jpg')}}" alt="icon_declaration" style="width: 30px; height: 30px"> <span> Déclarations</span> <span class="menu-arrow"></span></a>
 <ul class="list-unstyled" style="display: none;">
     <li><a href="{{path('declaration.liste')}}"><span>Liste déclarations</span></a></li>
-    <li><a href="#"><span>valider déclarations</span></a></li>
+    <li><a href="{{path('declarationNonvalider.afficher')}}"><span>valider déclarations</span></a></li>
 </ul>
 </li>
 
-{# <li>
-<a href="#"><img src="{{asset('assets/img/sidebar/icon-14.png')}}" alt="icon"> <span>Paramètres</span></a>
-</li>
-
-<li class="menu-title">STATS</li>
-<li class="submenu">
-<a href="#"><img src="{{asset('assets/asset/img/sidebar/icon-27.png')}}" alt="icon"> <span> Statistiques</span> <span class="menu-arrow"></span></a>
-<ul class="list-unstyled" style="display: none;">
-<li><a href="#">naissances</a></li>
-<li><a href="#">décès</a></li>
-<li><a href="#">permission</a></li>
-</ul>
-</li> #}
-
 </ul>
 </div>
 </div>
 </div>
-
 
 <div class="page-wrapper">
 <div class="content container-fluid">
@@ -231,7 +224,7 @@
       <div class="dash-widget-info text-right">
         <span>TOTAL PERMISSIONS </span>
         <h3>{{nbPermission}} </h3><br>
-        <a href="{{path('grh-permission.liste')}}"><p style="color: #2fdf84"><i class="fa fa-info-circle"></i> Voir détails</p></a>
+        <a href="{{path('drh-permission.liste')}}"><p style="color: #2fdf84"><i class="fa fa-info-circle"></i> Voir détails</p></a>
       </div>
     </div>
   </div>
@@ -247,37 +240,6 @@
   </div>
 </div>
 
-
-{# <div class="row">
-<div class="col-lg-6 d-flex">
-<div class="card flex-fill">
-<div class="card-header">
-<div class="row align-items-center">
-<div class="col-auto">
-<div class="page-title">
-Aperçu des demandes permissions
-</div>
-</div>
-<div class="col text-right">
-<div class=" mt-sm-0 mt-2">
-<button class="btn btn-light" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-ellipsis-h"></i></button>
- <div class="dropdown-menu dropdown-menu-right">
-<a class="dropdown-item" href="#">Action</a>
-<div role="separator" class="dropdown-divider"></div>
-<a class="dropdown-item" href="#">Another action</a>
-<div role="separator" class="dropdown-divider"></div>
-<a class="dropdown-item" href="#">Something else here</a>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="card-body">
-<div id="chart1"></div>
-</div>
-</div>
-</div>
-</div> #}
 {% endblock %}
 <div class="notification-box">
 <div class="msg-sidebar notifications msg-noti">
@@ -501,6 +463,7 @@ Aperçu des demandes permissions
 {# <script src="{{asset('assets/asset/js/jquery.slimscroll.js')}}"></script> #}
  
 <script src="{{asset('assets/asset/js/select2.min.js')}}"></script>
+{# <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> #}
 <script src="{{asset('assets/asset/js/moment.min.js')}}"></script>
 
 <script src="{{asset('assets/asset/js/fullcalendar.min.js')}}"></script>
@@ -513,6 +476,7 @@ Aperçu des demandes permissions
 
 <script src="{{asset('assets/asset/js/app.js')}}"></script>
 <script src="{{asset('node_modules/sweetalert2/dist/sweetalert2.all.min.js')}}"></script>
+
 <script>
 		{% for flashMessage in app.session.flashbag.get('error') %}
 			Swal.fire({
@@ -530,6 +494,65 @@ Aperçu des demandes permissions
 			});
 		{% endfor %}
 	</script>
+  <script>
+    // JavaScript code
+    document.addEventListener('DOMContentLoaded', function () {
+        const notificationElements = document.querySelectorAll('.notification-message');
+
+        notificationElements.forEach(notificationElement => {
+        notificationElement.addEventListener('click', function () {
+            const notificationId = this.getAttribute('data-id');
+            // alert(notificationId);
+            // console.log('Notification ID:', notificationId); // Vérifiez la valeur dans la console
+            if (notificationId) {
+                    // Faire une requête AJAX pour marquer la notification comme lue
+                    // Utilisez l'URL appropriée et la méthode POST
+                    fetch('/marquer-notification-lue/' + notificationId, {
+                        method: 'POST'
+                    }).then(response => {
+                        if (response.ok) {
+                            // Décrémenter le compteur de notifications
+                            const notifCounter = document.getElementById('notif-counter');
+                            notifCounter.textContent = parseInt(notifCounter.textContent) - 1;
+                        }
+                    });
+                }
+            });
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const notifCounter = document.getElementById("notif-counter");
+
+        document.querySelectorAll(".notification-message a").forEach(link => {
+            link.addEventListener("click", function (event) {
+                // Empêche le comportement de lien par défaut
+                event.preventDefault();
+
+                // Décrémente le compteur de notifications
+                nbNotif--;
+                // Met à jour le contenu de l'élément <span>
+                notifCounter.textContent = nbNotif;
+
+                // Marque la notification comme lue via une requête AJAX
+                fetch(link.href, {
+                    method: 'POST', // Ou 'GET' si vous préférez
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({lu: true}), // Envoyez les données nécessaires
+                }).then(response => {
+                    // Gérez la réponse si nécessaire
+                    // Redirige vers l'URL du lien cliqué
+                    window.location.href = link.href;
+                }).catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    });
+</script>
+
 {% block javascripts %}
     
 {% endblock %}

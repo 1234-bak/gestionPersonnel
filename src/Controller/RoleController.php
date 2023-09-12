@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Role;
 use App\Form\RoleType;
+use App\Repository\NotificationRepository;
 // use App\Service\MailerService;
 use App\Service\UploaderService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,13 +19,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class RoleController extends AbstractController
 {
-    #[Route('/admin', name: 'admin.page')]
-    public function index(): Response
-    {
-        return $this->render('role/admin-template.html.twig', [
-            'controller_name' => 'RoleController',
-        ]);
-    }
 
     #[Route('role/liste/{id?0}', name: 'role.liste')]
     public function indexAll(
@@ -32,6 +26,7 @@ class RoleController extends AbstractController
     UserInterface $user,
     EntityManagerInterface $entityManager,
     Request $request,
+    NotificationRepository $notificationRepository
 ): Response {
     $new = false;
     if (!$role) {
@@ -58,16 +53,23 @@ class RoleController extends AbstractController
 
     $repository = $entityManager->getRepository(Role::class);
     $roles = $repository->findAll();
-
+    $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+    $nbNotif = count($notifications);
     return $this->render('role/liste-role.html.twig', [
         'form' => $form->createView(),
         'roles' => $roles,
-        'user' => $user
+        'user' => $user,
+        'notifications' => $notifications,
+        'nbNotif' => $nbNotif
+
     ]);
 }
 
     #[Route("/role/delete-multiple", name:"role.delete_multiple", methods:["POST"])]
-    public function deleteMultiple(Request $request, EntityManagerInterface $entityManager): Response
+    public function deleteMultiple(
+        Request $request,
+        EntityManagerInterface $entityManager,
+    ): Response
     {
         $rolesIds = $request->request->get('roles');
 
@@ -94,6 +96,7 @@ class RoleController extends AbstractController
     UserInterface $user,
     EntityManagerInterface $entityManager,
     Request $request,
+    NotificationRepository $notificationRepository
 ): Response {
     $new = false;
     if (!$role) {
@@ -120,11 +123,14 @@ class RoleController extends AbstractController
 
     $repository = $entityManager->getRepository(Role::class);
     $roles = $repository->findAll();
-
+    $notifications = $notificationRepository->findNotificationsForUser($user->getPersonne());
+    $nbNotif = count($notifications);
     return $this->render('role/edit-role.html.twig', [
         'form' => $form->createView(),
         'roles' => $roles,
-        'user' => $user
+        'user' => $user,
+        'notifications' => $notifications,
+        'nbNotif' => $nbNotif
     ]);
 }
     #[Route('/role/{id<\d+>}', name: 'role.detail')]

@@ -194,6 +194,14 @@
                 window.location.href = "{{ path('app_login') }}";
             });
         {% endfor %}
+
+		{% for flashMessage in app.session.flashbag.get('succes') %}
+			Swal.fire({
+				title: 'Succès',
+				text: '{{ flashMessage|e }}',
+				icon: 'success'
+			});
+        {% endfor %}
 	</script>
 	{% block javascripts %}
 		
